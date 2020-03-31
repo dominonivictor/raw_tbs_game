@@ -1,0 +1,4 @@
+
+START = 1
+BATTLE = 2
+PAUSE = 3
