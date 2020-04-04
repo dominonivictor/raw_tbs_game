@@ -1,4 +1,5 @@
-from components.components import Actor, Stat
+from components.actors import Actor, Stat
+from components.jobs import Guardian, Thief
 import components.commands as comm
 from constants.creature_constants import creature_stats
 
@@ -15,7 +16,15 @@ def create_commands_list(commands):
 
     return commands_list
 
-def create_actor(animal):
+def create_job(job):
+    if job is 'guardian':
+        job = Guardian()
+    elif job is 'thief':
+        job = Thief()
+
+    return job
+
+def create_actor(animal, job):
     animal = creature_stats[animal]
     name = animal["name"].capitalize()
     hp_stat = Stat(value=animal["hp"])
@@ -23,22 +32,34 @@ def create_actor(animal):
     atk_stat = Stat(value=animal["atk"])
     spd_stat = Stat(value=animal["spd"])
     commands = create_commands_list(animal["commands"])
-    actor = Actor(name=name, hp=hp_stat, def_stat=def_stat, atk_stat=atk_stat, spd_stat=spd_stat, commands=commands)
+    job = create_job(job)
+    actor = Actor(name=name, hp=hp_stat, def_stat=def_stat, 
+        atk_stat=atk_stat, spd_stat=spd_stat, commands=commands,
+        job=job)
 
     return actor
 
 def handle_character_choice(choice):
-    actor = ''
-    if choice is 't':
-        actor = create_actor("turtle")
+    animal = choice[0]
+    job = choice[1]
 
-    elif choice is 'f':
-        actor = create_actor("fox")
+    if animal is 't':
+        animal = "turtle"
 
-    elif choice is 'c':
-        actor = create_actor("chicken")
+    elif animal is 'f':
+        animal = "fox"
 
-    return actor
+    elif animal is 'c':
+        animal = "chicken"
+
+    if job is 'g':
+        job = "guardian"
+    elif job is 't':
+        job = "thief"
+    else:
+        job = None
+
+    return create_actor(animal, job)
 
 def handle_action(choice, owner, target):
     action = ''

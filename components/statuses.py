@@ -6,14 +6,17 @@ class StatusList():
     def __init__(self):
         self.list = []
 
+    def apply_initial_buffs(self):
+        for status in self.list:
+            status.target = self.owner
+            status.apply_buff()
+
     def add_status(self, status):
-        # status.owner = self.owner
         self.list.append(status)
 
     def _remove_status(self, status): 
         status.remove_status()   
         self.list.remove(status)
-
 
     def pass_time(self):
         msg_list = []
@@ -26,6 +29,8 @@ class StatusList():
                 msg_list.append(msg)
 
         return msg_list
+
+
 
 #VERY BASE OF ALL
 class Status():
@@ -67,6 +72,10 @@ class Buff(Status):
     def __init__(self, target=None, owner=None, name="Ronacse's Grace", timer=0, status_dict={}, category='buff'):
         super().__init__(name=name, value=0, timer=timer, target=target, owner=owner, category=category)
         self.status_dict = status_dict
+        if self.owner:
+            self.apply_buff()
+
+    def apply_buff(self):
         for attr, value in self.status_dict.items():
             old_value = getattr(getattr(self.target, attr), 'value')
             setattr(getattr(self.target, attr), 'value', old_value + value)

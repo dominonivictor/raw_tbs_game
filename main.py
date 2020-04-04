@@ -30,28 +30,28 @@ class Game():
             self.p1 = handle_character_choice(choice)
             choice = input(f"""\nChoose p2 character: """)
             self.p2 = handle_character_choice(choice)
-            print(f"p1: {self.p1.name} VS p2: {self.p2.name}")
+            print(f"p1: {self.p1.name}, the {self.p1.job.name} VS p2: {self.p2.name}, the {self.p2.job.name}")
             self.state = game_states.BATTLE
 
         elif self.state is game_states.BATTLE:
             print("++++++++++++++++ BATTLE ++++++++++++++++++++++")
             print(f""" 
             ----------------------------------------------------
-            P1 - {self.p1.name} 
+            P1 - {self.p1.name}, the {self.p1.job.name} 
             HP: {self.p1.hp.value}/{self.p1.max_hp.value}
             ATK: {self.p1.atk_stat.value} 
             DEF: {self.p1.def_stat.value}
             SPD: {self.p1.spd_stat.value}
             Status: {self.p1.show_statuses()}
-            Skills: {self.p1.show_commands()}
+            Commands: {self.p1.show_commands()}
             ----------------------------------------------------
-            P2 - {self.p2.name} 
+            P2 - {self.p2.name}, the {self.p2.job.name}
             HP: {self.p2.hp.value}/{self.p2.max_hp.value}
             ATK: {self.p2.atk_stat.value} 
             DEF: {self.p2.def_stat.value}
             SPD: {self.p2.spd_stat.value}
             Status: {self.p2.show_statuses()}
-            Skills: {self.p2.show_commands()}
+            Commands: {self.p2.show_commands()}
             ----------------------------------------------------
             """)
 
