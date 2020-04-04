@@ -1,5 +1,5 @@
-from statuses import StatusList
-from commands import CommandList
+from components.statuses import StatusList
+from components.commands import CommandList
 
 class Actor():
     def __init__(self, name, hp, def_stat, atk_stat, spd_stat, commands=[]):

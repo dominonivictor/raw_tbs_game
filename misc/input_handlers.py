@@ -1,6 +1,6 @@
-from components import Actor, Stat
-import commands as comm
-from creature_constants import creature_stats
+from components.components import Actor, Stat
+import components.commands as comm
+from constants.creature_constants import creature_stats
 
 def create_commands_list(commands):
     commands_list = []

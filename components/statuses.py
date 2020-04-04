@@ -1,5 +1,5 @@
-import commands as com
-import status_constants as cons
+import components.commands as com
+import constants.status_constants as cons
 
 
 class StatusList():

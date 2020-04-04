@@ -1,5 +1,5 @@
-import statuses as sts
-import commands_constants as con
+import components.statuses as sts
+import constants.commands_constants as con
 
 base_atk = 4
 base_heal = 3

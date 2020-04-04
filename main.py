@@ -1,21 +1,20 @@
-from commands import Attack, Heal, VampBite, PowerUp, Blessing
-import game_states
-from input_handlers import handle_action, handle_character_choice
+from components.commands import Attack, Heal, VampBite, PowerUp, Blessing
+import misc.game_states as game_states
+from misc.input_handlers import handle_action, handle_character_choice
 
 commands_options = """ choose an action:
-                - Attack (a)
-                - Heal (h)
-                - Toxic Shot (t)
-                - Vamp Bite (v)
-                - Power Up (p)
-                - Blessing (b)
-                - Sun Charge (s)
-                """
+    - Attack (a)
+    - Heal (h)
+    - Toxic Shot (t)
+    - Vamp Bite (v)
+    - Power Up (p)
+    - Blessing (b)
+    - Sun Charge (s)\n"""
 
 actor_choices = """ 
-                - Turtle (t)
-                - Fox (f)
-                - Chicken (c)\n\n"""
+    - Turtle (t)
+    - Fox (f)
+    - Chicken (c)\n"""
 
 class Game():
     def __init__(self):
@@ -27,9 +26,9 @@ class Game():
 
     def main_loop(self):
         if self.state == game_states.START:
-            choice = input(f"""Welcome, choose p1 character: {actor_choices} """)
+            choice = input(f"""{actor_choices} \nChoose p1 character: """)
             self.p1 = handle_character_choice(choice)
-            choice = input(f"""Welcome, choose p2 character: {actor_choices}""")
+            choice = input(f"""\nChoose p2 character: """)
             self.p2 = handle_character_choice(choice)
             print(f"p1: {self.p1.name} VS p2: {self.p2.name}")
             self.state = game_states.BATTLE
@@ -56,10 +55,10 @@ class Game():
             ----------------------------------------------------
             """)
 
-            choice = input(f"""P1 {commands_options}""")
+            choice = input(f"""P1, then P2 {commands_options}P1: \n""")
             action = handle_action(choice, owner=self.p1, target=self.p2)
             self.event_list.append(action)
-            choice = input(f"""P2 {commands_options}""")
+            choice = input("P2: \n")
             action = handle_action(choice, owner=self.p2, target=self.p1)
             self.event_list.append(action)
             self.state = game_states.PAUSE

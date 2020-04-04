@@ -60,3 +60,21 @@ creature_stats = {
         ]
     }
 }
+
+'''
+<animal here>"":{
+        "name": "",
+        "hp": ,
+        "atk": ,
+        "def": ,
+        "spd": ,
+        "race": "",
+        "commands":[
+            "vamp_bite",
+            "toxic_shot",
+            "power_up",
+            "attack"
+        ]
+    },
+
+'''
