@@ -20,7 +20,6 @@ class Actor():
         if self.job:
             self.job.owner = self
             self.job.initialize()
-            self.statuses.apply_initial_buffs()
 
     def show_statuses(self):
         statuses = ''
@@ -31,12 +30,14 @@ class Actor():
         return statuses
 
     def show_commands(self):
-        commands = ''
+        commands_str = ''
+        i = 1
         for command in self.commands.list:
-            commands = commands + f'{command.name}, '
+            commands_str = commands_str + f'({i}) {command.name} - '
+            i += 1
 
-        commands = commands[:-2] + '.'
-        return commands
+        commands_str = commands_str[:-2] + '.'
+        return commands_str
     
 class Stat():
     def __init__(self, value):

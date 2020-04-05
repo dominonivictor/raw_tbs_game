@@ -22,10 +22,10 @@ creature_stats = {
         "spd": base_spd,
         "race": "mamalia",
         "commands":[
+            "attack",
             "vamp_bite",
             "toxic_shot",
             "power_up",
-            "attack"
         ]
     },
     "turtle":{
@@ -36,13 +36,10 @@ creature_stats = {
         "spd": base_spd + spd_minus,
         "race": "reptalia",
         "commands":[
-            "sun_charge",
-            "vamp_bite",
-            "toxic_shot",
-            "power_up",
             "attack",
-            "heal",
-            "blessing"
+            "sun_charge",
+            "power_up",
+            "regen",
         ]
     },
     "chicken":{
@@ -53,10 +50,10 @@ creature_stats = {
         "spd": base_spd + spd_plus,
         "race": "aves",
         "commands":[
+            "attack",
             "vamp_bite",
             "toxic_shot",
             "power_up",
-            "attack",
         ]
     }
 }

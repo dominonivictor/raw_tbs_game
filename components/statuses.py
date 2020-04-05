@@ -6,13 +6,10 @@ class StatusList():
     def __init__(self):
         self.list = []
 
-    def apply_initial_buffs(self):
-        for status in self.list:
-            status.target = self.owner
-            status.apply_buff()
-
     def add_status(self, status):
         self.list.append(status)
+        status.apply_buff()
+        
 
     def _remove_status(self, status): 
         status.remove_status()   
@@ -41,6 +38,9 @@ class Status():
         self.target = target
         self.owner = owner
         self.category = category
+
+    def apply_buff(self):
+        pass
 
     def pass_time(self):
         self.timer -= 1
@@ -72,8 +72,6 @@ class Buff(Status):
     def __init__(self, target=None, owner=None, name="Ronacse's Grace", timer=0, status_dict={}, category='buff'):
         super().__init__(name=name, value=0, timer=timer, target=target, owner=owner, category=category)
         self.status_dict = status_dict
-        if self.owner:
-            self.apply_buff()
 
     def apply_buff(self):
         for attr, value in self.status_dict.items():
@@ -116,8 +114,9 @@ class SpdUp(Buff):
         super().remove_status()
 
 
-class Regen(HoT):
-    def __init__(self, target=None, owner=None, value=2, timer=3, name='regen', category='hot'):
+class Regenerating(HoT):
+    def __init__(self, target=None, owner=None, value=cons.REGENERATING["value"], timer=cons.REGENERATING["value"], 
+    name=cons.REGENERATING["name"], category=cons.REGENERATING["category"]):
         super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category)
         
     def pass_time(self):
@@ -125,7 +124,8 @@ class Regen(HoT):
         return {"msg": f"{self.target.name} heals {self.value} from Regen"}
 
 class Poisoned(DoT):
-    def __init__(self, target=None, owner=None, value=2, timer=2, name='poison', category='dot'):
+    def __init__(self, target=None, owner=None, value=cons.POISONED["value"], timer=cons.POISONED["timer"], 
+    name=cons.POISONED["name"], category=cons.POISONED["category"]):
         super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category)
         
     def pass_time(self):

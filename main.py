@@ -1,26 +1,32 @@
-from components.commands import Attack, Heal, VampBite, PowerUp, Blessing
+from components.commands import Attack, Heal, VampBite, PowerUp, Regen
 import misc.game_states as game_states
 from misc.input_handlers import handle_action, handle_character_choice
 
 commands_options = """ choose an action:
     - Attack (a)
     - Heal (h)
-    - Toxic Shot (t)
-    - Vamp Bite (v)
-    - Power Up (p)
-    - Blessing (b)
-    - Sun Charge (s)\n"""
+    - ToxicShot (t)
+    - VampBite (v)
+    - PowerUp (p)
+    - Regen (b)
+    - SunCharge (s)\n"""
 
 actor_choices = """ 
+    Animals:
     - Turtle (t)
     - Fox (f)
-    - Chicken (c)\n"""
+    - Chicken (c)
+    Jobs:
+    - Guardian (g)
+    - Thief (t)
+    \n"""
 
 class Game():
     def __init__(self):
         self.state = game_states.START
         self.log = []
         self.event_list = []
+        self.entities = []
         self.p1 = None
         self.p2 = None
 
@@ -33,9 +39,11 @@ class Game():
             print(f"p1: {self.p1.name}, the {self.p1.job.name} VS p2: {self.p2.name}, the {self.p2.job.name}")
             self.state = game_states.BATTLE
 
+            self.entities.extend([self.p1, self.p2])
+
         elif self.state is game_states.BATTLE:
-            print("++++++++++++++++ BATTLE ++++++++++++++++++++++")
-            print(f""" 
+            print(f"""
+            ++++++++++++++++++ BATTLE ++++++++++++++++++++++++++ 
             ----------------------------------------------------
             P1 - {self.p1.name}, the {self.p1.job.name} 
             HP: {self.p1.hp.value}/{self.p1.max_hp.value}
@@ -55,11 +63,15 @@ class Game():
             ----------------------------------------------------
             """)
 
-            choice = input(f"""P1, then P2 {commands_options}P1: \n""")
-            action = handle_action(choice, owner=self.p1, target=self.p2)
+            comm_num_choice = int(input(f"""P1 {self.p1.show_commands()} \n"""))
+            entity_num_choice = int(input(f"Targets: {self.show_entities()}"))
+            action = handle_action(comm_num=comm_num_choice, owner=self.p1, 
+            target_num=entity_num_choice, entities=self.entities)
             self.event_list.append(action)
-            choice = input("P2: \n")
-            action = handle_action(choice, owner=self.p2, target=self.p1)
+            comm_num_choice = int(input(f"""P2 {self.p2.show_commands()} \n"""))
+            entity_num_choice = int(input(f"Targets: {self.show_entities()}"))
+            action = handle_action(comm_num=comm_num_choice, owner=self.p2, 
+            target_num=entity_num_choice, entities=self.entities)
             self.event_list.append(action)
             self.state = game_states.PAUSE
             print("++++++++++++++++++++++++++++++++++++++++++++++")
@@ -82,8 +94,16 @@ class Game():
         
         self.event_list = []
 
+    def show_entities(self):
+        entity_str = ''
+        i = 1
+        for entity in self.entities:
+            entity_str = entity_str + f'({i}) {entity.name}, '
+            i += 1
 
-    
+        entity_str = entity_str[:-2] + '.'
+        return entity_str
+
 
 if __name__ == '__main__':
     game = Game()

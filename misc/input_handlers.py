@@ -4,6 +4,7 @@ import components.commands as comm
 from constants.creature_constants import creature_stats
 
 def create_commands_list(commands):
+    #not very scalable... needs improving
     commands_list = []
     for command in commands:
         if command == 'sun_charge': commands_list.append(comm.SunCharge())
@@ -12,7 +13,7 @@ def create_commands_list(commands):
         elif command == 'heal': commands_list.append(comm.Heal())
         elif command == 'vamp_bite': commands_list.append(comm.VampBite())
         elif command == 'power_up': commands_list.append(comm.PowerUp())
-        elif command == 'blessing': commands_list.append(comm.Blessing())
+        elif command == 'regen': commands_list.append(comm.Regen())
 
     return commands_list
 
@@ -61,24 +62,15 @@ def handle_character_choice(choice):
 
     return create_actor(animal, job)
 
-def handle_action(choice, owner, target):
-    action = ''
-    if choice is 'a':
-        action = comm.Attack(owner=owner, target=target)
-    elif choice is 'h':
-        action = comm.Heal(owner=owner, target=owner)
-    elif choice is 't':
-        action = comm.ToxicShot(owner=owner, target=target)
-    elif choice is 'v':
-        action = comm.VampBite(owner=owner, target=target)
-    elif choice is 'p':
-        action = comm.PowerUp(owner=owner, target=owner)
-    elif choice is 'b':
-        action = comm.Blessing(owner=owner, target=owner)
-    elif choice is 's':
-        action = comm.SunCharge(owner=owner, target=owner)
+def handle_action(comm_num, owner, target_num, entities):
+    # action shall come as a number indicating 
+    comm_num -= 1
+    target_num -= 1
 
-    return action
+    command = owner.commands.list[comm_num]
+    command.target = entities[target_num]
+    
+    return command
     
 
 commands_options = """ choose an action:
@@ -87,5 +79,5 @@ commands_options = """ choose an action:
                 - Toxic Shot (t)
                 - Vamp Bite (v)
                 - Power Up (p)
-                - Blessing (b)
+                - Regen (b)
                 """

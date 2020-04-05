@@ -24,6 +24,7 @@ class Job():
     def apply_passives(self):
         if self.owner:
             for passive in self.passives:
+                passive.target = self.owner
                 self.owner.statuses.add_status(passive)
             
 

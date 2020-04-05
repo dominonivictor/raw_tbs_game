@@ -1,15 +1,12 @@
 import components.statuses as sts
 import constants.commands_constants as con
 
-base_atk = 4
-base_heal = 3
-
 class CommandList():
     def __init__(self):
         self.list = []
 
     def add_command(self, command):
-        command.owner = self
+        command.owner = self.owner
         self.list.append(command)
 
     def _remove_command(self, command): 
@@ -27,8 +24,8 @@ class Command():
         self.category = category
 
 class Attack(Command):
-    def __init__(self, owner=None, target=None, value=base_atk, name="Attack Command", 
-    category="Basic Attack", is_raw=False):
+    def __init__(self, owner=None, target=None, value=con.ATTACK["value"], name=con.ATTACK["name"], 
+    category=con.ATTACK["category"], is_raw=con.ATTACK["is_raw"]):
         super().__init__(owner=owner, target=target, value=value, name=name, 
         category=category)
         self.is_raw = is_raw
@@ -60,9 +57,9 @@ class Attack(Command):
     #     self.target.hp.value = v + hp if hp + v <= max_hp else max_hp 
 
 class Heal(Command):
-    def __init__(self, owner=None, target=None, value=base_heal, name="Heal Command", 
-    category="Healing"):
-        super().__init__(owner=owner, target=target, value=value, name=name)
+    def __init__(self, owner=None, target=None, value=con.HEAL["value"], name=con.HEAL["name"], 
+    category=con.HEAL["category"], description=con.HEAL["description"]):
+        super().__init__(owner=owner, target=target, value=value, name=name, category=category, description=description)
 
     def execute(self):
         if(not self.target):return {"msg": "Target for Heal not selected"}
@@ -82,11 +79,11 @@ class Heal(Command):
     #     return {"msg": f"{self.owner.name} attacks {self.target.name} for {self.value} damage"}
 
 class VampBite(Command):
-    def __init__(self, owner=None, target=None, value=4, eff=0.5, name="Vampire Bite", 
-    category="Special Attack"):
+    def __init__(self, owner=None, target=None, value=con.VAMP_BITE["value"], eff=con.VAMP_BITE["eff"], name=con.VAMP_BITE["name"], 
+    category=con.VAMP_BITE["category"]):
         super().__init__(owner=owner, target=target, value=value, name=name)
         self.eff = eff
-
+ 
     def execute(self):
         atk_result = Attack(owner=self.owner, target=self.target, value=self.value).execute()
         heal_value = int(atk_result["final_value"]*self.eff)
@@ -113,11 +110,12 @@ class SunCharge(CommandWithStatus):
         super().__init__(owner=owner, target=target, status_dict=status_dict, name=name, description=description, category=category)
 
     def execute(self):
-        atk_stat = sts.AtkUp(target=self.target, status_dict={"atk_stat": self.status_dict["atk_stat"]}, timer=self.timer)
-        def_stat = sts.DefUp(target=self.target, status_dict={"def_stat": self.status_dict["def_stat"]}, timer=self.timer)
-        spd_stat = sts.SpdUp(target=self.target, status_dict={"spd_stat": self.status_dict["spd_stat"]},)
-        self.target.statuses.add_status(atk_stat)
-        self.target.statuses.add_status(def_stat)
+        atk_up = sts.AtkUp(target=self.target, status_dict={"atk_stat": self.status_dict["atk_stat"]}, timer=self.timer)
+        def_up = sts.DefUp(target=self.target, status_dict={"def_stat": self.status_dict["def_stat"]}, timer=self.timer)
+        spd_up = sts.SpdUp(target=self.target, status_dict={"spd_stat": self.status_dict["spd_stat"]}, timer=self.timer)
+        self.target.statuses.add_status(atk_up)
+        self.target.statuses.add_status(def_up)
+        self.target.statuses.add_status(spd_up)
         return {"msg": self.description}
 
 
@@ -138,19 +136,21 @@ class ToxicShot(CommandWithStatus):
         return {"msg": f"{self.target.name} takes {final_value} and is now poisoned for {self.timer} turns"}
 
 class PowerUp(CommandWithStatus):
-    def __init__(self, owner=None, target=None, value=2, timer=2, name="PowerUp"):
-        super().__init__(owner=owner, target=target, value=value, name=name, timer=timer)
+    def __init__(self, owner=None, target=None, status_dict=con.POWER_UP["status_dict"], timer=con.POWER_UP["timer"],
+     name=con.POWER_UP["name"], category=con.POWER_UP["category"]):
+        super().__init__(owner=owner, target=target, status_dict=status_dict, name=name, timer=timer)
 
     def execute(self):
-        atk_stat_status = sts.AtkUp(target=self.target, owner=self.owner)
+        atk_stat_status = sts.AtkUp(target=self.target, owner=self.owner, status_dict={"atk_stat": self.status_dict["atk_stat"]})
         self.target.statuses.add_status(atk_stat_status)
         return {"msg":f"{self.target.name} gets powered up!"}
 
-class Blessing(CommandWithStatus):
-    def __init__(self, owner=None, target=None, value=2, timer=2, name="Blessing"):
-        super().__init__(owner=owner, target=target, name=name )
+class Regen(CommandWithStatus):
+    def __init__(self, owner=None, target=None, value=con.REGEN["value"], timer=con.REGEN["timer"], 
+    name=con.REGEN["name"], description=con.REGEN["description"], category=con.REGEN["category"]):
+        super().__init__(owner=owner, target=target, name=name, timer=timer, description=description, category=category)
 
     def execute(self):
-        regen_status = sts.Regen(target=self.target, owner=self.owner)
+        regen_status = sts.Regenerating(target=self.target, owner=self.owner, value=self.value, timer=self.timer)
         self.target.statuses.add_status(regen_status)
         return {"msg": f"{self.target.name} starts regenning"}

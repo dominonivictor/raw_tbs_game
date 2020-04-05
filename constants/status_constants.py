@@ -36,3 +36,18 @@ SPD_UP = {
     },
     "category": "Minor Buff",
 }
+
+
+REGENERATING = {
+    "name":"Regenerating",
+    "value": 2,
+    "timer": 4,
+    "category": "HoT",
+}
+
+POISONED = {
+    "name": "Poisoned",
+    "value": 2,
+    "timer": 3,
+    "category": "DoT",
+}
