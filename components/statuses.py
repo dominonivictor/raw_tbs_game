@@ -29,15 +29,17 @@ class StatusList():
 
 
 
-#VERY BASE OF ALL
+#
 class Status():
-    def __init__(self, name="Curse of The Deep", value=0, timer=0, target=None, owner=None, category='The Deep'):
+    def __init__(self, name="Curse of The Deep", value=0, timer=0, target=None, owner=None, 
+    category='The Deep', status_dict={}):
         self.name = name
         self.value = value
         self.timer = timer
         self.target = target
         self.owner = owner
         self.category = category
+        self.status_dict = status_dict
 
     def apply_buff(self):
         pass
@@ -51,17 +53,17 @@ class Status():
 
 #BASE MAIN ARCHETYPES
 class DoT(Status):
-    def __init__(self, target=None, owner=None, name="Amaterasu", value=0, timer=0, category='dot'):
-        super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category)
+    def __init__(self, target=None, owner=None, name="Amaterasu", value=0, timer=0, category='dot', status_dict={}):
+        super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category, status_dict=status_dict)
 
     def pass_time(self):
         super().pass_time()
-        com.Attack(owner=self.owner, target=self.target, value=self.value, is_raw=True).execute()
+        com.Attack(owner=self.owner, target=self.target).deal_damage(damage=self.value)
         return {"msg": f"Basic DoT msg, value = {self.value}, current_timer = {self.timer}"}
 
 class HoT(Status):
-    def __init__(self, target=None, owner=None, value=0, timer=0, name="Seeds of Love", category='hot'):
-        super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category)
+    def __init__(self, target=None, owner=None, value=0, timer=0, name="Seeds of Love", category='hot', status_dict={}):
+        super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category, status_dict=status_dict)
 
     def pass_time(self):
         super().pass_time()
@@ -69,9 +71,8 @@ class HoT(Status):
         return {"msg": f"Basic HoT msg, value = {self.value}, current_timer = {self.timer}"}
 
 class Buff(Status):
-    def __init__(self, target=None, owner=None, name="Ronacse's Grace", timer=0, status_dict={}, category='buff'):
-        super().__init__(name=name, value=0, timer=timer, target=target, owner=owner, category=category)
-        self.status_dict = status_dict
+    def __init__(self, target=None, owner=None, name="Ronacse's Grace", timer=0, status_dict={}, category='buff', value=0):
+        super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category, status_dict=status_dict)
 
     def apply_buff(self):
         for attr, value in self.status_dict.items():
@@ -90,25 +91,28 @@ class Buff(Status):
 
 #ACTUAL SPECIFIC STATUSES
 class AtkUp(Buff):
-    def __init__(self, target=None, owner=None, timer=cons.ATK_UP["timer"], name=cons.ATK_UP["name"], 
+    def __init__(self, target=None, owner=None, timer=cons.ATK_UP["timer"], value=0, name=cons.ATK_UP["name"], 
     status_dict=cons.ATK_UP["status_dict"], category=cons.ATK_UP["category"]):
-        super().__init__(name=name, timer=timer, target=target, owner=owner, category=category, status_dict=status_dict)
+        super().__init__(name=name, timer=timer, target=target, owner=owner, category=category, 
+        status_dict=status_dict, value=value)
 
     def remove_status(self):
         super().remove_status()
 
 class DefUp(Buff):
-    def __init__(self, target=None, owner=None, timer=cons.DEF_UP["timer"],
+    def __init__(self, target=None, owner=None, timer=cons.DEF_UP["timer"], value=0,
     name=cons.DEF_UP["name"], status_dict=cons.DEF_UP["status_dict"], category='buff'):
-        super().__init__(name=name, timer=timer, target=target, owner=owner, category=category, status_dict=status_dict)
+        super().__init__(name=name, timer=timer, target=target, owner=owner, category=category, 
+        status_dict=status_dict, value=value)
 
     def remove_status(self):
         super().remove_status()
 
 class SpdUp(Buff):
-    def __init__(self, target=None, owner=None, timer=cons.SPD_UP["timer"],
+    def __init__(self, target=None, owner=None, timer=cons.SPD_UP["timer"], value=0,
     name=cons.SPD_UP["name"], status_dict=cons.SPD_UP["status_dict"], category='buff'):
-        super().__init__(name=name, timer=timer, target=target, owner=owner, category=category, status_dict=status_dict)
+        super().__init__(name=name, timer=timer, target=target, owner=owner, category=category, 
+        status_dict=status_dict, value=value)
 
     def remove_status(self):
         super().remove_status()
@@ -116,8 +120,9 @@ class SpdUp(Buff):
 
 class Regenerating(HoT):
     def __init__(self, target=None, owner=None, value=cons.REGENERATING["value"], timer=cons.REGENERATING["value"], 
-    name=cons.REGENERATING["name"], category=cons.REGENERATING["category"]):
-        super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category)
+    name=cons.REGENERATING["name"], category=cons.REGENERATING["category"], status_dict={}):
+        super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category,
+        status_dict=status_dict)
         
     def pass_time(self):
         super().pass_time()
@@ -125,9 +130,18 @@ class Regenerating(HoT):
 
 class Poisoned(DoT):
     def __init__(self, target=None, owner=None, value=cons.POISONED["value"], timer=cons.POISONED["timer"], 
-    name=cons.POISONED["name"], category=cons.POISONED["category"]):
-        super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category)
+    name=cons.POISONED["name"], category=cons.POISONED["category"], status_dict={}):
+        super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category, status_dict=status_dict)
         
     def pass_time(self):
         super().pass_time()
         return {"msg": f"{self.target.name} takes {self.value} to poison"}
+
+class Burned(DoT):
+    def __init__(self, target=None, owner=None, value=cons.BURNED["value"], timer=cons.BURNED["timer"], 
+    name=cons.BURNED["name"], category=cons.BURNED["category"], status_dict={}):
+        super().__init__(name=name, value=value, timer=timer, target=target, owner=owner, category=category, status_dict=status_dict)
+        
+    def pass_time(self):
+        super().pass_time()
+        return {"msg": f"{self.target.name} takes {self.value} to THE BURN"}

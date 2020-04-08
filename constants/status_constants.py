@@ -51,3 +51,10 @@ POISONED = {
     "timer": 3,
     "category": "DoT",
 }
+
+BURNED = {
+    "name": "Burned",
+    "value": 25,
+    "timer": 4,
+    "category": "DoT",
+}

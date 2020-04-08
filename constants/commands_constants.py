@@ -1,9 +1,6 @@
 '''
 {
     "name": ,
-    "status_dict": { #optional if command has stat buffs
-        <stat_name>: stat_value
-    },
     "timer": , #only for commands with statuses
     "value": , #only for commands that deal/heal <value> hp
     "description": ,
@@ -11,9 +8,15 @@
     "eff" : , #for now only for VampBite(), it shows the efficiency of the vampire bite heal
     "is_raw": , # default is False, only valid for commands that use Attack()
     # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+    "status_dict": { #optional if command has stat buffs
+        <status_name>: status_value
+    },
+    "command_dict": {
+        <command_name>: command_value
+    }
 }
 '''
-
+default = None
 base_atk = 3
 base_heal = 4
 base_buff = 2
@@ -55,7 +58,7 @@ SUN_CHARGE = {
         "spd_stat": base_buff
     },
     "timer": short_timer,
-    "description": "Sun Charge increases all stats by 2 for 1 turn. But where is light soon darkness will follow.",
+    "description": "Sun Charge increases all stats by 2 for 1 turn.",
     "category": "Greater Buff"
 }
 
@@ -63,6 +66,9 @@ TOXIC_SHOT = {
     "name": "Toxic Shot",
     "status_dict":{
         "poisoned": 2
+    },
+    "command_dict": {
+        "attack": 2,
     },
     "timer": mid_timer,
     "value": 2,
@@ -87,4 +93,7 @@ REGEN = {
     "value": base_heal//2, #only for commands that deal/heal <value> hp
     "description": "Owner starts to regenerate!",
     "category": "Healing",
+    "status_dict":{
+        "regen": base_heal//2
+    },
 }

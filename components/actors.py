@@ -2,7 +2,7 @@ from components.statuses import StatusList
 from components.commands import CommandList
 
 class Actor():
-    def __init__(self, name="Nameless", hp=666, def_stat=42, atk_stat=73, spd_stat=13, commands=[], job=None):
+    def __init__(self, name="Nameless", hp=666, def_stat=42, atk_stat=73, spd_stat=13, commands=[], job=None, equipment=None):
         self.name = name
         self.hp = hp
         self.max_hp = Stat(value=hp.value)
@@ -20,6 +20,10 @@ class Actor():
         if self.job:
             self.job.owner = self
             self.job.initialize()
+
+        self.equipment = equipment
+        if self.equipment:
+            self.equip()
 
     def show_statuses(self):
         statuses = ''
@@ -39,6 +43,19 @@ class Actor():
         commands_str = commands_str[:-2] + '.'
         return commands_str
     
+    def equip(self, item=None):
+        if not item:
+            self.equipment.owner = self
+            self.equipment.equip(self)
+        else:
+            item.owner = self
+            item.equip(owner=self)
+
+    def unequip(self):
+        self.equipment.unequip()
+        self.equipment.owner = None
+        self.equipment = None
+        
 class Stat():
     def __init__(self, value):
         self.value = value

@@ -1,15 +1,6 @@
-from components.commands import Attack, Heal, VampBite, PowerUp, Regen
 import misc.game_states as game_states
 from misc.input_handlers import handle_action, handle_character_choice
-
-commands_options = """ choose an action:
-    - Attack (a)
-    - Heal (h)
-    - ToxicShot (t)
-    - VampBite (v)
-    - PowerUp (p)
-    - Regen (b)
-    - SunCharge (s)\n"""
+import components.weapons as wpns
 
 actor_choices = """ 
     Animals:
@@ -26,22 +17,31 @@ class Game():
         self.state = game_states.START
         self.log = []
         self.event_list = []
-        self.entities = []
+        self.actors = []
+        self.equipments = [wpns.Dagger(), wpns.Zarabatana()]
         self.p1 = None
         self.p2 = None
 
     def main_loop(self):
         if self.state == game_states.START:
+            ########################## STARTING SCREEN ONLY SHOWN ONCE
             choice = input(f"""{actor_choices} \nChoose p1 character: """)
-            self.p1 = handle_character_choice(choice)
+            choice = choice if choice else 'tt'
+            equip_num_choice = input(f"Equipments for P1 {self.show_equipments()}")
+            equip_num_choice = int(equip_num_choice) if equip_num_choice else 1
+            self.p1 = handle_character_choice(choice, equip_num_choice, self.equipments)
             choice = input(f"""\nChoose p2 character: """)
-            self.p2 = handle_character_choice(choice)
-            print(f"p1: {self.p1.name}, the {self.p1.job.name} VS p2: {self.p2.name}, the {self.p2.job.name}")
+            choice = choice if choice else 'cg'
+            equip_num_choice = input(f"Equipments for P2 {self.show_equipments()}")
+            equip_num_choice = int(equip_num_choice) if equip_num_choice else 2
+            self.p2 = handle_character_choice(choice, equip_num_choice, self.equipments)
+            print(f"p1: {self.p1.name}-{self.p1.job.name}-{self.p1.equipment.name} VS p2: {self.p2.name}-{self.p2.job.name}-{self.p2.equipment.name}")
             self.state = game_states.BATTLE
 
-            self.entities.extend([self.p1, self.p2])
+            self.actors.extend([self.p1, self.p2])
 
         elif self.state is game_states.BATTLE:
+            ######################### BATTLE SHOWN 
             print(f"""
             ++++++++++++++++++ BATTLE ++++++++++++++++++++++++++ 
             ----------------------------------------------------
@@ -63,20 +63,26 @@ class Game():
             ----------------------------------------------------
             """)
 
-            comm_num_choice = int(input(f"""P1 {self.p1.show_commands()} \n"""))
-            entity_num_choice = int(input(f"Targets: {self.show_entities()}"))
+            comm_num_choice = input(f"""P1 {self.p1.show_commands()} \n""")
+            comm_num_choice = int(comm_num_choice) if comm_num_choice else 1
+            entity_num_choice = input(f"Targets for P1 {self.p1.name}: {self.show_actors()}")
+            entity_num_choice = int(entity_num_choice) if entity_num_choice else 1
             action = handle_action(comm_num=comm_num_choice, owner=self.p1, 
-            target_num=entity_num_choice, entities=self.entities)
+            target_num=entity_num_choice, actors=self.actors)
             self.event_list.append(action)
-            comm_num_choice = int(input(f"""P2 {self.p2.show_commands()} \n"""))
-            entity_num_choice = int(input(f"Targets: {self.show_entities()}"))
+            comm_num_choice = input(f"""P2 {self.p2.show_commands()} \n""")
+            comm_num_choice = int(comm_num_choice) if comm_num_choice else 1
+            entity_num_choice = input(f"Targets for P2 {self.p2.name}: {self.show_actors()}")
+            entity_num_choice = int(entity_num_choice) if entity_num_choice else 1
             action = handle_action(comm_num=comm_num_choice, owner=self.p2, 
-            target_num=entity_num_choice, entities=self.entities)
+            target_num=entity_num_choice, actors=self.actors)
             self.event_list.append(action)
             self.state = game_states.PAUSE
             print("++++++++++++++++++++++++++++++++++++++++++++++")
 
         elif self.state is game_states.PAUSE:
+            ############################### BATTLE RESULTS
+            import pdb; pdb.set_trace()
             print("========== IN BETWEEN TURNS ===============")
             msg_list = self.p1.statuses.pass_time()
             self.event_list.extend(msg_list)
@@ -90,19 +96,32 @@ class Game():
                 msg = event
             else:
                 msg = event.execute()
-            print(f"{msg['msg']}")
-        
+
+            if msg:
+                print(f"{msg.get('msg', f'no msg to show... {event}')}")
+            else:
+                print(f"{event}")
         self.event_list = []
 
-    def show_entities(self):
-        entity_str = ''
+    def show_actors(self):
+        actor_str = ''
         i = 1
-        for entity in self.entities:
-            entity_str = entity_str + f'({i}) {entity.name}, '
+        for actor in self.actors:
+            actor_str = actor_str + f'({i}) {actor.name}, '
             i += 1
 
-        entity_str = entity_str[:-2] + '.'
-        return entity_str
+        actor_str = actor_str[:-2] + '.'
+        return actor_str
+
+    def show_equipments(self):
+        equip_str = ''
+        i = 1
+        for equip in self.equipments:
+            equip_str = equip_str + f'({i}) {equip.name}, '
+            i += 1
+
+        equip_str = equip_str[:-2] + '.'
+        return equip_str
 
 
 if __name__ == '__main__':
