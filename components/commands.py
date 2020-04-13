@@ -39,6 +39,15 @@ class Command():
 
 
     def execute(self):
+        #probably start separating all this mess into smaller functions
+
+        owner_status_base_names = map(lambda x: x.base_name, self.owner.statuses.list)
+        target_status_base_names = map(lambda x: x.base_name, self.target.statuses.list)
+        if "stun" in owner_status_base_names: return {'msg': f"{self.owner.name} is stunned and can't move!"}
+        if "perfect_counter_stance" in target_status_base_names: 
+            self.target = self.owner
+
+        
         execution_dict = {}
         params_status = {
             "owner": self.owner,
@@ -59,7 +68,10 @@ class Command():
             "spd_stat": sts.SpdUp(**params_status),
             "regen": sts.Regenerating(**params_status),
             "poisoned": sts.Poisoned(**params_status),
-            "burned": sts.Burned(**params_status)
+            "burned": sts.Burned(**params_status),
+            "stunned": sts.Stunned(**params_status),
+            "enraged": sts.Enraged(**params_status),
+            "perfect_counter_stance": sts.PerfectCounterStance(**params_status),
         }
 
         for k, v in self.status_dict.items():
@@ -208,8 +220,29 @@ class Regen(Command):
     name=con.REGEN["name"], description=con.REGEN["description"], category=con.REGEN["category"],
     status_dict=con.REGEN["status_dict"]):
         super().__init__(owner=owner, target=target, name=name, timer=timer, description=description, 
-        category=category, status_dict=status_dict)
+        category=category, status_dict=status_dict, value=value)
 
     def execute(self):
         super().execute()
         return {"msg": f"{self.target.name} starts regenning"}
+
+class Rage(Command):
+    def __init__(self, owner=None, target=None, timer=con.RAGE["timer"], name=con.RAGE["name"], 
+    description=con.RAGE["description"], category=con.RAGE["category"], status_dict=con.RAGE["status_dict"]):
+        super().__init__(owner=owner, target=target, name=name, timer=timer, description=description, 
+        category=category, status_dict=status_dict)
+
+    def execute(self):
+        super().execute()
+        return {"msg": f"{self.target.name} is enraged (ATK +, DEF -)"}
+
+class PerfectCounter(Command):
+    def __init__(self, owner=None, target=None, timer=con.PERFECT_COUNTER["timer"], name=con.PERFECT_COUNTER["name"], 
+    description=con.PERFECT_COUNTER["description"], category=con.PERFECT_COUNTER["category"], 
+    status_dict=con.PERFECT_COUNTER["status_dict"]):
+        super().__init__(owner=owner, target=target, name=name, timer=timer, description=description, 
+        category=category, status_dict=status_dict)
+
+    def execute(self):
+        super().execute()
+        return {"msg": f"{self.target.name} is ready for anything!"}

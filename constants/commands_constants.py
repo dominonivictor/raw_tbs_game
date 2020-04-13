@@ -1,21 +1,3 @@
-'''
-{
-    "name": ,
-    "timer": , #only for commands with statuses
-    "value": , #only for commands that deal/heal <value> hp
-    "description": ,
-    "category": ,
-    "eff" : , #for now only for VampBite(), it shows the efficiency of the vampire bite heal
-    "is_raw": , # default is False, only valid for commands that use Attack()
-    # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
-    "status_dict": { #optional if command has stat buffs
-        <status_name>: status_value
-    },
-    "command_dict": {
-        <command_name>: command_value
-    }
-}
-'''
 default = None
 base_atk = 3
 base_heal = 4
@@ -97,3 +79,57 @@ REGEN = {
         "regen": base_heal//2
     },
 }
+
+RAGE = {
+    "name": "Rage",
+    "timer": 2, #only for commands with statuses
+    "description": "Someone is mad",
+    "category": "Major Buff",
+    "status_dict": { #optional if command has stat buffs
+        "enraged": 2
+    },
+}
+
+PERFECT_COUNTER = {
+    "name": "Perfect Counter",
+    "timer": 2, #only for commands with statuses
+    "description": "Full Counter",
+    "category": "Major Buff",
+    "status_dict": { #optional if command has stat buffs
+        "perfect_counter_stance": 2
+    },
+}
+
+SHIELD_BASH = {
+    "name": "Shield Bash",
+    "value": 5, #only for commands that deal/heal <value> hp
+    "description": "Bashy bash",
+    "category": "Utility Attack",
+    "is_raw": False, # default is False, only valid for commands that use Attack()
+    # if is_raw is True it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+    "status_dict": { #optional if command has stat buffs
+        "stunned": 2
+    },
+    "command_dict": {
+        "attack": 5
+    }
+}
+
+'''
+{
+    "name": ,
+    "timer": , #only for commands with statuses
+    "value": , #only for commands that deal/heal <value> hp
+    "description": ,
+    "category": ,
+    "eff" : , #for now only for VampBite(), it shows the efficiency of the vampire bite heal
+    "is_raw": , # default is False, only valid for commands that use Attack()
+    # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+    "status_dict": { #optional if command has stat buffs
+        <status_name>: status_value
+    },
+    "command_dict": {
+        <command_name>: command_value
+    }
+}
+'''

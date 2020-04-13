@@ -25,3 +25,21 @@ DAGGER = {
     "category": "meelee",
 
 }
+
+CAULDRON = {
+    "name": "Cauldron",
+    "value": 3,
+    "statuses": [],
+    "commands": [comm.Rage(name="Rage Soup")],
+    "category": "meelee",
+}
+
+SHIELD = {
+    "name": "Shield",
+    "value": 3,
+    "statuses": [sts.DefUp()],
+    "commands": [
+        comm.PerfectCounter(), 
+        comm.Attack(name="Shield Bash", value=3, status_dict={"stun": 2})],
+    "category": "meelee",
+}

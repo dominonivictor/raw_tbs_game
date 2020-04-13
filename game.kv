@@ -1,0 +1,98 @@
+#:kivy 1.11
+
+<PuzzleTile@ButtonBehavior+Label>
+    size_hint: None, None
+    size: 50, 50
+    on_press: 
+        self.parent.select_tile(target_tile=self)
+        
+    canvas.before:
+        Color:
+            rgba: self.rgba
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Line:
+            width: 1
+            rectangle: self.x, self.y, self.width, self.height
+
+BoxLayout:
+    orientation: 'horizontal'
+    #>>>>>>>>>>>>>>>>>>>> LEFT SIDE
+    BoxLayout:
+        orientation: 'vertical'
+        #>>>>>>>>>>>>>>>>>>>>>>>>> GRID
+        PuzzleGrid:
+            size_hint_y: 80
+            id: puzzle
+            rows: 1
+
+        #>>>>>>>>>>>>>>>>>>>>>>>>> Options Buttons
+        BoxLayout:
+            id: options
+            size_hint_y: 20
+            orientation: 'vertical'
+            MinorOptionsBox:
+                id: minor_options
+                canvas.before:
+                    Color:
+                        rgba: 0, 0.8, 0, 0.5
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+                Button:
+                    on_press: print("nice")
+            MajorOptionsBox:
+                id: major_options
+                BoxLayout:
+                    orientation: 'vertical'
+                    Button:
+                        text: "pass turn"
+                        on_press:
+                            puzzle.pass_turn()
+                    Button:
+                        text: "create grid"
+                        on_press: 
+                            puzzle.set_size()
+
+    #>>>>>>>>>>>>>>>>>>>>> RIGHT SIDE
+    BoxLayout:
+        orientation: 'vertical'
+        # >>>>>>>>>>>>>>>>>>>>>>>>> Stats Screen
+        BoxLayout:
+            orientation: 'vertical'
+            id: stats_screen
+            size_hint_y: 60
+            Label: 
+                id: debug_label
+                size_hint_y: 10
+                text: "Debug info here"
+                bgcolor: [0, 0.8, 0.1, 0.6]
+                canvas.before:
+                    Color:
+                        rgba: self.bgcolor
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            StatsPanel:
+                id: stats_panel
+                size_hint_y: 90
+                text: "Stats info here"
+
+        # >>>>>>>>>>>>>>>>>>>>>>>>>> LOG SCREEN
+        BoxLayout:  
+            orientation: 'vertical'
+            id: log_screen
+            size_hint_y: 40
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: 20
+                Button:
+                    text: "Back"
+                Button:
+                    text: "Next"
+
+            Label:
+                size_hint_y: 80
+                text: "LOG TEXT HERE"

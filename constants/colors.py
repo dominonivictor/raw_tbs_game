@@ -1,0 +1,3 @@
+CONFIRMED_BLUE = (0, 0, 1, 0.4)
+SELECTED_RED = (1, 0, 0, .2)
+BASIC_BLACK = (1, 1, 1, .2)

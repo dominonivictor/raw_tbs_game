@@ -50,3 +50,15 @@ class Dagger(Weapon):
     commands=con.DAGGER["commands"], category=con.DAGGER["category"]):
         super().__init__(name=name, value=value, statuses=statuses, commands=commands, 
         category=category)
+
+class Cauldron(Weapon):
+    def __init__(self, name=con.CAULDRON["name"], value=con.CAULDRON["value"], statuses=con.CAULDRON["statuses"], 
+    commands=con.CAULDRON["commands"], category=con.CAULDRON["category"]):
+        super().__init__(name=name, value=value, statuses=statuses, commands=commands, 
+        category=category)
+
+class Shield(Weapon):
+    def __init__(self, name=con.SHIELD["name"], value=con.SHIELD["value"], statuses=con.SHIELD["statuses"], 
+    commands=con.SHIELD["commands"], category=con.SHIELD["category"]):
+        super().__init__(name=name, value=value, statuses=statuses, commands=commands, 
+        category=category)
