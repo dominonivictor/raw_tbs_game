@@ -69,7 +69,7 @@ INCOME_UP = {
     "base_name": "buff",
     "timer": 2,
     "status_dict":{
-        "income": 2,
+        "income_stat": 2,
     },
     "category": "Minor Buff",
 }

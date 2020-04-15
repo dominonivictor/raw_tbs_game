@@ -1,5 +1,5 @@
 import components.statuses as sts
-import constants.commands_constants as con
+import constants.commands_cons as con
 
 class CommandList():
     def __init__(self):

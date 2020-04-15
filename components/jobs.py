@@ -32,6 +32,15 @@ class Job():
         if self.owner:
             for command in self.commands:
                 self.owner.commands.add_command(command)
+    
+    def unlearn(self):
+        if self.owner:
+            for command in self.commands:
+                self.owner.commands.remove_command(command)
+            for status in self.statuses:
+                self.owner.statuses.remove_status(status)
+
+            self.owner = None 
 
 
 class Guardian(Job):

@@ -1,6 +1,5 @@
 import misc.game_states as game_states
 from menus import initial_setup, show_battle_stats
-import components.weapons as wpns
 from player import Player
 
 

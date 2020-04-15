@@ -1,9 +1,9 @@
 from components.actors import Actor, Stat
 from components.jobs import Guardian, Thief, Merchant, Hunter, Cook
-from components.weapons import Zarabatana, Dagger, Cauldron, Shield
+from components.equips import Zarabatana, Dagger, Cauldron, Shield
 import components.commands as comm
 import menus
-from constants.creature_constants import creature_stats
+from constants.creature_cons import creature_stats
 
 
 def create_commands_list(commands):

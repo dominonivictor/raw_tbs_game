@@ -1,5 +1,5 @@
 import components.commands as com
-import constants.status_constants as cons
+import constants.status_cons as cons
 
 
 class StatusList():
@@ -9,9 +9,8 @@ class StatusList():
     def add_status(self, status):
         self.list.append(status)
         status.apply_buff()
-        
 
-    def _remove_status(self, status): 
+    def remove_status(self, status): 
         status.remove_status()   
         self.list.remove(status)
 
@@ -21,7 +20,7 @@ class StatusList():
             msg = s.pass_time()
             msg_list.append(msg)
             if s.timer == 0:
-                self._remove_status(s)
+                self.remove_status(s)
                 msg = {"msg": f"{s.name} ran out"}
                 msg_list.append(msg)
 
@@ -49,7 +48,6 @@ class Status():
     def remove_status(self):
         pass
 
-
 class Stunned(Status):
     def __init__(self, target=None, owner=None, base_name=cons.STUNNED["base_name"], timer=cons.STUNNED["timer"], value=0, name=cons.STUNNED["name"], 
     category=cons.STUNNED["category"], status_dict={}):
@@ -59,7 +57,6 @@ class PerfectCounterStance(Status):
     def __init__(self, target=None, owner=None, base_name=cons.PERFECT_COUNTER_STANCE["base_name"], timer=cons.PERFECT_COUNTER_STANCE["timer"], 
     value=0, name=cons.PERFECT_COUNTER_STANCE["name"], category=cons.PERFECT_COUNTER_STANCE["category"], status_dict={}):
         super().__init__(name=name, base_name=base_name, timer=timer, target=target, owner=owner, category=category, value=value, status_dict=status_dict)
-
 
 #BASE MAIN ARCHETYPES
 class DoT(Status):
@@ -98,7 +95,6 @@ class Buff(Status):
             old_value = getattr(getattr(self.target, attr), 'value')
             setattr(getattr(self.target, attr), 'value', old_value - value)
         
-
 #ACTUAL SPECIFIC STATUSES
 class AtkUp(Buff):
     def __init__(self, target=None, base_name=cons.ATK_UP["base_name"], owner=None, timer=cons.ATK_UP["timer"], value=0, name=cons.ATK_UP["name"], 

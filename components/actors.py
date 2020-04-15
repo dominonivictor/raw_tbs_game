@@ -51,17 +51,17 @@ class Actor():
         return commands_str
 
     def learn_job(self, job):
+        if self.job:
+            self.job.unlearn()
         job.owner = self
         self.job = job
         self.job.initialize()
-    
+
     def add_equip(self, item):
-        item.owner = self
         item.equip(owner=self)
 
     def unequip(self):
         self.equip.unequip()
-        self.equip.owner = None
         self.equip = None
 
     def show_battle_stats(self):
