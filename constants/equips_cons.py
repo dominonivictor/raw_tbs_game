@@ -40,6 +40,6 @@ SHIELD = {
     "statuses": [sts.DefUp()],
     "commands": [
         comm.PerfectCounter(), 
-        comm.Attack(name="Shield Bash", value=3, status_dict={"stun": 2})],
+        comm.Attack(name="Shield Bash", value=3, status_dict={"stunned": 2})],
     "category": "meelee",
 }

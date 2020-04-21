@@ -23,27 +23,32 @@ class CommandList():
         self.list.remove(command)
 
 class Command():
-    def __init__(self, owner=None, target=None, value=0, name="Abyssal Lord Command", 
-    description="Abyssal Lord Command Description", category="Abyssal", status_dict={}, 
-    timer=0, command_dict={}, is_raw=False):
-        self.name = name
-        self.description = description
-        self.category = category
-        self.owner = owner
-        self.target = target
-        self.value = value
-        self.timer = timer
-        self.is_raw = is_raw
-        self.status_dict = status_dict
-        self.command_dict = command_dict
+    def __init__(self, **kwargs):
+        self.name = kwargs.get('name', "Abyssal Lord Command")
+        self.description = kwargs.get('description', "Abyssal Lord Command Description")
+        self.category = kwargs.get('category', "Abyssal")
+        self.owner = kwargs.get('owner', None)
+        self.target = kwargs.get('target', None)
+        self.value = kwargs.get('value', 0)
+        self.timer = kwargs.get('timer', 0)
+        self.is_raw = kwargs.get('is_raw', False)
+        self.max_range = kwargs.get('max_range', 1)
+        self.status_dict = kwargs.get('status_dict', {})
+        self.command_dict = kwargs.get('command_dict', {})
 
 
     def execute(self):
         #probably start separating all this mess into smaller functions
 
-        owner_status_base_names = map(lambda x: x.base_name, self.owner.statuses.list)
-        target_status_base_names = map(lambda x: x.base_name, self.target.statuses.list)
-        if "stun" in owner_status_base_names: return {'msg': f"{self.owner.name} is stunned and can't move!"}
+        owner_status_base_names = list(map(lambda x: x.base_name, self.owner.statuses.list))
+        target_status_base_names = list(map(lambda x: x.base_name, self.target.statuses.list))
+
+        if "stunned" in owner_status_base_names: 
+            return {
+                'msg': f"{self.owner.name} is stunned and can't move!",
+                'valid_action': False,
+                'result': {"attack": "no attack", "final_value": 0}
+            }
         if "perfect_counter_stance" in target_status_base_names: 
             self.target = self.owner
 
@@ -54,13 +59,15 @@ class Command():
             "target": self.target,
             "value": self.value,
             "timer": self.timer,
-            "status_dict": {},
         }
         params_commands = {**params_status, **{"command_dict": {}}}
+
         commands = {
             "attack": Attack(**params_commands),
             "heal": Heal(**params_commands),
         }
+
+        #need to add status_dict[attr] to each individually
 
         statuses = {
             "atk_stat": sts.AtkUp(**params_status),
@@ -70,13 +77,14 @@ class Command():
             "poisoned": sts.Poisoned(**params_status),
             "burned": sts.Burned(**params_status),
             "stunned": sts.Stunned(**params_status),
-            "enraged": sts.Enraged(**params_status),
             "perfect_counter_stance": sts.PerfectCounterStance(**params_status),
         }
 
         for k, v in self.status_dict.items():
             status = statuses.get(k)
-            status.value = v if v else status.value
+            if self.target:
+                status.target = self.target
+            status.status_dict[k] = v 
             self.target.statuses.add_status(status)
 
         for k, v in self.command_dict.items():
@@ -90,13 +98,14 @@ class Command():
         }
 
 class Attack(Command):
-    def __init__(self, owner=None, target=None, value=con.ATTACK["value"], name=con.ATTACK["name"], 
-    category=con.ATTACK["category"], is_raw=con.ATTACK["is_raw"], timer=0, status_dict={}, command_dict={}):
-        super().__init__(owner=owner, target=target, value=value, name=name, category=category, 
-        timer=timer, status_dict=status_dict, command_dict=command_dict, is_raw=is_raw)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def execute(self):
-        super().execute()
+        result = super().execute()
+
+        if not result.get("valid_action", True):
+            return result
 
         name = self.owner.name
     
@@ -127,13 +136,13 @@ class Attack(Command):
     #     self.target.hp.value = v + hp if hp + v <= max_hp else max_hp 
 
 class Heal(Command):
-    def __init__(self, owner=None, target=None, value=con.HEAL["value"], name=con.HEAL["name"], 
-    category=con.HEAL["category"], description=con.HEAL["description"], is_raw=True, timer=None, 
-    status_dict={}, command_dict={}):
-        super().__init__(owner=owner, target=target, value=value, name=name, category=category, 
-        timer=timer, status_dict=status_dict, command_dict=command_dict, is_raw=is_raw)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def execute(self):
+        result = super().execute()
+        if not result.get("valid_action", True):
+            return result
         if(not self.target):return {"msg": "Target for Heal not selected, lost turn! :P"}
         try:
             name = self.owner.name
@@ -155,12 +164,14 @@ class VampBite(Command):
     '''
     wanted to make vampbite part of customizable stuff but maybe i can leave it as a base skill...
     '''
-    def __init__(self, owner=None, target=None, value=con.VAMP_BITE["value"], eff=con.VAMP_BITE["eff"], name=con.VAMP_BITE["name"], 
-    category=con.VAMP_BITE["category"]):
-        super().__init__(owner=owner, target=target, value=value, name=name)
-        self.eff = eff
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.eff = kwargs.get('eff', 0)
  
     def execute(self):
+        result = super().execute()
+        if not result.get("valid_action", True):
+            return result
         atk_result = Attack(owner=self.owner, target=self.target, value=self.value).execute()
         heal_value = int(atk_result["final_value"]*self.eff)
         Heal(owner=self.owner, target=self.owner, value=heal_value).execute()
@@ -184,9 +195,8 @@ class VampBite(Command):
 #         super().execute()
 
 class SunCharge(Command):
-    def __init__(self, owner=None, target=None, status_dict=con.SUN_CHARGE["status_dict"], name=con.SUN_CHARGE["name"], 
-    description=con.SUN_CHARGE["description"], category=con.SUN_CHARGE["category"]):
-        super().__init__(owner=owner, target=target, status_dict=status_dict, name=name, description=description, category=category)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def execute(self):
         super().execute()
@@ -194,11 +204,8 @@ class SunCharge(Command):
 
 #######################################################
 class ToxicShot(Command):
-    def __init__(self, owner=None, target=None, value=con.TOXIC_SHOT["value"], timer=con.TOXIC_SHOT["timer"], 
-    status_dict=con.TOXIC_SHOT["status_dict"], name=con.TOXIC_SHOT["name"],
-    category=con.TOXIC_SHOT["category"], command_dict=con.TOXIC_SHOT["command_dict"]):
-        super().__init__(owner=owner, target=target, value=value, name=name, timer=timer, status_dict=status_dict,
-        command_dict=command_dict)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         
     def execute(self):
         result = super().execute()
@@ -207,41 +214,32 @@ class ToxicShot(Command):
         return {"msg": f"{self.target.name} takes {final_value} and is now poisoned for {self.timer} turns"}
 
 class PowerUp(Command):
-    def __init__(self, owner=None, target=None, status_dict=con.POWER_UP["status_dict"], timer=con.POWER_UP["timer"],
-     name=con.POWER_UP["name"], category=con.POWER_UP["category"]):
-        super().__init__(owner=owner, target=target, status_dict=status_dict, name=name, timer=timer)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def execute(self):
         super().execute()
         return {"msg":f"{self.target.name} gets powered up!"}
 
 class Regen(Command):
-    def __init__(self, owner=None, target=None, value=con.REGEN["value"], timer=con.REGEN["timer"], 
-    name=con.REGEN["name"], description=con.REGEN["description"], category=con.REGEN["category"],
-    status_dict=con.REGEN["status_dict"]):
-        super().__init__(owner=owner, target=target, name=name, timer=timer, description=description, 
-        category=category, status_dict=status_dict, value=value)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def execute(self):
         super().execute()
         return {"msg": f"{self.target.name} starts regenning"}
 
 class Rage(Command):
-    def __init__(self, owner=None, target=None, timer=con.RAGE["timer"], name=con.RAGE["name"], 
-    description=con.RAGE["description"], category=con.RAGE["category"], status_dict=con.RAGE["status_dict"]):
-        super().__init__(owner=owner, target=target, name=name, timer=timer, description=description, 
-        category=category, status_dict=status_dict)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def execute(self):
         super().execute()
         return {"msg": f"{self.target.name} is enraged (ATK +, DEF -)"}
 
 class PerfectCounter(Command):
-    def __init__(self, owner=None, target=None, timer=con.PERFECT_COUNTER["timer"], name=con.PERFECT_COUNTER["name"], 
-    description=con.PERFECT_COUNTER["description"], category=con.PERFECT_COUNTER["category"], 
-    status_dict=con.PERFECT_COUNTER["status_dict"]):
-        super().__init__(owner=owner, target=target, name=name, timer=timer, description=description, 
-        category=category, status_dict=status_dict)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def execute(self):
         super().execute()

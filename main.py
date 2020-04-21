@@ -10,7 +10,7 @@ from game import Game
 
 import constants.colors as colors
 
-import controllers.grid_controller as grid_con
+import controllers.board_controller as board_con
 import controllers.buttons_controller as btn_con
 
 class StatsPanel(Label):
@@ -43,23 +43,23 @@ class PuzzleTile(ButtonBehavior, Label):
 class PuzzleGrid(Factory.GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.grid_size = 13
         self.rows = 1
         self.grid = []
-        self.initial_spaces = [(2, 2), (10, 2), (2, 10), (10, 10)]
-        self.game = Game()
-        grid_con.grid_clean_selected_things(grid_obj=self)
+        self.graph = {}
+        self.initial_spaces = [(2, 2), (6, 2), (10, 2), (2, 10), (2, 6), (10, 10), (6, 10), (10, 6)]
+        self.highlighted_tiles = []
+        self.game = Game(grid_size = self.grid_size)
+        board_con.board_clean_selected_things(board=self)
 
-    def create_grid(self, size=13):
-        grid_con.create_grid(grid_obj=self, size=size)
+    def create_grid(self):
+        board_con.create_grid(board=self, size=self.grid_size)
 
-    # This is getting wayyyyyyyy too big... but after making stuff work minimally i'll look into
-    # refactoring and removing stuff from here and putting in other files and stuff, here needs to be
-    # clean functions that makes me understand what's happening
     def select_tile(self, target_tile):
-        grid_con.select_tile(grid=self, target_tile=target_tile)
+        board_con.select_tile(board=self, target_tile=target_tile)
                 
     def pass_turn(self):
-        grid_con.pass_turn(grid_obj=self)
+        board_con.pass_turn(board=self)
 
 
 class GameApp(App):

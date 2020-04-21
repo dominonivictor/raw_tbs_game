@@ -28,23 +28,23 @@ def minor_box_update_list(box, new_list):
 
 def major_move_btn():
     app = App.get_running_app()
-    grid = app.root.ids.puzzle 
+    board = app.root.ids.puzzle 
 
-    if grid.selected_tile and grid.selected_tile.actor:
-        grid.state = gs.TARGETING
-        grid.selected_action = "move"
+    if board.selected_tile and board.selected_tile.actor:
+        board.state = gs.TARGETING
+        board.selected_action = "move"
         print("targeting mode")
     else:
         print("No actor selected")
 
 def major_btn_update_minor_box(new_list):
     app = App.get_running_app()
-    grid = app.root.ids.puzzle 
+    board = app.root.ids.puzzle 
     minor_box = app.root.ids.minor_options
     
     #needs to be commands    
-    grid.state = gs.TARGETING
-    grid.selected_action = "command"
+    board.state = gs.TARGETING
+    board.selected_action = "command"
     minor_box.update_commands_list(new_list) #jobs_list comes from import
     
 def gen_major_box_widgets(box):

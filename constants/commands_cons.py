@@ -12,14 +12,16 @@ ATTACK = {
     "value": base_atk, #only for commands that deal/heal <value> hp
     "description": "Gives a good old punch to the face",
     "category": "Basic Attack",  
-    "is_raw": False,  
+    "is_raw": False,
+    "max_range": 1,  
 }
 
 HEAL = {
     "name": "Healing Salve",
     "value": base_heal, #only for commands that deal/heal <value> hp
     "description": "Gives a healing salve to the target",
-    "category": "Basic Heal",    
+    "category": "Basic Heal",  
+    "max_range": 2, 
 }
 
 VAMP_BITE = {
@@ -30,6 +32,7 @@ VAMP_BITE = {
     "eff": vamp_bite_eff,
     "is_raw": False, # default is False, only valid for commands that use Attack()
     # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+    "max_range": 1,
 }
 
 SUN_CHARGE = {
@@ -41,7 +44,8 @@ SUN_CHARGE = {
     },
     "timer": short_timer,
     "description": "Sun Charge increases all stats by 2 for 1 turn.",
-    "category": "Greater Buff"
+    "category": "Greater Buff",
+    "max_range": 2,
 }
 
 TOXIC_SHOT = {
@@ -55,7 +59,8 @@ TOXIC_SHOT = {
     "timer": mid_timer,
     "value": 2,
     "description": "Shoots target and poisons for 3 turns",
-    "category": "Attack and DoT"
+    "category": "Attack and DoT",
+    "max_range": 3,
 }
 
 POWER_UP = {
@@ -67,6 +72,7 @@ POWER_UP = {
     "description": "Owner gets a bonus for its attack for 2",
     "category": "Minor Buff",
     # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+    "max_range": 2,
 }
 
 REGEN = {
@@ -78,6 +84,7 @@ REGEN = {
     "status_dict":{
         "regen": base_heal//2
     },
+    "max_range": 2,
 }
 
 RAGE = {
@@ -86,8 +93,10 @@ RAGE = {
     "description": "Someone is mad",
     "category": "Major Buff",
     "status_dict": { #optional if command has stat buffs
-        "enraged": 2
+        "atk_stat": 3,
+        "def_stat": -4,
     },
+    "max_range": 3,
 }
 
 PERFECT_COUNTER = {
@@ -98,6 +107,7 @@ PERFECT_COUNTER = {
     "status_dict": { #optional if command has stat buffs
         "perfect_counter_stance": 2
     },
+    "max_range": 0,
 }
 
 SHIELD_BASH = {
@@ -112,7 +122,8 @@ SHIELD_BASH = {
     },
     "command_dict": {
         "attack": 5
-    }
+    },
+    "max_range": 1,
 }
 
 '''
@@ -130,6 +141,7 @@ SHIELD_BASH = {
     },
     "command_dict": {
         <command_name>: command_value
-    }
+    },
+    "max_range": 1,
 }
 '''

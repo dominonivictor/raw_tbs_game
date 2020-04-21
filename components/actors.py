@@ -20,12 +20,11 @@ class Actor():
 
         self.job = job
         if self.job:
-            self.job.owner = self
-            self.job.initialize()
+            self.learn_job(job)
 
         self.equip = equip
         if self.equip:
-            self.equip()
+            self.add_equip(equip)
 
         self.x = x
         self.y = y

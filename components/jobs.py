@@ -2,11 +2,12 @@ from components.statuses import DefUp, SpdUp, AtkUp, MaxHpUp, IncomeUp
 from components.commands import SunCharge, ToxicShot
 
 class Job():
-    def __init__(self, owner=None, name="Jobless", category="good for nothing", commands=[], passives=[]):
-        self.name = name
-        self.category = category
-        self.commands = commands #which should be unique for each 
-        self.passives = passives #which are basically perma statuses!
+    def __init__(self, **kwargs):
+        self.owner = kwargs.get('owner', None)
+        self.name = kwargs.get('name', "Jobless")
+        self.category = kwargs.get('category', "good for nothing")
+        self.commands = kwargs.get('commands', []) #which should be unique for each 
+        self.passives = kwargs.get('passives', []) #which are basically perma statuses!
 
 
     def initialize(self):
@@ -37,7 +38,7 @@ class Job():
         if self.owner:
             for command in self.commands:
                 self.owner.commands.remove_command(command)
-            for status in self.statuses:
+            for status in self.passives:
                 self.owner.statuses.remove_status(status)
 
             self.owner = None 

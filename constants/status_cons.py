@@ -74,18 +74,6 @@ INCOME_UP = {
     "category": "Minor Buff",
 }
 
-ENRAGED = {
-    "name": "Enraged",
-    "base_name": "buff",
-    "timer": 2,
-    "status_dict":{
-        "atk_stat": 3,
-        "def_stat": -4,
-    },
-    "category": "Major Buff",
-}
-
-
 REGENERATING = {
     "name":"Regenerating",
     "base_name": "hot",

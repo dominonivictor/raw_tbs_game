@@ -16,12 +16,12 @@ class StatusList():
 
     def pass_time(self):
         msg_list = []
-        for s in self.list:
-            msg = s.pass_time()
+        for status in self.list:
+            msg = status.pass_time()
             msg_list.append(msg)
-            if s.timer == 0:
-                self.remove_status(s)
-                msg = {"msg": f"{s.name} ran out"}
+            if status.timer == 0:
+                self.remove_status(status)
+                msg = {"msg": f"{status.name} ran out"}
                 msg_list.append(msg)
 
         return msg_list
@@ -94,6 +94,8 @@ class Buff(Status):
         for attr, value in self.status_dict.items():
             old_value = getattr(getattr(self.target, attr), 'value')
             setattr(getattr(self.target, attr), 'value', old_value - value)
+
+        self.owner = None
         
 #ACTUAL SPECIFIC STATUSES
 class AtkUp(Buff):
@@ -140,16 +142,6 @@ class IncomeUp(Buff):
 
     def remove_status(self):
         super().remove_status()
-
-class Enraged(Buff):
-    def __init__(self, target=None, base_name=cons.ENRAGED["base_name"], owner=None, timer=cons.ENRAGED["timer"], value=0, name=cons.ENRAGED["name"], 
-    status_dict=cons.ENRAGED["status_dict"], category=cons.ENRAGED["category"]):
-        super().__init__(name=name, base_name=base_name, timer=timer, target=target, owner=owner, category=category, 
-        status_dict=status_dict, value=value)
-
-    def remove_status(self):
-        super().remove_status()
-
 
 class Regenerating(HoT):
     def __init__(self, target=None, base_name=cons.REGENERATING["base_name"], owner=None, value=cons.REGENERATING["value"], timer=cons.REGENERATING["value"], 

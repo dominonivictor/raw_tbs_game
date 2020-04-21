@@ -3,19 +3,20 @@ import constants.equips_cons as con
 
 class Equip():
     def __init__(self, name="Lostvayne", value=10, statuses=[], commands=[], category="Forgotten", owner=None, element=None):
-         self.name = name
-         self.value = value
-         self.statuses = statuses
-         self.commands = commands
-         self.category = category
-         self.element = element
-         self.owner = owner
+        self.name = name
+        self.value = value
+        self.statuses = statuses
+        self.commands = commands
+        self.category = category
+        self.element = element
+        self.owner = owner
 
     def equip(self, owner):
         self.owner = owner
         for command in self.commands:
             self.owner.commands.add_command(command)
         for status in self.statuses:
+            status.target = self.owner
             self.owner.statuses.add_status(status)
 
         self.owner.equip = self
