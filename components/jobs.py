@@ -1,5 +1,6 @@
 from components.statuses import DefUp, SpdUp, AtkUp, MaxHpUp, IncomeUp
 from components.commands import SunCharge, ToxicShot
+import constants.commands_cons as comm_cons
 
 class Job():
     def __init__(self, **kwargs):
@@ -45,21 +46,21 @@ class Job():
 
 
 class Guardian(Job):
-    def __init__(self, owner=None, name="Guardian", category="Tank", commands=[SunCharge()], passives=[DefUp(timer=-1)]):
+    def __init__(self, owner=None, name="Guardian", category="Tank", commands=[SunCharge(**comm_cons.SUN_CHARGE)], passives=[DefUp(timer=-1)]):
         super().__init__(owner=owner, name=name, category=category, commands=commands, passives=passives)
 
 class Thief(Job):
-    def __init__(self, owner=None, name="Thief", category="DPS?", commands=[ToxicShot()], passives=[SpdUp(timer=-1)]):
+    def __init__(self, owner=None, name="Thief", category="DPS?", commands=[ToxicShot(**comm_cons.TOXIC_SHOT)], passives=[SpdUp(timer=-1)]):
         super().__init__(owner=owner, name=name, category=category, commands=commands, passives=passives)
 
 class Hunter(Job):
-    def __init__(self, owner=None, name="Hunter", category="DPS", commands=[ToxicShot()], passives=[AtkUp(timer=-1)]):
+    def __init__(self, owner=None, name="Hunter", category="DPS", commands=[ToxicShot(**comm_cons.TOXIC_SHOT)], passives=[AtkUp(timer=-1)]):
         super().__init__(owner=owner, name=name, category=category, commands=commands, passives=passives)
 
 class Cook(Job):
-    def __init__(self, owner=None, name="Cook", category="Utility", commands=[ToxicShot()], passives=[MaxHpUp(timer=-1)]):
+    def __init__(self, owner=None, name="Cook", category="Utility", commands=[ToxicShot(**comm_cons.TOXIC_SHOT)], passives=[MaxHpUp(timer=-1)]):
         super().__init__(owner=owner, name=name, category=category, commands=commands, passives=passives)
 
 class Merchant(Job):
-    def __init__(self, owner=None, name="Merchant", category="Utility", commands=[ToxicShot()], passives=[IncomeUp(timer=-1)]):
+    def __init__(self, owner=None, name="Merchant", category="Utility", commands=[ToxicShot(**comm_cons.TOXIC_SHOT)], passives=[IncomeUp(timer=-1)]):
         super().__init__(owner=owner, name=name, category=category, commands=commands, passives=passives)

@@ -2,8 +2,11 @@ from components.statuses import StatusList
 from components.commands import CommandList
 
 class Actor():
-    def __init__(self, name="Nameless", x=0, y=0, hp=666, def_stat=42, atk_stat=73, spd_stat=13, income_stat=23, commands=[], job=None, equip=None):
+    def __init__(self, x=0, y=0, name="Nameless", letter="X", kingdom="No kingdom", animal="scrub", hp=666, def_stat=42, atk_stat=73, spd_stat=13, income_stat=23, commands=[], job=None, equip=None):
         self.name = name
+        self.letter = letter
+        self.kingdom = kingdom
+        self.animal = animal
         self.hp = hp
         self.max_hp = Stat(value=hp.value)
         self.def_stat = def_stat 
@@ -66,6 +69,8 @@ class Actor():
     def show_battle_stats(self):
         string = f"""
         Name: {self.name}
+        Animal: {self.animal}
+        Kingdom: {self.kingdom}
         HP: {self.hp.value}/{self.max_hp.value}
         ATK: {self.atk_stat.value}
         DEF: {self.def_stat.value}

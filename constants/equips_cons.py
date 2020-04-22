@@ -1,5 +1,6 @@
 import components.statuses as sts
 import components.commands as comm
+import constants.commands_cons as comm_con
 '''
 {
     "name": ,
@@ -13,7 +14,9 @@ ZARABA = {
     "name": "Zarabatana",
     "value": 5,
     "statuses": [],
-    "commands": [comm.ToxicShot(name="Zulu Toxin Shot", value=5, status_dict={"poisoned": 4})],
+    "commands": [
+        comm.ToxicShot(**comm_con.ZARABA_SHOT)
+    ],
     "category": "ranged",
 }
 
@@ -21,7 +24,7 @@ DAGGER = {
     "name": "Dagger",
     "value": 10,
     "statuses": [],
-    "commands": [comm.Attack(name="Slash", value=10, is_raw=True)],
+    "commands": [comm.Attack(**comm_con.DAGGER_ATTACK)],
     "category": "meelee",
 
 }
@@ -30,7 +33,7 @@ CAULDRON = {
     "name": "Cauldron",
     "value": 3,
     "statuses": [],
-    "commands": [comm.Rage(name="Rage Soup")],
+    "commands": [comm.Rage(**comm_con.RAGE_SOUP)],
     "category": "meelee",
 }
 
@@ -40,6 +43,7 @@ SHIELD = {
     "statuses": [sts.DefUp()],
     "commands": [
         comm.PerfectCounter(), 
-        comm.Attack(name="Shield Bash", value=3, status_dict={"stunned": 2})],
+        comm.Attack(**comm_con.SHIELD_BASH_ATTACK)
+    ],
     "category": "meelee",
 }

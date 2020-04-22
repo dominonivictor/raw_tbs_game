@@ -1,29 +1,30 @@
 
-base_hp = 100
+base_hp = 25
 base_atk = 3
 base_def = 1
 base_spd = 4
 base_income = 1
 
-hp_plus = 0
-hp_minus = 0
+hp_plus = 5
+hp_minus = -3
 atk_plus = 2
 atk_minus = -1
-def_plus = 1
+def_plus = 2
 def_minus = -1
-spd_plus = 2
+spd_plus = 1
 spd_minus = -1
 
 creature_stats = {
     "f":{
         "animal": "fox",
-        "name": "Foxius",
+        "letter": "F",
+        "name": "Rogue",
         "hp": base_hp + hp_minus,
         "atk": base_atk + atk_plus,
         "def": base_def,
         "spd": base_spd,
         "income": base_income,
-        "race": "mamalia",
+        "kingdom": "mamalia",
         "commands":[
             "attack",
             "vamp_bite",
@@ -33,13 +34,14 @@ creature_stats = {
     },
     "t":{
         "animal": "turtle",
-        "name": "Turtlus",
+        "letter": "T",
+        "name": "Kami",
         "hp": base_hp + hp_plus,
         "atk": base_atk + atk_minus,
         "def": base_def + def_plus,
         "spd": base_spd + spd_minus,
         "income": base_income,
-        "race": "reptalia",
+        "kingdom": "reptalia",
         "commands":[
             "attack",
             "sun_charge",
@@ -49,13 +51,14 @@ creature_stats = {
     },
     "c":{
         "animal": "chicken",
-        "name": "Chickenus",
+        "letter": "C",
+        "name": "Bugh Cohk",
         "hp": base_hp + hp_minus,
         "atk": base_atk + atk_plus,
         "def": base_def + def_minus,
         "spd": base_spd + spd_plus,
         "income": base_income,
-        "race": "aves",
+        "kingdom": "aves",
         "commands":[
             "attack",
             "vamp_bite",
@@ -65,13 +68,14 @@ creature_stats = {
     },
     "a":{
         "animal": "alligator",
-        "name": "Alligatus",
+        "letter": "A",
+        "name": "Shrek",
         "hp": base_hp,
         "atk": base_atk + atk_plus,
         "def": base_def,
         "spd": base_spd + spd_minus,
         "income": base_income,
-        "race": "reptalia",
+        "kingdom": "reptalia",
         "commands":[
             "sun_charge",
             "toxic_shot",
@@ -80,14 +84,15 @@ creature_stats = {
         ]
     },
     "p":{
-        "animal": "capybara",
-        "name": "Capyus",
+        "animal": "platypus",
+        "letter": "P",
+        "name": "Perry",
         "hp": base_hp + hp_minus,
         "atk": base_atk + atk_plus,
         "def": base_def + def_plus,
         "spd": base_spd + spd_minus,
         "income": base_income,
-        "race": "mamalia",
+        "kingdom": "mamalia",
         "commands":[
             "vamp_bite",
             "toxic_shot",
@@ -97,13 +102,14 @@ creature_stats = {
     },
     "o":{
         "animal": "owl",
+        "letter": "O",
         "name": "Owrly",
         "hp": base_hp,
         "atk": base_atk + atk_plus,
         "def": base_def + def_minus,
         "spd": base_spd,
         "income": base_income,
-        "race": "aves",
+        "kingdom": "aves",
         "commands":[
             "vamp_bite",
             "toxic_shot",
@@ -116,12 +122,13 @@ creature_stats = {
 '''
     "":{
         "animal": ,
+        "letter": ,
         "name": "",
         "hp": ,
         "atk": ,
         "def": ,
         "spd": ,
-        "race": "",
+        "kingdom": "",
         "commands":[
             "vamp_bite",
             "toxic_shot",

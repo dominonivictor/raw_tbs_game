@@ -5,12 +5,19 @@ import misc.game_states as gs
 
 from components.jobs_commands import jobs_list
 from components.equips_commands import equips_list
+from controllers.board_controller import highlight_attackable_spaces, clean_tiles
 
 def minor_btn_on_press(minor_btn):
     app = App.get_running_app()
-    app.root.ids.puzzle.selected_action = "command"
-    app.root.ids.puzzle.selected_command = minor_btn.command
-    app.root.ids.puzzle.state = gs.TARGETING
+    board = app.root.ids.puzzle
+    board.selected_action = "command"
+    command = minor_btn.command
+    board.selected_command = command
+    start_tile = board.selected_tile
+    
+    clean_tiles(board.highlighted_tiles, board)
+    highlight_attackable_spaces(command, start_tile)
+    board.state = gs.TARGETING
 
 
 def minor_box_update_list(box, new_list):
@@ -28,14 +35,15 @@ def minor_box_update_list(box, new_list):
 
 def major_move_btn():
     app = App.get_running_app()
+    log_text = app.root.ids.log_text
     board = app.root.ids.puzzle 
 
     if board.selected_tile and board.selected_tile.actor:
         board.state = gs.TARGETING
         board.selected_action = "move"
-        print("targeting mode")
+        log_text.text += "targeting mode\n"
     else:
-        print("No actor selected")
+        log_text.text += "No actor selected\n"
 
 def major_btn_update_minor_box(new_list):
     app = App.get_running_app()

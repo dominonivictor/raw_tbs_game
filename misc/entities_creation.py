@@ -2,7 +2,6 @@ from components.actors import Actor, Stat
 from components.jobs import Guardian, Thief, Merchant, Hunter, Cook
 from components.equips import Zarabatana, Dagger, Cauldron, Shield
 import components.commands as comm
-import menus
 from constants.creature_cons import creature_stats
 import constants.commands_cons as comm_cons
 
@@ -49,16 +48,20 @@ def create_actor(animal):
     #animal recieves the animal string ex: "f"
 
     animal = creature_stats[animal]
-    name = animal["name"].capitalize()
+    name = animal["name"]
+    creature = animal["animal"]
+    letter = animal["letter"]
+    kingdom = animal["kingdom"]
     hp_stat = Stat(value=animal["hp"])
     def_stat = Stat(value=animal["def"])
     atk_stat = Stat(value=animal["atk"])
     spd_stat = Stat(value=animal["spd"])
     income_stat = Stat(value=animal["income"])
     commands = create_commands_list(animal["commands"])
+
     
-    actor = Actor(name=name, hp=hp_stat, def_stat=def_stat, 
-        atk_stat=atk_stat, spd_stat=spd_stat, income_stat=income_stat,
-        commands=commands)
+    actor = Actor(name=name, hp=hp_stat, letter=letter, kingdom=kingdom,
+        animal=creature, def_stat=def_stat, atk_stat=atk_stat, spd_stat=spd_stat, 
+        income_stat=income_stat, commands=commands)
 
     return actor

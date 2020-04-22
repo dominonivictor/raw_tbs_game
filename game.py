@@ -1,5 +1,5 @@
 import misc.game_states as game_states
-from menus import initial_setup, show_battle_stats
+from menus import initial_setup
 from player import Player
 from map_objects.tile import Tile
 from random import randint

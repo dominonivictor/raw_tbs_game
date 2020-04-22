@@ -17,6 +17,35 @@
             width: 1
             rectangle: self.x, self.y, self.width, self.height
 
+<ScrollableLog>:
+    Label:
+        text: root.text
+        font_size: 20
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]
+        halign: 'center'
+        canvas.before:
+            Color:
+                rgba: (25/255, 100/255, 126/255, 0.8)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+            Line:
+                width: 1
+                rectangle: self.x, self.y, self.width, self.height
+
+<StatsPanel>:
+    canvas.before:
+        Color:
+            rgba: (25/255, 100/255, 126/255, 0.8)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Line:
+            width: 1
+            rectangle: self.x, self.y, self.width, self.height
+
 BoxLayout:
     orientation: 'horizontal'
     #>>>>>>>>>>>>>>>>>>>> LEFT SIDE
@@ -64,11 +93,11 @@ BoxLayout:
         BoxLayout:
             orientation: 'vertical'
             id: stats_screen
-            size_hint_y: 60
+            size_hint_y: 50
             Label: 
                 id: debug_label
                 size_hint_y: 10
-                text: "Debug info here"
+                text: "Actor Stats below (click on actor to check stats)"
                 bgcolor: [0, 0.8, 0.1, 0.6]
                 canvas.before:
                     Color:
@@ -85,15 +114,21 @@ BoxLayout:
         BoxLayout:  
             orientation: 'vertical'
             id: log_screen
-            size_hint_y: 40
-            BoxLayout:
-                orientation: 'horizontal'
-                size_hint_y: 20
-                Button:
-                    text: "Back"
-                Button:
-                    text: "Next"
-
+            size_hint_y: 50
             Label:
-                size_hint_y: 80
-                text: "LOG TEXT HERE"
+                size_hint_y: 10
+                text: "Log Information bellow"
+                canvas.before:
+                    Color:
+                        rgba: (254/255, 94/255, 65/255, 0.5)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                    Line:
+                        width: 1
+                        rectangle: self.x, self.y, self.width, self.height    
+            BoxLayout:
+                size_hint_y: 90
+                ScrollableLog:
+                    size_hint_x: 95
+                    id: log_text

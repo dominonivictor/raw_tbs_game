@@ -16,6 +16,27 @@ ATTACK = {
     "max_range": 1,  
 }
 
+DAGGER_ATTACK = {
+    "name": "Slash",
+    "value": 10, #only for commands that deal/heal <value> hp
+    "description": "True dmg dealing dagger",
+    "category": "Basic Attack",  
+    "is_raw": True,
+    "max_range": 1,
+}
+
+SHIELD_BASH_ATTACK = {
+    "name": "Shield Bash",
+    "value": 3, #only for commands that deal/heal <value> hp
+    "description": "Bashes oponnent, leaving him stunned",
+    "category": "Basic Attack",
+    "status_dict": {
+        "stunned": 2
+    },
+    "is_raw": False,
+    "max_range": 1,
+}
+
 HEAL = {
     "name": "Healing Salve",
     "value": base_heal, #only for commands that deal/heal <value> hp
@@ -63,6 +84,21 @@ TOXIC_SHOT = {
     "max_range": 3,
 }
 
+ZARABA_SHOT = {
+    "name": "Zulu Toxin Shot",
+    "status_dict":{
+        "poisoned": 4
+    },
+    "command_dict": {
+        "attack": 2,
+    },
+    "timer": mid_timer,
+    "value": 2,
+    "description": "Shoots target and poisons for 3 turns",
+    "category": "Attack and DoT",
+    "max_range": 3,
+}
+
 POWER_UP = {
     "name": "Power Up",
     "status_dict": { #optional if command has stat buffs
@@ -97,6 +133,11 @@ RAGE = {
         "def_stat": -4,
     },
     "max_range": 3,
+}
+
+RAGE_SOUP = {
+    **RAGE,
+    'name': 'Rage Soup'
 }
 
 PERFECT_COUNTER = {

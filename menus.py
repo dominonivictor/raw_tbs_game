@@ -77,8 +77,6 @@ def select_initial_actor_job_equip(player, n_actors, n_jobs, n_equips):
     actors_l = ["t", "f", "c", "a", "p", "o"]
     jobs_l = ["g", "t", "c", "h", "m"]
     equips_l = ["z", "d", "c", "s"]
-    print(f"--<<~~|| {player.name} choices ||~~>>--")
-    print("------------------------------------------")
     
     # p_choice = input(f"Actors ({n_actors}): ")
     actors =  "".join([choice(actors_l) for _ in range(n_actors)]) #p_choice if p_choice else

@@ -52,13 +52,13 @@ def select_tile(board, target_tile):
 def select_tile_normal_state(app, board, target_tile):
     game_grid = board.game.grid
     if board.selected_tile:
-        x, y = target_tile.grid_x, target_tile.grid_y
+        x, y = board.selected_tile.grid_x, board.selected_tile.grid_y
         board.selected_tile.rgba = game_grid[x][y].color
 
     actor = target_tile.actor if target_tile.actor else None
     if actor and not actor.has_moved:
         clean_tiles(board.highlighted_tiles, board)
-        highlight_movable_spaces(pos=(target_tile.x, target_tile.y), actor=actor, start_tile=target_tile)
+        highlight_movable_spaces(actor=actor, start_tile=target_tile)
 
     target_tile.rgba = colors.SELECTED_RED
     board.selected_tile = target_tile
@@ -68,51 +68,60 @@ def select_tile_normal_state(app, board, target_tile):
     app.root.ids.minor_options.update_commands_list(actor_command_list)
 
 def select_tile_targeting_state(board, target_tile):
+    app = App.get_running_app()
+    log_text = app.root.ids.log_text
     if not board.selected_tile:
-        print("No tile selected!")
+        log_text.text += "No tile selected!\n"
         board.state = gs.NORMAL
     elif not board.selected_tile.actor:
-        print("no actor selected!")
+        log_text.text += "no actor selected!\n"
         board.state = gs.NORMAL
     else:
         current_tile = board.selected_tile
         actor = current_tile.actor
-
+        high_tiles = board.highlighted_tiles
         if board.selected_action == "move":
-            targeting_move(actor=actor, current_tile=current_tile, target_tile=target_tile, movable_tiles=board.highlighted_tiles, board=board)
+            targeting_move(actor=actor, current_tile=current_tile, target_tile=target_tile, movable_tiles=high_tiles, board=board)
 
         elif board.selected_action == "command":
-            targeting_command(board=board, actor=actor, target_tile=target_tile)
+            targeting_command(board=board, actor=actor, target_tile=target_tile, commandable_tiles=high_tiles)
 
         board_clean_selected_things(board=board, but_not_selected_tile=True, target_tile=target_tile)
+    clean_tiles(board.highlighted_tiles, board)
 
 def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
+    app = App.get_running_app()
+    log_text = app.root.ids.log_text
     if actor.has_moved:
-        print("actor has already moved!")
+        log_text.text += "Actor has already moved!\n"
     elif target_tile.actor:
-        print("This tile is already ocuppied!")
+        log_text.text += "This tile is already ocuppied!\n"
     elif((target_tile.grid_x, target_tile.grid_y) not in movable_tiles):
-        print(movable_tiles)
-        print("Destination out of range!")
+        log_text.text += "Destination out of range!\n"
     else:
         target_tile.actor = actor
         current_tile.actor = None
         x, y = target_tile.grid_x, target_tile.grid_y
         current_tile.rgba = board.game.grid[x][y].color
         current_tile.text = "."
-        target_tile.text = target_tile.actor.name[0]
+        target_tile.text = target_tile.actor.letter
         target_tile.rgba = colors.WALKABLE_BLUE
 
+        board.selected_tile = target_tile
         actor.update_pos(target_tile.grid_x, target_tile.grid_y)
         actor.has_moved = True
 
     clean_tiles(board.highlighted_tiles, board)
 
-def targeting_command(board, actor, target_tile):
+def targeting_command(board, actor, target_tile, commandable_tiles):
+    app = App.get_running_app()
+    log_text = app.root.ids.log_text
     if not target_tile.actor:
-        print("No target selected!")
+        log_text.text += "No target selected!\n"
     elif board.selected_tile.actor.has_acted:
-        print("Actor has already acted!")
+        log_text.text += "Actor has already acted!\n"
+    elif((target_tile.grid_x, target_tile.grid_y) not in commandable_tiles):
+        log_text.text += "Destination out of range!\n"
     else:
         command = board.selected_command
         target = target_tile.actor
@@ -124,7 +133,9 @@ def targeting_command(board, actor, target_tile):
         board.game.event_list.append(command)
 
 def pass_turn(board):
-    print("turn passes!")
+    app = App.get_running_app()
+    log_text = app.root.ids.log_text
+    log_text.text += "turn passes!\n"
     game = board.game
     for event in game.event_list:
         if type(event) is dict:
@@ -133,9 +144,9 @@ def pass_turn(board):
             msg = event.execute()
 
         if msg:
-            print(f"{msg.get('msg', f'no msg to show... {event}')}")
+            log_text.text += f"{msg.get('msg', f'no msg to show... {event}')}\n"
         else:
-            print(f"{event}")
+            log_text.text += f"{event}\n"
 
     game.event_list = []
     for actor in game.actors:
@@ -145,6 +156,7 @@ def pass_turn(board):
 
     for row in board.grid:
         for tile in row:
+            x, y = tile.grid_x, tile.grid_y
             tile.rgba = board.game.grid[x][y].color
 
 
@@ -154,12 +166,11 @@ def add_actors_in_starting_positions(board):
     for i, (x, y) in enumerate(board.initial_spaces):
         tile = board.grid[x][y]
         actor = board.game.actors[i]
-        tile.text = actor.name[0]
+        tile.text = actor.letter
         tile.actor = actor
         actor.update_pos(x=x, y=y)
 
-def highlight_movable_spaces(pos, actor, start_tile):
-    origin_x, origin_y = pos
+def highlight_movable_spaces(actor, start_tile):
     app = App.get_running_app()
 
     n_moves = actor.spd_stat.value
@@ -171,6 +182,21 @@ def highlight_movable_spaces(pos, actor, start_tile):
     
     for x, y in closed_list:
         ui_grid[x][y].rgba = colors.WALKABLE_BLUE
+
+    board.highlighted_tiles = closed_list
+
+def highlight_attackable_spaces(command, start_tile):
+    app = App.get_running_app()
+
+    n_moves = command.max_range
+    board = app.root.ids.puzzle
+    ui_grid = board.grid
+    game_grid = board.game.grid
+
+    closed_list = calculate_dijkstras(start_tile, board, game_grid, calculate_cost_to_attack, n_moves)
+    
+    for x, y in closed_list:
+        ui_grid[x][y].rgba = colors.ATTACKABLE_RED
 
     board.highlighted_tiles = closed_list
 
@@ -204,6 +230,9 @@ def calculate_dijkstras(start_tile, board, game_grid, step_cost_function, n_move
 def calculate_cost_to_move(pos, game_grid):
     x, y = pos
     return game_grid[x][y].move_cost
+
+def calculate_cost_to_attack(pos, game_grid):
+    return 1
 
 def get_tile_neighbors(tile_xy, max_size, game_grid, closed_list):
     neighbors = []

@@ -1,10 +1,11 @@
 from kivy.factory import Factory
 from kivy.app import App
-from kivy.properties import ListProperty
+from kivy.properties import ListProperty, StringProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.scrollview import ScrollView
 
 from game import Game
 
@@ -12,6 +13,12 @@ import constants.colors as colors
 
 import controllers.board_controller as board_con
 import controllers.buttons_controller as btn_con
+
+class LogScreen(BoxLayout):
+    msg_list = []
+
+class ScrollableLog(ScrollView):
+    text = StringProperty('')
 
 class StatsPanel(Label):
     rgba = ListProperty(colors.BASIC_BLACK)
