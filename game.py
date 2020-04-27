@@ -6,7 +6,7 @@ from random import randint
 import constants.colors as colors
 
 class Game():
-    def __init__(self, grid_size=13):
+    def __init__(self, **kwargs):
         self.state = game_states.START
         self.log = []
         self.event_list = []
@@ -18,9 +18,14 @@ class Game():
         }
         self.p1 = Player(name='P1')
         self.p2 = Player(name='P2')
-        initial_setup(self.initial_values, p1=self.p1, p2=self.p2)
+        self.grid_size = kwargs.get("grid_size", 13)
+        self.grid = self.create_grid(grid_size=self.grid_size)
+
+        self.board = kwargs.get("board")
+
+        initial_setup(self.initial_values, p1=self.p1, p2=self.p2, game=self)
         self.add_actors()
-        self.grid = self.create_grid(grid_size=grid_size)
+
 
     def show_actors(self):
         actor_str = ''
@@ -71,4 +76,5 @@ class Game():
 
         grid = list(map(list, zip(*grid))) #doing this to transpose
         return grid
+
 

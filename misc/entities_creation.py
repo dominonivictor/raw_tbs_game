@@ -1,25 +1,16 @@
 from components.actors import Actor, Stat
 from components.jobs import Guardian, Thief, Merchant, Hunter, Cook
 from components.equips import Zarabatana, Dagger, Cauldron, Shield
-import components.commands as comm
+from components.commands import instaciate_commands_dict
 from constants.creature_cons import creature_stats
-import constants.commands_cons as comm_cons
-
 
 def create_commands_list(commands):
     #not very scalable... needs improving
     commands_list = []
-    comm_dict = {
-        'sun_charge': comm.SunCharge(**comm_cons.SUN_CHARGE),
-        'toxic_shot': comm.ToxicShot(**comm_cons.TOXIC_SHOT),
-        'attack': comm.Attack(**comm_cons.ATTACK),
-        'heal': comm.Heal(**comm_cons.HEAL),
-        'vamp_bite': comm.VampBite(**comm_cons.VAMP_BITE),
-        'power_up': comm.PowerUp(**comm_cons.POWER_UP),
-        'regen': comm.Regen(**comm_cons.REGEN),
-    }
+    comm_dict = instaciate_commands_dict()
     for command in commands:
-        commands_list.append(comm_dict.get(command, comm.Command()))
+        comm = comm_dict.get(command)
+        commands_list.append(comm)
 
     return commands_list
 
@@ -44,24 +35,25 @@ def create_equip(equip):
 
     return equip
 
-def create_actor(animal):
+def create_actor(animal, game):
     #animal recieves the animal string ex: "f"
 
     animal = creature_stats[animal]
-    name = animal["name"]
-    creature = animal["animal"]
-    letter = animal["letter"]
-    kingdom = animal["kingdom"]
-    hp_stat = Stat(value=animal["hp"])
-    def_stat = Stat(value=animal["def"])
-    atk_stat = Stat(value=animal["atk"])
-    spd_stat = Stat(value=animal["spd"])
-    income_stat = Stat(value=animal["income"])
-    commands = create_commands_list(animal["commands"])
+    actor_dict = {
+        "name": animal["name"],
+        "animal": animal["animal"],
+        "letter": animal["letter"],
+        "kingdom": animal["kingdom"],
+        "hp": Stat(value=animal["hp"]),
+        "def_stat": Stat(value=animal["def"]),
+        "atk_stat": Stat(value=animal["atk"]),
+        "spd_stat": Stat(value=animal["spd"]),
+        "income_stat": Stat(value=animal["income"]),
+        "commands": create_commands_list(animal["commands"]),
 
-    
-    actor = Actor(name=name, hp=hp_stat, letter=letter, kingdom=kingdom,
-        animal=creature, def_stat=def_stat, atk_stat=atk_stat, spd_stat=spd_stat, 
-        income_stat=income_stat, commands=commands)
+        "game_eye": game,
+    }
+
+    actor = Actor(**actor_dict)
 
     return actor

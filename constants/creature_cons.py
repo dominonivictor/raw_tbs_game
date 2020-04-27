@@ -28,8 +28,8 @@ creature_stats = {
         "commands":[
             "attack",
             "vamp_bite",
-            "toxic_shot",
-            "power_up",
+            "speed_up",
+            "multiply",
         ]
     },
     "t":{
@@ -44,9 +44,9 @@ creature_stats = {
         "kingdom": "reptalia",
         "commands":[
             "attack",
-            "sun_charge",
-            "power_up",
             "regen",
+            "defense_up",
+            "sun_charge",
         ]
     },
     "c":{
@@ -61,9 +61,9 @@ creature_stats = {
         "kingdom": "aves",
         "commands":[
             "attack",
-            "vamp_bite",
-            "toxic_shot",
-            "power_up",
+            "rage",
+            "speed_up",
+            "golden_egg",
         ]
     },
     "a":{
@@ -77,10 +77,10 @@ creature_stats = {
         "income": base_income,
         "kingdom": "reptalia",
         "commands":[
-            "sun_charge",
-            "toxic_shot",
+            "attack",
+            "vamp_bite",
             "power_up",
-            "attack"
+            "sun_charge",
         ]
     },
     "p":{
@@ -94,10 +94,10 @@ creature_stats = {
         "income": base_income,
         "kingdom": "mamalia",
         "commands":[
-            "vamp_bite",
+            "attack",
             "toxic_shot",
             "power_up",
-            "attack"
+            "multiply",
         ]
     },
     "o":{
@@ -111,10 +111,10 @@ creature_stats = {
         "income": base_income,
         "kingdom": "aves",
         "commands":[
-            "vamp_bite",
-            "toxic_shot",
+            "attack",
+            "heal",
             "power_up",
-            "attack"
+            "golden_egg",
         ]
     },
 }

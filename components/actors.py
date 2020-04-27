@@ -2,37 +2,39 @@ from components.statuses import StatusList
 from components.commands import CommandList
 
 class Actor():
-    def __init__(self, x=0, y=0, name="Nameless", letter="X", kingdom="No kingdom", animal="scrub", hp=666, def_stat=42, atk_stat=73, spd_stat=13, income_stat=23, commands=[], job=None, equip=None):
-        self.name = name
-        self.letter = letter
-        self.kingdom = kingdom
-        self.animal = animal
-        self.hp = hp
-        self.max_hp = Stat(value=hp.value)
-        self.def_stat = def_stat 
-        self.atk_stat = atk_stat
-        self.spd_stat = spd_stat
-        self.income_stat = income_stat
+    def __init__(self, **kwargs):
+        self.name = kwargs.get("name", "Nameless")
+        self.letter = kwargs.get("letter", "X")
+        self.kingdom = kwargs.get("kingdom", "No kingdom")
+        self.animal = kwargs.get("animal", "scrub")
+        self.hp = kwargs.get("hp")
+        self.max_hp = Stat(value=kwargs.get("hp").value)
+        self.def_stat = kwargs.get("def_stat") 
+        self.atk_stat = kwargs.get("atk_stat")
+        self.spd_stat = kwargs.get("spd_stat")
+        self.income_stat = kwargs.get("income_stat")
         self.statuses = StatusList()
         self.statuses.owner = self
 
         self.commands = CommandList()
         self.commands.owner = self
-        for command in commands:
-            self.commands.add_command(command)
+        for command in kwargs.get("commands", []):
+            self.commands.add_command(command, "base")
 
-        self.job = job
+        self.job = kwargs.get("job", None)
         if self.job:
             self.learn_job(job)
 
-        self.equip = equip
+        self.equip = kwargs.get("equip", None)
         if self.equip:
             self.add_equip(equip)
 
-        self.x = x
-        self.y = y
+        self.x = kwargs.get("x", 0)
+        self.y = kwargs.get("y", 0)
         self.has_moved = False
         self.has_acted = False
+
+        self.game_eye = GameEye(game=kwargs.get("game_eye", None)) #game watcher... 
 
     def show_statuses(self):
         statuses = ''
@@ -97,3 +99,6 @@ class Stat():
     def __init__(self, value):
         self.value = value
 
+class GameEye():
+    def __init__(self, **kwargs):
+        self.game = kwargs.get("game")

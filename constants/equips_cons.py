@@ -42,7 +42,7 @@ SHIELD = {
     "value": 3,
     "statuses": [sts.DefUp()],
     "commands": [
-        comm.PerfectCounter(), 
+        comm.PerfectCounter(**comm_con.PERFECT_COUNTER), 
         comm.Attack(**comm_con.SHIELD_BASH_ATTACK)
     ],
     "category": "meelee",

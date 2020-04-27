@@ -116,17 +116,18 @@ def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
 def targeting_command(board, actor, target_tile, commandable_tiles):
     app = App.get_running_app()
     log_text = app.root.ids.log_text
-    if not target_tile.actor:
+    command = board.selected_command
+    if not target_tile.actor and command.name != "Multiply":
         log_text.text += "No target selected!\n"
     elif board.selected_tile.actor.has_acted:
         log_text.text += "Actor has already acted!\n"
     elif((target_tile.grid_x, target_tile.grid_y) not in commandable_tiles):
         log_text.text += "Destination out of range!\n"
     else:
-        command = board.selected_command
         target = target_tile.actor
         
         command.target = target
+        command.target_xy = target_tile.grid_x, target_tile.grid_y
         actor.has_acted = True
 
         board.selected_tile.rgba = colors.WALKABLE_BLUE
@@ -164,11 +165,14 @@ def pass_turn(board):
 
 def add_actors_in_starting_positions(board):
     for i, (x, y) in enumerate(board.initial_spaces):
-        tile = board.grid[x][y]
-        actor = board.game.actors[i]
-        tile.text = actor.letter
-        tile.actor = actor
-        actor.update_pos(x=x, y=y)
+        actor = board.game.actors[i]    
+        add_actor_at_xy(board, actor, x, y)
+
+def add_actor_at_xy(board, actor, x, y):
+    tile = board.grid[x][y]
+    tile.text = actor.letter
+    tile.actor = actor
+    actor.update_pos(x=x, y=y)
 
 def highlight_movable_spaces(actor, start_tile):
     app = App.get_running_app()

@@ -56,8 +56,8 @@ class PuzzleGrid(Factory.GridLayout):
         self.graph = {}
         self.initial_spaces = [(2, 2), (6, 2), (10, 2), (2, 10), (2, 6), (10, 10), (6, 10), (10, 6)]
         self.highlighted_tiles = []
-        self.game = Game(grid_size = self.grid_size)
         board_con.board_clean_selected_things(board=self)
+        self.game = Game(grid_size=self.grid_size, board=self)
 
     def create_grid(self):
         board_con.create_grid(board=self, size=self.grid_size)

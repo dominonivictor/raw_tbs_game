@@ -2,8 +2,10 @@ default = None
 base_atk = 3
 base_heal = 4
 base_buff = 2
+buff_plus = 1
+buff_minus = -1
 vamp_bite_eff = 0.5
-short_timer = 5 # 1 round
+short_timer = 2 # 1 round
 mid_timer = 3 # 2 rounds
 long_timer = 4 # 3 rounds
 
@@ -59,12 +61,12 @@ VAMP_BITE = {
 SUN_CHARGE = {
     "name": "Sun Charge",
     "status_dict": {
-        "atk_stat": base_buff,
-        "def_stat": base_buff,
-        "spd_stat": base_buff
+        "atk_stat": base_buff + buff_minus,
+        "def_stat": base_buff + buff_minus,
+        "spd_stat": base_buff + buff_minus,
     },
-    "timer": short_timer,
-    "description": "Sun Charge increases all stats by 2 for 1 turn.",
+    "timer": mid_timer,
+    "description": "Sun Charge increases all stats by 1 for 1 turn.",
     "category": "Greater Buff",
     "max_range": 2,
 }
@@ -105,7 +107,31 @@ POWER_UP = {
         "atk_stat": base_buff,
     },
     "timer": 2, #only for commands with statuses
-    "description": "Owner gets a bonus for its attack for 2",
+    "description": "Owner gets a bonus for its attack for 2 for 1 turn",
+    "category": "Minor Buff",
+    # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+    "max_range": 2,
+}
+
+DEFENSE_UP = {
+    "name": "Defense Up",
+    "status_dict": { #optional if command has stat buffs
+        "def_stat": base_buff,
+    },
+    "timer": 2, #only for commands with statuses
+    "description": "Owner gets a bonus for its defense for 2 for 1 turn",
+    "category": "Minor Buff",
+    # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+    "max_range": 2,
+}
+
+SPEED_UP = {
+    "name": "Speed Up",
+    "status_dict": { #optional if command has stat buffs
+        "speed_stat": base_buff + buff_minus,
+    },
+    "timer": 3, #only for commands with statuses
+    "description": "Owner gets a bonus for its speed by 1 for 2 turns",
     "category": "Minor Buff",
     # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
     "max_range": 2,
@@ -165,6 +191,30 @@ SHIELD_BASH = {
         "attack": 5
     },
     "max_range": 1,
+}
+
+GOLDEN_EGG = {
+    "name": "Golden Egg",
+    "timer": 2, #only for commands with statuses
+    "description": "Grants 2 random bonuses for 1 turn",
+    "category": "Greater Buff",
+    "status_dict": { #optional if command has stat buffs
+        "atk_stat": 2,
+        "def_stat": 2,
+        "spd_stat": 2,
+        "income_stat": 2,
+    },
+    "max_range": 1,
+}
+
+MULTIPLY = {
+    "name": "Multiply",
+    "description": "Creates a minion to fight for you",
+    "category": "Summon",
+    "max_range": 2,
+    "command_dict": {
+        "attack": 10
+    },
 }
 
 '''

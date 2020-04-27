@@ -55,7 +55,7 @@ def actors_options():
     print(f"{'-'*(t_len_max*3)}") 
 
 
-def initial_setup(initial_values, p1, p2):
+def initial_setup(initial_values, p1, p2, game):
     actors_num = initial_values["actors_num"]
     jobs_num = initial_values["jobs_num"]
     equips_num = initial_values["equips_num"]
@@ -65,12 +65,12 @@ def initial_setup(initial_values, p1, p2):
     # actors_options()
 
     for player in players:
-        select_initial_actor_job_equip(player, actors_num, jobs_num, equips_num)
+        select_initial_actor_job_equip(player, actors_num, jobs_num, equips_num, game)
 
 
 
 
-def select_initial_actor_job_equip(player, n_actors, n_jobs, n_equips):
+def select_initial_actor_job_equip(player, n_actors, n_jobs, n_equips, game):
     player_actors = []
     player_equips = []
     player_jobs = []
@@ -82,7 +82,7 @@ def select_initial_actor_job_equip(player, n_actors, n_jobs, n_equips):
     actors =  "".join([choice(actors_l) for _ in range(n_actors)]) #p_choice if p_choice else
     actors = list(actors[:n_actors])
     for actor in actors:
-        player.add_actor(create_actor(actor))
+        player.add_actor(create_actor(actor, game))
 
     # p_choice = input(f"Jobs ({n_jobs}): ")
     jobs =  "".join([choice(jobs_l) for _ in range(n_jobs)]) #p_choice if p_choice else
