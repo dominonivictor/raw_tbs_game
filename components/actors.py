@@ -1,5 +1,7 @@
 from components.statuses import StatusList
 from components.commands import CommandList
+from game_eye import GameEye
+
 
 class Actor():
     def __init__(self, **kwargs):
@@ -34,7 +36,7 @@ class Actor():
         self.has_moved = False
         self.has_acted = False
 
-        self.game_eye = GameEye(game=kwargs.get("game_eye", None)) #game watcher... 
+        self.game_eye = GameEye.instance()
 
     def show_statuses(self):
         statuses = ''
@@ -99,6 +101,3 @@ class Stat():
     def __init__(self, value):
         self.value = value
 
-class GameEye():
-    def __init__(self, **kwargs):
-        self.game = kwargs.get("game")

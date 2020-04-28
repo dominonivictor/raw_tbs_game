@@ -8,6 +8,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 
 from game import Game
+from game_eye import GameEye
 
 import constants.colors as colors
 
@@ -54,10 +55,12 @@ class PuzzleGrid(Factory.GridLayout):
         self.rows = 1
         self.grid = []
         self.graph = {}
-        self.initial_spaces = [(2, 2), (6, 2), (10, 2), (2, 10), (2, 6), (10, 10), (6, 10), (10, 6)]
+        self.initial_spaces = [(4, 4), (6, 4), (8, 4), (4, 8), (4, 6), (8, 8), (6, 8), (8, 6)]
         self.highlighted_tiles = []
         board_con.board_clean_selected_things(board=self)
         self.game = Game(grid_size=self.grid_size, board=self)
+        game_eye = GameEye.instance()
+        game_eye.game = self.game
 
     def create_grid(self):
         board_con.create_grid(board=self, size=self.grid_size)

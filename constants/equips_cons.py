@@ -15,7 +15,7 @@ ZARABA = {
     "value": 5,
     "statuses": [],
     "commands": [
-        comm.ToxicShot(**comm_con.ZARABA_SHOT)
+        comm.Attack(**comm_con.ZARABA_SHOT)
     ],
     "category": "ranged",
 }
@@ -33,7 +33,7 @@ CAULDRON = {
     "name": "Cauldron",
     "value": 3,
     "statuses": [],
-    "commands": [comm.Rage(**comm_con.RAGE_SOUP)],
+    "commands": [comm.Command(**comm_con.RAGE_SOUP)],
     "category": "meelee",
 }
 
@@ -41,8 +41,7 @@ SHIELD = {
     "name": "Shield",
     "value": 3,
     "statuses": [sts.DefUp()],
-    "commands": [
-        comm.PerfectCounter(**comm_con.PERFECT_COUNTER), 
+    "commands": [ 
         comm.Attack(**comm_con.SHIELD_BASH_ATTACK)
     ],
     "category": "meelee",

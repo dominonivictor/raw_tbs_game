@@ -5,8 +5,10 @@ from map_objects.tile import Tile
 from random import randint
 import constants.colors as colors
 
+
 class Game():
     def __init__(self, **kwargs):
+        
         self.state = game_states.START
         self.log = []
         self.event_list = []
@@ -76,5 +78,4 @@ class Game():
 
         grid = list(map(list, zip(*grid))) #doing this to transpose
         return grid
-
 
