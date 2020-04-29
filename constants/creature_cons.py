@@ -29,7 +29,6 @@ creature_stats = {
             "attack",
             "vamp_bite",
             "speed_up",
-            "multiply",
         ]
     },
     "t":{
@@ -46,7 +45,6 @@ creature_stats = {
             "attack",
             "regen",
             "defense_up",
-            "sun_charge",
         ]
     },
     "c":{
@@ -63,7 +61,6 @@ creature_stats = {
             "attack",
             "rage",
             "speed_up",
-            "golden_egg",
         ]
     },
     "a":{
@@ -80,7 +77,6 @@ creature_stats = {
             "attack",
             "vamp_bite",
             "power_up",
-            "sun_charge",
         ]
     },
     "p":{
@@ -97,7 +93,6 @@ creature_stats = {
             "attack",
             "toxic_shot",
             "power_up",
-            "multiply",
         ]
     },
     "o":{
@@ -114,7 +109,6 @@ creature_stats = {
             "attack",
             "heal",
             "power_up",
-            "golden_egg",
         ]
     },
 }

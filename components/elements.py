@@ -1,14 +1,17 @@
-import constants.elements_cons as cons
 
 
 class Element():
-    def __init__(self, name="Primal Element", timer=0, status_dict={}):
+    def __init__(self, name="Primal Element", timer=0, statuses=[]):
         self.name = name
         self.timer = timer
-        self.status_dict = status_dict
+        self.statuses = statuses
 
 
+import constants.elements_cons as cons
 
-class Fire(Element):
-    def __init__(self, name=cons.FIRE["name"], timer=cons.FIRE["timer"], status_dict=cons.FIRE["status_dict"]):
-        super().__init__(name=name, timer=timer, status_dict=status_dict)
+def get_new_element_by_id(id):
+    elements = {
+        "fire": Element(**cons.FIRE)
+    }
+
+    return elements.get(id)

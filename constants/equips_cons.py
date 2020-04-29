@@ -1,6 +1,9 @@
-import components.statuses as sts
-import components.commands as comm
-import constants.commands_cons as comm_con
+from components.statuses import get_new_status_by_id
+import constants.status_cons as sts_cons
+from components.commands import get_new_command_by_id
+
+#FUCK THIS IS BAD, I need to instanciate every time i do this, or else i just get references and
+#things will go very badly
 '''
 {
     "name": ,
@@ -15,7 +18,7 @@ ZARABA = {
     "value": 5,
     "statuses": [],
     "commands": [
-        comm.Attack(**comm_con.ZARABA_SHOT)
+        get_new_command_by_id("paralize_shot")
     ],
     "category": "ranged",
 }
@@ -24,7 +27,9 @@ DAGGER = {
     "name": "Dagger",
     "value": 10,
     "statuses": [],
-    "commands": [comm.Attack(**comm_con.DAGGER_ATTACK)],
+    "commands": [
+        get_new_command_by_id("true_slash")
+    ],
     "category": "meelee",
 
 }
@@ -33,16 +38,20 @@ CAULDRON = {
     "name": "Cauldron",
     "value": 3,
     "statuses": [],
-    "commands": [comm.Command(**comm_con.RAGE_SOUP)],
+    "commands": [
+        get_new_command_by_id("rage")
+    ],
     "category": "meelee",
 }
 
 SHIELD = {
     "name": "Shield",
     "value": 3,
-    "statuses": [sts.DefUp()],
+    "statuses": [
+        get_new_status_by_id("def_up")
+    ],
     "commands": [ 
-        comm.Attack(**comm_con.SHIELD_BASH_ATTACK)
+        get_new_command_by_id("shield_bash")
     ],
     "category": "meelee",
 }

@@ -18,10 +18,8 @@ class Actor():
         self.statuses = StatusList()
         self.statuses.owner = self
 
-        self.commands = CommandList()
-        self.commands.owner = self
-        for command in kwargs.get("commands", []):
-            self.commands.add_command(command, "base")
+        self.base_commands = kwargs.get("commands", [])
+        self.commands = CommandList(owner=self)
 
         self.job = kwargs.get("job", None)
         if self.job:

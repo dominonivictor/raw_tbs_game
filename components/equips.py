@@ -14,7 +14,7 @@ class Equip():
     def equip(self, owner):
         self.owner = owner
         for command in self.commands:
-            self.owner.commands.add_command(command)
+            self.owner.commands.add_command(command, category="equip")
         for status in self.statuses:
             status.target = self.owner
             self.owner.statuses.add_status(status)
@@ -24,7 +24,7 @@ class Equip():
     def unequip(self):
         if self.owner:
             for command in self.commands:
-                self.owner.commands.remove_command(command)
+                self.owner.commands.remove_command(command, category="equip")
             for status in self.statuses:
                 self.owner.statuses.remove_status(status)
 
@@ -32,17 +32,19 @@ class Equip():
 
     def add_element(self, element):
         #go into added command and apply the status thingy
+        if self.element:
+            self.remove_element(self.element)
         element.owner = self
         for command in self.commands:
-            command.status_dict.update(element.status_dict)
-
-        if self.owner:
-            for command in self.owner.commands.list:
-                for w_command in self.commands:
-                    if w_command.name == command.name:
-                        command.status_dict.update(element.status_dict)
+            command.statuses.add_status(element.statuses)
 
         self.element = element
+
+    def remove_element(self, element):
+        element.owner = None
+        for command in self.commands:
+            command.statuses.remove(element.status)
+
 
 class Zarabatana(Equip):
     def __init__(self, name=con.ZARABA["name"], value=con.ZARABA["value"], statuses=con.ZARABA["statuses"], 

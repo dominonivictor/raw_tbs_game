@@ -1,16 +1,24 @@
 import components.statuses as sts
 import components.actors as actors
-import constants.commands_cons as cons
 from random import sample
 from controllers.board_controller import add_actor_at_xy
 from game_eye import GameEye
 
+
 class CommandList():
     def __init__(self, **kwargs):
+        self.owner = kwargs.get("owner")
         self.base_list = []
+        self.kingdom_list = []
         self.equip_list = []
         self.job_list = []
         self.list = []
+        self.init(self.owner.base_commands)
+
+    def init(self, commands):
+        for command in commands:
+            self.add_command(command, "base")
+        self.add_kingdom_command()
 
     def add_command(self, command, category=""):
         for comm in self.list:
@@ -25,16 +33,36 @@ class CommandList():
                 self.equip_list.append(command)
             if("job" in category):
                 self.job_list.append(command)
+            if("kingdom" in category):
+                self.kingdom_list.append(command)
 
-    def remove_command(self, command): 
+    def remove_command(self, command, category=""): 
         command.owner = None  
         self.list.remove(command)
+        if("base" in category):
+            self.base_list.remove(command)
+        if("equip" in category):
+            self.equip_list.remove(command)
+        if("job" in category):
+            self.job_list.remove(command)
+        if("kingdom" in category):
+            self.kingdom_list.remove(command)
 
     def add_eye(self):
         self.game_eye = self.owner.game_eye
 
+    def add_kingdom_command(self):
+        kingdom = self.owner.kingdom
+        command = {
+            "mamalia": get_new_command_by_id("multiply"),
+            "reptalia": get_new_command_by_id("sun_charge"),
+            "aves": get_new_command_by_id("golden_egg"),
+        }.get(kingdom)
+        self.add_command(command, category="kingdom")
+
 class Command():
     def __init__(self, **kwargs):
+        self.id = kwargs.get("id")
         self.name = kwargs.get('name', "Abyssal Lord Command")
         self.description = kwargs.get('description', "Abyssal Lord Command Description")
         self.category = kwargs.get('category', "Abyssal")
@@ -49,7 +77,9 @@ class Command():
         self.max_range = kwargs.get('max_range', 1)
         self.final_value = 0
         
-        self.status_dict = kwargs.get('status_dict', {})
+        from components.statuses import CommandStatusList
+        self.statuses = CommandStatusList()
+        self.statuses.init(kwargs.get("statuses", []))
         self.command_dict = kwargs.get('command_dict', {})
 
         self.msg = kwargs.get("msg", "")
@@ -65,15 +95,14 @@ class Command():
         if(not special_result.get("should_continue", True)):
             return special_result
 
-        params_status = {
+        params_commands = {
             "owner": self.owner,
             "target": self.target,
             "value": self.value,
             "timer": self.timer,
         }
-        params_commands = {**params_status, **{"command_dict": {}}}
 
-        self.manage_statuses(params_status=params_status)
+        self.manage_statuses()
 
         execution_dict = self.manage_commands(params_commands=params_commands)
 
@@ -104,24 +133,12 @@ class Command():
 
         return {}
 
-    def manage_statuses(self, params_status):
-        statuses = {
-            "atk_stat": sts.AtkUp(**params_status),
-            "def_stat": sts.DefUp(**params_status),
-            "spd_stat": sts.SpdUp(**params_status),
-            "income_stat": sts.IncomeUp(**params_status),
-            "regen": sts.Regenerating(**params_status),
-            "poisoned": sts.Poisoned(**params_status),
-            "burned": sts.Burned(**params_status),
-            "stunned": sts.Stunned(**params_status),
-            "perfect_counter_stance": sts.PerfectCounterStance(**params_status),
-        }
-
-        for k, v in self.status_dict.items():
-            status = statuses.get(k)
+    def manage_statuses(self):
+        for status in self.statuses.list:
+            #this may not be the case, only applies the commands target if it doesn't have a target
             if self.target:
-                status.target = self.target
-            status.status_dict[k] = v 
+                #is this really necessary? probably
+                status.target = self.target 
             self.target.statuses.add_status(status)
 
     def manage_commands(self, params_commands):
@@ -223,23 +240,11 @@ class VampBite(Command):
 class GoldenEgg(Command):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.original_status_dict = kwargs.get("status_dict")
-        self.choices = []
+        self.original_statuses = kwargs.get("statuses")
 
-    def execute(self):
-        new_status_dict = self.choose_2_statuses()
-        self.status_dict = new_status_dict
-        super().execute()
-
-    def choose_2_statuses(self):
-        self.choices = sample(list(self.status_dict), k=2)
-        
-        new_status_dict = {
-            self.choices[0]: self.original_status_dict[self.choices[0]],
-            self.choices[1]: self.original_status_dict[self.choices[1]]
-        }
-
-        return new_status_dict
+    def execute(self): 
+        self.statuses = sample(list(self.statuses), k=2)
+        super().execute()        
 
 class Multiply(Command):
     def __init__(self, **kwargs):
@@ -270,6 +275,9 @@ class Multiply(Command):
         self.game_eye.add_actor(minion)
         add_actor_at_xy(board=self.game_eye.get_board(), actor=minion, x=x, y=y)
 
+## others
+# Toxic Shot
+
 ####################################
 ######### EQUIPS COMMANDS ##########
 ####################################
@@ -277,8 +285,56 @@ class Multiply(Command):
 #Slash (dagger) true dmg 10
 #Shield Bash Attack (shield) stunned effect
 #Rage (Cauldron)
+#Zulu Shot
+
+####################################
+######### JOBS COMMANDS ############
+####################################
+
 #Perfect Counter
-#Toxic Shot
+
+class CopyCat(Command):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.has_stolen = False
+        self.stolen_command = None
+
+    def execute(self):
+        copied_command = None
+        if self.has_stolen:
+            self.name = "Steal"
+            self.has_stolen = False
+            self.owner.commands.remove_command(self.stolen_command)
+            self.msg = f"{self.owner} forgets previous command!"
+        else:
+            self.name = "Forget"
+            self.has_stolen = True
+            target = self.target
+            if target.job:
+                copied_command = sample(target.commands.job_list, k=1)[0]
+            elif target.equip:
+                copied_command = sample(target.commands.equip_list, k=1)[0]
+            else:
+                copied_command = target.commands.base_list[-1]
+            copied_command = get_new_command_by_id(copied_command.id)
+            self.stolen_command = copied_command
+            self.owner.commands.add_command(copied_command)
+            self.msg = f"{self.owner.name} copies {copied_command.name} from {target.name}!"
+
+        return {"msg": self.msg}
+
+class Mixn(Command):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def execute(self):
+        if not self.target.equip:
+            return {"msg": "Target doesn't have an equip to mix with"}
+        from components.elements import get_new_element_by_id
+        element = get_new_element_by_id("fire")
+        self.owner.equip.add_element(element)
+        
+        return {"msg": f"{self.owner.name} adds {element.name} element to a {self.target.equip.name}"}
 
 ####################################
 ######### STATUS COMMANDS ##########
@@ -287,8 +343,11 @@ class Multiply(Command):
 #PowerUp
 #DefenseUp
 #SpeedUp
+#IncomeUp
+#MaxHpUp
 
 def instaciate_commands_dict():
+    import constants.commands_cons as cons
     commands_dict = {
         #all/most of these could be made into a single command with different kwargs basically
         'attack': Attack(**cons.ATTACK),
@@ -299,13 +358,26 @@ def instaciate_commands_dict():
         'golden_egg': GoldenEgg(**cons.GOLDEN_EGG),
         'multiply': Multiply(**cons.MULTIPLY),
         
+        'true slash': Attack(**cons.DAGGER_ATTACK),
         'toxic_shot': Attack(**cons.TOXIC_SHOT),
+        'paralize_shot': Attack(**cons.PARALIZE_SHOT),
         'rage': Command(**cons.RAGE_SOUP),
+        'shield_bash': Attack(**cons.SHIELD_BASH),
+
         'perfect_counter': Command(**cons.PERFECT_COUNTER),
-        
+        'copy_cat': CopyCat(**cons.COPY_CAT),
+        'mixn': Mixn(**cons.MIXN),
+
         'power_up': Command(**cons.POWER_UP),
         'defense_up': Command(**cons.DEFENSE_UP),
         'speed_up': Command(**cons.SPEED_UP),
+        # 'income_up': Command(**cons.INCOME_UP),
+        # 'max_hp_up': Command(**cons.MAX_HP_UP),
         'regen': Command(**cons.REGEN),
     }
     return commands_dict
+
+def get_new_command_by_id(id):
+    commands = instaciate_commands_dict()
+    
+    return commands.get(id)

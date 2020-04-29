@@ -1,7 +1,9 @@
+from components.statuses import get_new_status_by_id
+
 FIRE ={
     "name": "Fire",
     "timer": 2,
-    "status_dict":{
-        "burned": 4
-    },
+    "statuses":[
+        get_new_status_by_id("burned")
+    ],
 }
