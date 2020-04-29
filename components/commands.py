@@ -251,10 +251,10 @@ class VampBite(Command):
 class GoldenEgg(Command):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.original_statuses = kwargs.get("statuses")
+        self.original_statuses_list = self.statuses.list
 
     def execute(self): 
-        self.statuses.list = sample(self.original_statuses, k=2)
+        self.statuses.list = sample(self.original_statuses_list, k=2)
         super().execute()        
 
 class Multiply(Command):
