@@ -1,5 +1,5 @@
 from random import choice
-from misc.entities_creation import create_actor, create_job, create_equip
+from misc.entities_creation import create_actor
 
 
 def initial_setup(initial_values, p1, p2, game):
@@ -29,15 +29,15 @@ def select_initial_actor_job_equip(player, n_actors, n_jobs, n_equips, game):
     for actor in actors:
         player.add_actor(create_actor(actor, game))
 
-    # p_choice = input(f"Jobs ({n_jobs}): ")
-    jobs =  "".join([choice(jobs_l) for _ in range(n_jobs)]) #p_choice if p_choice else
-    jobs = list(jobs[:n_jobs])
-    for job in jobs:
-        player.add_job(create_job(job))
+    # # p_choice = input(f"Jobs ({n_jobs}): ")
+    # jobs =  "".join([choice(jobs_l) for _ in range(n_jobs)]) #p_choice if p_choice else
+    # jobs = list(jobs[:n_jobs])
+    # for job in jobs:
+    #     player.add_job(create_job(job))
 
-    # p_choice = input(f"Equips ({n_equips}): ")
-    equips = "".join([choice(equips_l) for _ in range(n_equips)]) #p_choice if p_choice else 
-    equips = list(equips[:n_equips])
-    for equip in equips:
-        player.add_equip(create_equip(equip))
+    # # p_choice = input(f"Equips ({n_equips}): ")
+    # equips = "".join([choice(equips_l) for _ in range(n_equips)]) #p_choice if p_choice else 
+    # equips = list(equips[:n_equips])
+    # for equip in equips:
+    #     player.add_equip(create_equip(equip))
 

@@ -10,10 +10,11 @@ class LearnJobCommand(Command):
         self.target.learn_job(self.job)
         return {"msg": self.target.name + self.description}
 
-jobs_list = [
-    LearnJobCommand(**cons.GUARDIAN),
-    LearnJobCommand(**cons.THIEF),
-    LearnJobCommand(**cons.MERCHANT),
-    LearnJobCommand(**cons.HUNTER),
-    LearnJobCommand(**cons.COOK),
-]
+def gen_jobs_list():
+    return [
+        LearnJobCommand(**cons.GUARDIAN),
+        LearnJobCommand(**cons.THIEF),
+        LearnJobCommand(**cons.MERCHANT),
+        LearnJobCommand(**cons.HUNTER),
+        LearnJobCommand(**cons.COOK),
+    ]

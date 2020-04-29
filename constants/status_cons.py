@@ -4,12 +4,24 @@
     "base_name": ,
     "value":,
     "timer":,
-    "statuses":[], #empty if self, which i believe is all cases... is it possible a multi status? yes
-    #sun charge is an example... but there it is ok... he isn't exacly a status but a command with statuses...
-    "categoty":,
+    "category":,
+    "attr": ,#optional, if impacts an actor attr
 }
+
+ids:
+"stunned",
+"perfect_counter_stance",
+"atk_up",
+"def_up",
+"spd_up",
+"max_hp_up",
+"income_up",
+"regen",
+"poisoned",
+"burned",
 '''
 STUNNED = {
+    "id": "stunned",
     "name": "Stunned",
     "base_name": "stunned",
     "timer": 2,
@@ -18,6 +30,7 @@ STUNNED = {
 }
 
 PERFECT_COUNTER_STANCE = {
+    "id": "perfect_counter_stance",
     "name": "Perfect Counter Stance",
     "base_name": "perfect_counter_stance",
     "timer": 2,
@@ -25,6 +38,7 @@ PERFECT_COUNTER_STANCE = {
 }
 
 ATK_UP = {
+    "id": "atk_up",
     "name": "Attack Up",
     "base_name": "buff",
     "timer": 2,
@@ -34,6 +48,7 @@ ATK_UP = {
 }
 
 DEF_UP = {
+    "id": "def_up",
     "name": "Defense Up",
     "base_name": "buff",
     "timer": 2,
@@ -43,6 +58,7 @@ DEF_UP = {
 }
 
 SPD_UP = {
+    "id": "spd_up",
     "name": "Speed Up",
     "base_name": "buff",
     "timer": 2,
@@ -52,6 +68,7 @@ SPD_UP = {
 }
 
 MAX_HP_UP = {
+    "id": "max_hp_up",
     "name": "Max Hp Up",
     "base_name": "buff",
     "timer": 2,
@@ -61,6 +78,7 @@ MAX_HP_UP = {
 }
 
 INCOME_UP = {
+    "id": "income_up",
     "name": "Income Up",
     "base_name": "buff",
     "timer": 2,
@@ -70,6 +88,7 @@ INCOME_UP = {
 }
 
 REGENERATING = {
+    "id": "regen",
     "name":"Regenerating",
     "base_name": "hot",
     "value": 2,
@@ -78,6 +97,7 @@ REGENERATING = {
 }
 
 POISONED = {
+    "id": "poisoned",
     "name": "Poisoned",
     "base_name": "dot",
     "value": 2,
@@ -86,6 +106,7 @@ POISONED = {
 }
 
 BURNED = {
+    "id": "burned",
     "name": "Burned",
     "base_name": "dot",
     "value": 3,

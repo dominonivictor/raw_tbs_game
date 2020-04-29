@@ -54,9 +54,9 @@ class CommandList():
     def add_kingdom_command(self):
         kingdom = self.owner.kingdom
         command = {
-            "mamalia": get_new_command_by_id("multiply"),
-            "reptalia": get_new_command_by_id("sun_charge"),
-            "aves": get_new_command_by_id("golden_egg"),
+            "mamalia": get_new_command_by_id(id="multiply"),
+            "reptalia": get_new_command_by_id(id="sun_charge"),
+            "aves": get_new_command_by_id(id="golden_egg"),
         }.get(kingdom)
         self.add_command(command, category="kingdom")
 
@@ -79,7 +79,9 @@ class Command():
         
         from components.statuses import CommandStatusList
         self.statuses = CommandStatusList()
-        self.statuses.init(kwargs.get("statuses", []))
+        self.statuses.owner = self
+        self.statuses.init(kwargs.get("statuses_list", []))
+
         self.command_dict = kwargs.get('command_dict', {})
 
         self.msg = kwargs.get("msg", "")
@@ -118,8 +120,12 @@ class Command():
         return {"msg": self.msg.format(*self.msg_function(*self.msg_args, self=self))}
 
     def manage_special_status_or_commands(self):
-        owner_status_base_names = list(map(lambda x: x.base_name, self.owner.statuses.list))
-        target_status_base_names = list(map(lambda x: x.base_name, self.target.statuses.list))
+        
+        owner_status_base_names, target_status_base_names = [], []
+        if self.owner:
+            owner_status_base_names = list(map(lambda x: x.base_name, self.owner.statuses.list))
+        if self.target:
+            target_status_base_names = list(map(lambda x: x.base_name, self.target.statuses.list))
 
         if "stunned" in owner_status_base_names: 
             return {
@@ -134,11 +140,20 @@ class Command():
         return {}
 
     def manage_statuses(self):
-        for status in self.statuses.list:
-            #this may not be the case, only applies the commands target if it doesn't have a target
-            if self.target:
-                #is this really necessary? probably
-                status.target = self.target 
+        for statuses in self.statuses.list:
+            
+            if type(statuses) is list:
+                for status in statuses:
+                    #this may not be the case, only applies the commands target if it doesn't have a target
+                    self.add_status(status)
+            else:
+                self.add_status(statuses)
+
+    def add_status(self, status):
+        if self.target:
+            
+            #is this really necessary? probably
+            status.target = self.target 
             self.target.statuses.add_status(status)
 
     def manage_commands(self, params_commands):
@@ -183,8 +198,8 @@ class Attack(Command):
 
         return self.get_msg_dict()
 
-    def deal_damage(self, damage):
-        self.target.hp.value -= damage
+    def deal_damage(self, damage, is_raw=True):
+        self.target.hp_stat.value -= damage
 
 
 class Heal(Command):
@@ -198,18 +213,14 @@ class Heal(Command):
             return result
 
         v = self.value
-        hp = self.target.hp.value
-        max_hp = self.target.max_hp.value
-        self.target.hp.value = v + hp if hp + v <= max_hp else max_hp 
+        hp = self.target.hp_stat.value
+        max_hp = self.target.max_hp_stat.value
+        self.target.hp_stat.value = v + hp if hp + v <= max_hp else max_hp 
 
         self.heal_value = v
         if not self.msg_function: return
 
         return self.get_msg_dict()
-
-    # def undo(self):
-    #     self.target.hp.value -= self.value
-    #     return {"msg": f"{self.owner.name} attacks {self.target.name} for {self.value} damage"}
 
 class VampBite(Command):
     '''
@@ -243,7 +254,7 @@ class GoldenEgg(Command):
         self.original_statuses = kwargs.get("statuses")
 
     def execute(self): 
-        self.statuses = sample(list(self.statuses), k=2)
+        self.statuses.list = sample(self.original_statuses, k=2)
         super().execute()        
 
 class Multiply(Command):
@@ -261,7 +272,7 @@ class Multiply(Command):
             "animal": f"small {parent.animal}",
             "letter": parent.letter.lower(),
             "kingdom": parent.kingdom,
-            "hp": actors.Stat(value=int(parent.hp.value*self.ratio)),
+            "hp": actors.Stat(value=int(parent.hp_stat.value*self.ratio)),
             "atk_stat": actors.Stat(value=int(parent.atk_stat.value*(self.ratio**2))),
             "def_stat": actors.Stat(value=int(parent.def_stat.value*(self.ratio**2))),
             "spd_stat": actors.Stat(value=int(parent.spd_stat.value*self.ratio)),
@@ -316,7 +327,7 @@ class CopyCat(Command):
                 copied_command = sample(target.commands.equip_list, k=1)[0]
             else:
                 copied_command = target.commands.base_list[-1]
-            copied_command = get_new_command_by_id(copied_command.id)
+            copied_command = get_new_command_by_id(id=copied_command.id)
             self.stolen_command = copied_command
             self.owner.commands.add_command(copied_command)
             self.msg = f"{self.owner.name} copies {copied_command.name} from {target.name}!"
@@ -331,8 +342,8 @@ class Mixn(Command):
         if not self.target.equip:
             return {"msg": "Target doesn't have an equip to mix with"}
         from components.elements import get_new_element_by_id
-        element = get_new_element_by_id("fire")
-        self.owner.equip.add_element(element)
+        element = get_new_element_by_id(id="fire")
+        self.target.equip.add_element(element)
         
         return {"msg": f"{self.owner.name} adds {element.name} element to a {self.target.equip.name}"}
 
@@ -346,38 +357,59 @@ class Mixn(Command):
 #IncomeUp
 #MaxHpUp
 
-def instaciate_commands_dict():
+def instaciate_commands_dict(**kwargs):
+    '''
+    cons content
+    {
+        "name": ,
+        "timer": , #only for commands with statuses_list
+        "value": , #only for commands that deal/heal <value> hp
+        "description": ,
+        "category": ,
+        "eff" : , #for now only for VampBite(), it shows the efficiency of the vampire bite heal
+        "is_raw": , # default is False, only valid for commands that use Attack()
+        # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+        "statuses_list": { #optional if command has stat buffs
+            <status_name>: status_value
+        },
+        "command_dict": {
+            <command_name>: command_value
+        },
+        "max_range": 1,
+    }
+    '''
     import constants.commands_cons as cons
     commands_dict = {
         #all/most of these could be made into a single command with different kwargs basically
-        'attack': Attack(**cons.ATTACK),
-        'heal': Heal(**cons.HEAL),
-        'vamp_bite': VampBite(**cons.VAMP_BITE),
+        'attack': Attack(**{**cons.ATTACK, **kwargs}),
+        'heal': Heal(**{**cons.HEAL, **kwargs}),
+        'vamp_bite': VampBite(**{**cons.VAMP_BITE, **kwargs}),
 
-        'sun_charge': Command(**cons.SUN_CHARGE),
-        'golden_egg': GoldenEgg(**cons.GOLDEN_EGG),
-        'multiply': Multiply(**cons.MULTIPLY),
+        'sun_charge': Command(**{**cons.SUN_CHARGE, **kwargs}),
+        'golden_egg': GoldenEgg(**{**cons.GOLDEN_EGG, **kwargs}),
+        'multiply': Multiply(**{**cons.MULTIPLY, **kwargs}),
         
-        'true slash': Attack(**cons.DAGGER_ATTACK),
-        'toxic_shot': Attack(**cons.TOXIC_SHOT),
-        'paralize_shot': Attack(**cons.PARALIZE_SHOT),
-        'rage': Command(**cons.RAGE_SOUP),
-        'shield_bash': Attack(**cons.SHIELD_BASH),
+        'true_slash': Attack(**{**cons.DAGGER_ATTACK, **kwargs}),
+        'toxic_shot': Attack(**{**cons.TOXIC_SHOT, **kwargs}),
+        'paralize_shot': Attack(**{**cons.PARALIZE_SHOT, **kwargs}),
+        'rage': Command(**{**cons.RAGE_SOUP, **kwargs}),
+        'shield_bash': Attack(**{**cons.SHIELD_BASH, **kwargs}),
 
-        'perfect_counter': Command(**cons.PERFECT_COUNTER),
-        'copy_cat': CopyCat(**cons.COPY_CAT),
-        'mixn': Mixn(**cons.MIXN),
+        'perfect_counter': Command(**{**cons.PERFECT_COUNTER, **kwargs}),
+        'copy_cat': CopyCat(**{**cons.COPY_CAT, **kwargs}),
+        'mixn': Mixn(**{**cons.MIXN, **kwargs}),
 
-        'power_up': Command(**cons.POWER_UP),
-        'defense_up': Command(**cons.DEFENSE_UP),
-        'speed_up': Command(**cons.SPEED_UP),
-        # 'income_up': Command(**cons.INCOME_UP),
-        # 'max_hp_up': Command(**cons.MAX_HP_UP),
-        'regen': Command(**cons.REGEN),
+        'power_up': Command(**{**cons.POWER_UP, **kwargs}),
+        'defense_up': Command(**{**cons.DEFENSE_UP, **kwargs}),
+        'speed_up': Command(**{**cons.SPEED_UP, **kwargs}),
+        # 'income_up': Command(**{**cons.INCOME_UP, **kwargs}),
+        # 'max_hp_up': Command(**{**cons.MAX_HP_UP, **kwargs}),
+        'regen': Command(**{**cons.REGEN, **kwargs}),
     }
     return commands_dict
 
-def get_new_command_by_id(id):
-    commands = instaciate_commands_dict()
+def get_new_command_by_id(**kwargs):
+    id = kwargs.get("id")
+    commands = instaciate_commands_dict(**kwargs)
     
     return commands.get(id)

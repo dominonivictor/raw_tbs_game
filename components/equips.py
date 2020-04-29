@@ -2,21 +2,37 @@ import constants.equips_cons as con
 
 
 class Equip():
-    def __init__(self, name="Lostvayne", value=10, statuses=[], commands=[], category="Forgotten", owner=None, element=None):
-        self.name = name
-        self.value = value
-        self.statuses = statuses
-        self.commands = commands
-        self.category = category
-        self.element = element
-        self.owner = owner
+    def __init__(self, **kwargs):
+        self.id = kwargs.get("id")
+        self.name = kwargs.get("name", "Lostvayne")
+        self.value = kwargs.get("value", 10)
+        self.statuses = kwargs.get("statuses", [])
+        self.category = kwargs.get("category", "Forgotten")
+        self.element = kwargs.get("element", None)
+        self.owner = kwargs.get("owner", None)
+
+        from components.commands import get_new_command_by_id
+        commands = kwargs.get("commands_func_params")
+        self.commands = [get_new_command_by_id(id=commands)]
 
     def equip(self, owner):
+        new_commands_list = []
         self.owner = owner
+
+        from components.commands import get_new_command_by_id
         for command in self.commands:
-            self.owner.commands.add_command(command, category="equip")
+            new_command = get_new_command_by_id(**command.__dict__)
+            new_command.owner = self.owner
+            new_commands_list.append(new_command)
+            self.owner.commands.add_command(new_command, category="equip")
+
+        self.commands = new_commands_list
+
+        from components.statuses import get_new_status_by_id
         for status in self.statuses:
-            status.target = self.owner
+            new_status = get_new_status_by_id(**status.__dict__)
+            new_status.owner = self.owner
+            # status.target = self.owner
             self.owner.statuses.add_status(status)
 
         self.owner.equip = self
@@ -34,38 +50,30 @@ class Equip():
         #go into added command and apply the status thingy
         if self.element:
             self.remove_element(self.element)
-        element.owner = self
+        from components.elements import get_new_element_by_id
+        new_element = get_new_element_by_id(id=element.id)
+        new_element.owner = self
         for command in self.commands:
-            command.statuses.add_status(element.statuses)
+            command.statuses.add_status(new_element.statuses)
 
-        self.element = element
+        self.element = new_element
 
     def remove_element(self, element):
         element.owner = None
         for command in self.commands:
             command.statuses.remove(element.status)
 
+    def show_equip_stats(self):
+        string = f"""{self.name}, value: {self.value}, element: {self.element.name if self.element else "none"}
+            equip_statuses: {[s.name for s in self.statuses]}, equip_commands: {[c.name for c in self.commands]}
+        """
+        return string
 
-class Zarabatana(Equip):
-    def __init__(self, name=con.ZARABA["name"], value=con.ZARABA["value"], statuses=con.ZARABA["statuses"], 
-    commands=con.ZARABA["commands"], category=con.ZARABA["category"]):
-        super().__init__(name=name, value=value, statuses=statuses, commands=commands, 
-        category=category)
-
-class Dagger(Equip):
-    def __init__(self, name=con.DAGGER["name"], value=con.DAGGER["value"], statuses=con.DAGGER["statuses"], 
-    commands=con.DAGGER["commands"], category=con.DAGGER["category"]):
-        super().__init__(name=name, value=value, statuses=statuses, commands=commands, 
-        category=category)
-
-class Cauldron(Equip):
-    def __init__(self, name=con.CAULDRON["name"], value=con.CAULDRON["value"], statuses=con.CAULDRON["statuses"], 
-    commands=con.CAULDRON["commands"], category=con.CAULDRON["category"]):
-        super().__init__(name=name, value=value, statuses=statuses, commands=commands, 
-        category=category)
-
-class Shield(Equip):
-    def __init__(self, name=con.SHIELD["name"], value=con.SHIELD["value"], statuses=con.SHIELD["statuses"], 
-    commands=con.SHIELD["commands"], category=con.SHIELD["category"]):
-        super().__init__(name=name, value=value, statuses=statuses, commands=commands, 
-        category=category)
+def get_new_equip_by_id(**kwargs):
+    equips = {
+        "zarabatana": Equip(**{**con.ZARABA, **kwargs}),
+        "dagger": Equip(**{**con.DAGGER, **kwargs}),
+        "cauldron": Equip(**{**con.CAULDRON, **kwargs}),
+        "shield": Equip(**{**con.SHIELD, **kwargs}),
+    }
+    return equips.get(kwargs.get("id"))

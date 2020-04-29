@@ -7,8 +7,17 @@ class StatusList():
         self.list = []
 
     def add_status(self, status):
-        self.list.append(status)
-        status.apply_buff()
+        if type(status) is list:
+            new_list = [get_new_status_by_id(**{**s.__dict__, **{"owner": self.owner}}) for s in status]
+            self.list.extend(new_list)
+            for status in new_list:
+                status.apply_buff()
+        else:
+            new_status = get_new_status_by_id(**{**status.__dict__, **{"owner": self.owner}})
+            self.list.append(new_status)
+            new_status.apply_buff()
+
+        print(f"owner:{self.owner.name}, statuses: {self.owner.statuses.list}")
 
     def remove_status(self, status): 
         status.remove_status()   
@@ -32,24 +41,33 @@ class CommandStatusList():
 
     def init(self, statuses):
         for status in statuses:
-            self.add_status(status)
+            new_status = get_new_status_by_id(**status) if type(status) is not list else self.init(status)
+            self.add_status(new_status)
 
     def add_status(self, status):
-        self.list.append(status)
+        if type(status) is list:
+            for s in status:
+                self.add_status(s)
+        else:
+            new_status = get_new_status_by_id(**status.__dict__)
+            new_status.owner = self.owner
+            self.list.append(new_status)
 
     def remove_status(self, status): 
         status.remove_status() 
 
 class Status():
     def __init__(self, **kwargs):
+        self.id = kwargs.get("id")
         self.name = kwargs.get("name", "Curse of The Deep")
         self.base_name = kwargs.get("base_name", "Curse of The Deep")
+        self.attr = kwargs.get("attr")
         self.value = kwargs.get("value", 0)
         self.timer = kwargs.get("timer", 0)
         self.owner = kwargs.get("owner", None)
         self.target = kwargs.get("target", None)
         self.category = kwargs.get("category", "Deep")
-        self.statuses = kwargs.get("statuses", [self]) if kwargs.get("statuses", False) else [self]
+        self.statuses = kwargs.get("statuses", [self]) if kwargs.get("statuses", []) else [self]
 
     def apply_buff(self):
         pass
@@ -63,8 +81,8 @@ class Status():
 
 #BASE MAIN ARCHETYPES
 class DoT(Status):
-    def __init__(self, target=None, owner=None, name="Amaterasu", base_name="dot", value=0, timer=0, category='dot', statuses=[]):
-        super().__init__(name=name, base_name=base_name, value=value, timer=timer, target=target, owner=owner, category=category, statuses=statuses)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def pass_time(self):
         super().pass_time()
@@ -72,8 +90,8 @@ class DoT(Status):
         return {"msg": f"Basic DoT msg, value = {self.value}, current_timer = {self.timer}"}
 
 class HoT(Status):
-    def __init__(self, target=None, owner=None, value=0, timer=0, base_name="hot", name="Seeds of Love", category='hot', statuses=[]):
-        super().__init__(name=name, base_name=base_name, value=value, timer=timer, target=target, owner=owner, category=category, statuses=statuses)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def pass_time(self):
         super().pass_time()
@@ -81,9 +99,8 @@ class HoT(Status):
         return {"msg": f"Basic HoT msg, value = {self.value}, current_timer = {self.timer}"}
 
 class Buff(Status):
-    def __init__(self, target=None, owner=None, name="Ronacse's Grace", base_name="buff", timer=0, statuses=[], category='buff', value=0, attr=None):
-        super().__init__(name=name, base_name=base_name, value=value, timer=timer, target=target, owner=owner, category=category, statuses=statuses)
-        self.attr = attr
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def apply_buff(self):
         
@@ -105,20 +122,21 @@ class Buff(Status):
 ################################        
 ####### SPECIAL STATUSES #######
 ################################
+#Stunned
+#PerfectCounterStance
 
-class Stunned(Status):
-    def __init__(self, target=None, owner=None, base_name=cons.STUNNED["base_name"], timer=cons.STUNNED["timer"], value=0, name=cons.STUNNED["name"], 
-    category=cons.STUNNED["category"], statuses=[]):
-        super().__init__(name=name, base_name=base_name, timer=timer, target=target, owner=owner, category=category, value=value, statuses=statuses)
-
-class PerfectCounterStance(Status):
-    def __init__(self, target=None, owner=None, base_name=cons.PERFECT_COUNTER_STANCE["base_name"], timer=cons.PERFECT_COUNTER_STANCE["timer"], 
-    value=0, name=cons.PERFECT_COUNTER_STANCE["name"], category=cons.PERFECT_COUNTER_STANCE["category"], statuses=[]):
-        super().__init__(name=name, base_name=base_name, timer=timer, target=target, owner=owner, category=category, value=value, statuses=statuses)
-        
-
-def get_new_status_by_id(id, **kwargs):
-    status = {
+def get_statuses_dict(**kwargs):
+    """
+    {
+        "name":,
+        "base_name": ,
+        "value":,
+        "timer":,
+        "category":,
+        "attr": ,#optional, if impacts an actor attr
+    }
+    """
+    statuses = {
         "atk_up": Buff(**{**cons.ATK_UP, **kwargs}),
         "def_up": Buff(**{**cons.DEF_UP, **kwargs}),
         "spd_up": Buff(**{**cons.SPD_UP, **kwargs}),
@@ -126,9 +144,15 @@ def get_new_status_by_id(id, **kwargs):
         "income_up": Buff(**{**cons.INCOME_UP, **kwargs}),
         "regen": HoT(**{**cons.REGENERATING, **kwargs}),
         "poisoned": DoT(**{**cons.POISONED, **kwargs}),
-        "burned": HoT(**{**cons.BURNED, **kwargs}),
-        "stunned": Stunned(**{**cons.STUNNED, **kwargs}),
-        "perfect_counter_stance": PerfectCounterStance(**{**cons.PERFECT_COUNTER_STANCE, **kwargs}),
-    }.get(id)
+        "burned": DoT(**{**cons.BURNED, **kwargs}),
+        "stunned": Status(**{**cons.STUNNED, **kwargs}),
+        "perfect_counter_stance": Status(**{**cons.PERFECT_COUNTER_STANCE, **kwargs}),
+    }
+
+    return statuses
+
+def get_new_status_by_id(**kwargs):
+    id = kwargs.get("id")
+    status = get_statuses_dict(**kwargs).get(id)
 
     return status
