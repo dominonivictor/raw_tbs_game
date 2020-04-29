@@ -183,8 +183,8 @@ class Attack(Command):
 
         return self.get_msg_dict()
 
-    def deal_damage(self, damage):
-        self.target.hp.value -= damage
+    def deal_damage(self, damage, is_raw=True):
+        self.target.hp_stat.value -= damage
 
 
 class Heal(Command):
@@ -198,9 +198,9 @@ class Heal(Command):
             return result
 
         v = self.value
-        hp = self.target.hp.value
-        max_hp = self.target.max_hp.value
-        self.target.hp.value = v + hp if hp + v <= max_hp else max_hp 
+        hp = self.target.hp_stat.value
+        max_hp_stat = self.target.max_hp_stat.value
+        self.target.hp_stat.value = v + hp if hp + v <= max_hp_stat else max_hp_stat 
 
         self.heal_value = v
         if not self.msg_function: return
@@ -240,10 +240,10 @@ class VampBite(Command):
 class GoldenEgg(Command):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.original_statuses = kwargs.get("statuses")
+        self.original_statuses_list = self.statuses.list
 
     def execute(self): 
-        self.statuses = sample(list(self.statuses), k=2)
+        self.statuses.list = sample(self.original_statuses_list, k=2)
         super().execute()        
 
 class Multiply(Command):
@@ -261,7 +261,7 @@ class Multiply(Command):
             "animal": f"small {parent.animal}",
             "letter": parent.letter.lower(),
             "kingdom": parent.kingdom,
-            "hp": actors.Stat(value=int(parent.hp.value*self.ratio)),
+            "hp": actors.Stat(value=int(parent.hp_stat.value*self.ratio)),
             "atk_stat": actors.Stat(value=int(parent.atk_stat.value*(self.ratio**2))),
             "def_stat": actors.Stat(value=int(parent.def_stat.value*(self.ratio**2))),
             "spd_stat": actors.Stat(value=int(parent.spd_stat.value*self.ratio)),

@@ -9,8 +9,8 @@ class Actor():
         self.letter = kwargs.get("letter", "X")
         self.kingdom = kwargs.get("kingdom", "No kingdom")
         self.animal = kwargs.get("animal", "scrub")
-        self.hp = kwargs.get("hp")
-        self.max_hp = Stat(value=kwargs.get("hp").value)
+        self.hp_stat = kwargs.get("hp_stat")
+        self.max_hp_stat = Stat(value=kwargs.get("hp_stat").value)
         self.def_stat = kwargs.get("def_stat") 
         self.atk_stat = kwargs.get("atk_stat")
         self.spd_stat = kwargs.get("spd_stat")
@@ -73,7 +73,7 @@ class Actor():
         Name: {self.name}
         Animal: {self.animal}
         Kingdom: {self.kingdom}
-        HP: {self.hp.value}/{self.max_hp.value}
+        HP: {self.hp_stat.value}/{self.max_hp_stat.value}
         ATK: {self.atk_stat.value}
         DEF: {self.def_stat.value}
         SPD: {self.spd_stat.value}

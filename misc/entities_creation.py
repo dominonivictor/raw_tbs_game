@@ -44,7 +44,7 @@ def create_actor(animal, game):
         "animal": animal["animal"],
         "letter": animal["letter"],
         "kingdom": animal["kingdom"],
-        "hp": Stat(value=animal["hp"]),
+        "hp_stat": Stat(value=animal["hp_stat"]),
         "def_stat": Stat(value=animal["def"]),
         "atk_stat": Stat(value=animal["atk"]),
         "spd_stat": Stat(value=animal["spd"]),
