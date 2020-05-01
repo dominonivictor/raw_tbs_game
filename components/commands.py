@@ -60,6 +60,20 @@ class CommandList():
         }.get(kingdom)
         self.add_command(command, category="kingdom")
 
+    def show_commands(self):
+        commands_str = ''
+        i = 1
+        for command in self.list:
+            commands_str = commands_str + f'({i}) {command.name} - '
+            i += 1
+
+        commands_str = commands_str[:-2] + '.'
+        return commands_str
+
+    def pass_turn(self):
+        pass
+
+
 class Command():
     def __init__(self, **kwargs):
         self.id = kwargs.get("id")
@@ -120,6 +134,7 @@ class Command():
         return {"msg": self.msg.format(*self.msg_function(*self.msg_args, self=self))}
 
     def manage_special_status_or_commands(self):
+        # separate each into a self standing function
         
         owner_status_base_names, target_status_base_names = [], []
         if self.owner:
@@ -140,19 +155,19 @@ class Command():
         return {}
 
     def manage_statuses(self):
+        # make this more manageable
         for statuses in self.statuses.list:
             
             if type(statuses) is list:
                 for status in statuses:
-                    #this may not be the case, only applies the commands target if it doesn't have a target
+                    # this may not be the case, only applies the commands target if it doesn't have a target
                     self.add_status(status)
             else:
                 self.add_status(statuses)
 
     def add_status(self, status):
         if self.target:
-            
-            #is this really necessary? probably
+            # is this really necessary? probably
             status.target = self.target 
             self.target.statuses.add_status(status)
 
@@ -170,8 +185,8 @@ class Command():
         return execution_dict
 
     def calculate_final_dmg_value(self, is_raw=False):
-        actor_atk_stat = self.owner.atk_stat.value
-        value_after_bonuses = actor_atk_stat - self.target.def_stat.value if not self.is_raw else 0
+        actor_atk_stat = self.owner.atk_stat
+        value_after_bonuses = actor_atk_stat - self.target.def_stat if not self.is_raw else 0
         final_value =  self.value + value_after_bonuses
         if final_value < 0: final_value = 0
 
@@ -185,42 +200,43 @@ class Attack(Command):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-
     def execute(self):
         result = super().execute()
         if not result.get("valid_action", True):
             return result
 
-        self.calculate_final_dmg_value(is_raw=self.is_raw)
-        self.deal_damage(self.final_value)
-
+        self.deal_damage(self.final_value, is_raw=self.is_raw)
         if not self.msg_function: return
-
         return self.get_msg_dict()
 
-    def deal_damage(self, damage, is_raw=True):
-        self.target.hp_stat.value -= damage
-
+    def deal_damage_to_target(self, damage, is_raw=True):
+        self.calculate_final_dmg_value(is_raw=is_raw)
+        self.target.hp_stat -= damage
 
 class Heal(Command):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.heal_value = 0
+        
 
     def execute(self):
         result = super().execute()
         if not result.get("valid_action", True):
             return result
 
-        v = self.value
-        hp = self.target.hp_stat.value
-        max_hp = self.target.max_hp_stat.value
-        self.target.hp_stat.value = v + hp if hp + v <= max_hp else max_hp 
-
-        self.heal_value = v
+        self.heal_damage(self, final_value)
         if not self.msg_function: return
-
         return self.get_msg_dict()
+
+    def calculate_heal_damage(self, value):
+        hp = self.target.hp_stat
+        max_hp = self.target.max_hp_stat
+        final_value = value + hp if hp + value <= max_hp else max_hp 
+        return final_value
+
+    def heal_damage(self, value):
+        self.heal_value = self.calculate_final_heal_damage(value)
+        self.target.hp += self.heal_value
 
 class VampBite(Command):
     '''
@@ -272,11 +288,11 @@ class Multiply(Command):
             "animal": f"small {parent.animal}",
             "letter": parent.letter.lower(),
             "kingdom": parent.kingdom,
-            "hp": actors.Stat(value=int(parent.hp_stat.value*self.ratio)),
-            "atk_stat": actors.Stat(value=int(parent.atk_stat.value*(self.ratio**2))),
-            "def_stat": actors.Stat(value=int(parent.def_stat.value*(self.ratio**2))),
-            "spd_stat": actors.Stat(value=int(parent.spd_stat.value*self.ratio)),
-            "income_stat": actors.Stat(value=int(parent.income_stat.value*self.ratio)),
+            "hp_stat": int(parent.hp_stat*self.ratio),
+            "atk_stat": int(parent.atk_stat*(self.ratio**2)),
+            "def_stat": int(parent.def_stat*(self.ratio**2)),
+            "spd_stat": int(parent.spd_stat*self.ratio),
+            "income_stat": int(parent.income_stat*self.ratio),
             "commands": parent.commands.base_list,
             "x": x,
             "y": y,

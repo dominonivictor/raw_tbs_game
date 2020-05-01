@@ -9,23 +9,29 @@
 }
 
 ids:
-"stunned",
-"perfect_counter_stance",
-"atk_up",
-"def_up",
-"spd_up",
-"max_hp_up",
-"income_up",
-"regen",
-"poisoned",
-"burned",
+    "stunned",
+    "perfect_counter_stance",
+    "atk_up",
+    "def_up",
+    "spd_up",
+    "max_hp_up",
+    "income_up",
+    "regen",
+    "poisoned",
+    "burned",
+
+categories:
+    special_buff
+    attr_buff
+    hp_buff
 '''
+##################### SPECIAL EFFECTS ##########################
 STUNNED = {
     "id": "stunned",
     "name": "Stunned",
     "base_name": "stunned",
     "timer": 2,
-    "category": "Major Debuff",
+    "category": "special_status",
     
 }
 
@@ -34,16 +40,18 @@ PERFECT_COUNTER_STANCE = {
     "name": "Perfect Counter Stance",
     "base_name": "perfect_counter_stance",
     "timer": 2,
-    "category": "Major Buff"
+    "category": "special_status"
 }
 
+
+##################### ATTR BUFFS ##################
 ATK_UP = {
     "id": "atk_up",
     "name": "Attack Up",
     "base_name": "buff",
     "timer": 2,
     "value": 2,
-    "category": "Minor Buff",
+    "category": "attr_buff",
     "attr": "atk_stat",
 }
 
@@ -53,7 +61,7 @@ DEF_UP = {
     "base_name": "buff",
     "timer": 2,
     "value": 2,
-    "category": "Minor Buff",
+    "category": "attr_buff",
     "attr": "def_stat",
 }
 
@@ -63,7 +71,7 @@ SPD_UP = {
     "base_name": "buff",
     "timer": 2,
     "value": 2,
-    "category": "Minor Buff",
+    "category": "attr_buff",
     "attr": "spd_stat",
 }
 
@@ -73,7 +81,7 @@ MAX_HP_UP = {
     "base_name": "buff",
     "timer": 2,
     "value": 2,
-    "category": "Minor Buff",
+    "category": "attr_buff",
     "attr": "max_hp_stat",
 }
 
@@ -83,17 +91,18 @@ INCOME_UP = {
     "base_name": "buff",
     "timer": 2,
     "value": 2,
-    "category": "Minor Buff",
+    "category": "attr_buff",
     "attr": "income_stat",
 }
 
+########################## DMG/HEAL BUFFS ##########################
 REGENERATING = {
     "id": "regen",
     "name":"Regenerating",
     "base_name": "hot",
     "value": 2,
     "timer": 4,
-    "category": "HoT",
+    "category": "hp_change",
 }
 
 POISONED = {
@@ -102,7 +111,7 @@ POISONED = {
     "base_name": "dot",
     "value": 2,
     "timer": 4,
-    "category": "DoT",
+    "category": "hp_change",
 }
 
 BURNED = {
@@ -111,6 +120,6 @@ BURNED = {
     "base_name": "dot",
     "value": 3,
     "timer": 3,
-    "category": "DoT",
+    "category": "hp_change",
 }
 

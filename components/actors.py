@@ -1,4 +1,4 @@
-from components.statuses import StatusList
+from components.statuses import StatusManager
 from components.commands import CommandList
 from game_eye import GameEye
 
@@ -10,12 +10,13 @@ class Actor():
         self.kingdom = kwargs.get("kingdom", "No kingdom")
         self.animal = kwargs.get("animal", "scrub")
         self.hp_stat = kwargs.get("hp_stat")
-        self.max_hp_stat = Stat(value=kwargs.get("hp_stat").value)
-        self.def_stat = kwargs.get("def_stat") 
+        self.max_hp_stat = kwargs.get("hp_stat")
         self.atk_stat = kwargs.get("atk_stat")
+        self.def_stat = kwargs.get("def_stat") 
         self.spd_stat = kwargs.get("spd_stat")
         self.income_stat = kwargs.get("income_stat")
-        self.statuses = StatusList()
+        
+        self.statuses = StatusManager()
         self.statuses.owner = self
 
         self.base_commands = kwargs.get("commands", [])
@@ -37,47 +38,30 @@ class Actor():
         self.game_eye = GameEye.instance()
 
     def show_statuses(self):
-        statuses = ''
-        for status in self.statuses.list:
-            statuses += f'{status.name}, '
-
-        statuses = statuses[:-2] + '.'
-        return statuses
+        return self.statuses.show_statuses()
 
     def show_commands(self):
-        commands_str = ''
-        i = 1
-        for command in self.commands.list:
-            commands_str = commands_str + f'({i}) {command.name} - '
-            i += 1
-
-        commands_str = commands_str[:-2] + '.'
-        return commands_str
-
+        return self.commands.show_commands()
+        
     def learn_job(self, job):
-        if self.job:
-            self.job.unlearn()
-        job.owner = self
-        self.job = job
-        self.job.initialize()
-
+        job.learn(owner=self)
+        
     def add_equip(self, item):
         item.equip(owner=self)
 
     def unequip(self):
         self.equip.unequip()
-        self.equip = None
 
     def show_battle_stats(self):
         string = f"""
         Name: {self.name}
         Animal: {self.animal}
         Kingdom: {self.kingdom}
-        HP: {self.hp_stat.value}/{self.max_hp_stat.value}
-        ATK: {self.atk_stat.value}
-        DEF: {self.def_stat.value}
-        SPD: {self.spd_stat.value}
-        In: {self.income_stat.value}
+        HP: {self.hp_stat}/{self.max_hp_stat}
+        ATK: {self.atk_stat}
+        DEF: {self.def_stat}
+        SPD: {self.spd_stat}
+        In: {self.income_stat}
         Statuses: {self.show_statuses()}
         Commands: {self.show_commands()}
         x, y: {self.x}, {self.y}
@@ -95,7 +79,8 @@ class Actor():
         self.has_acted = False
         self.has_moved = False
 
-class Stat():
-    def __init__(self, value):
-        self.value = value
-
+    def pass_turn(self):
+        self.commands.pass_turn()
+        self.statuses.pass_turn()
+        self.equip.pass_turn()
+        self.job.pass_turn()

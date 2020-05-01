@@ -3,7 +3,7 @@ FIRE ={
     "id": "fire",
     "name": "Fire",
     "timer": 2,
-    "statuses_func_params": "burned"
+    "status_ids": ["burned"]
 }
 
 '''
@@ -11,6 +11,6 @@ FIRE ={
     "id": ,
     "name": ,
     "timer": ,
-    "status_id": <status_id>
+    "status_ids": [<status_id>]
 }
 '''

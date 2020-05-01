@@ -1,4 +1,4 @@
-from components.actors import Actor, Stat
+from components.actors import Actor
 from components.jobs import Guardian, Thief, Merchant, Hunter, Cook
 from components.equips import get_new_equip_by_id
 from components.commands import instaciate_commands_dict
@@ -23,11 +23,11 @@ def create_actor(animal, game):
         "animal": animal["animal"],
         "letter": animal["letter"],
         "kingdom": animal["kingdom"],
-        "hp_stat": Stat(value=animal["hp_stat"]),
-        "def_stat": Stat(value=animal["def"]),
-        "atk_stat": Stat(value=animal["atk"]),
-        "spd_stat": Stat(value=animal["spd"]),
-        "income_stat": Stat(value=animal["income"]),
+        "hp_stat": animal["hp_stat"],
+        "def_stat": animal["def"],
+        "atk_stat": animal["atk"],
+        "spd_stat": animal["spd"],
+        "income_stat": animal["income"],
         "commands": create_commands_list(animal["commands"]),
 
         "game_eye": game,
