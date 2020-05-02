@@ -7,20 +7,20 @@ class Actor():
     def __init__(self, **kwargs):
         self.name = kwargs.get("name", "Nameless")
         self.letter = kwargs.get("letter", "X")
-        self.kingdom = kwargs.get("kingdom", "No kingdom")
-        self.animal = kwargs.get("animal", "scrub")
-        self.hp_stat = kwargs.get("hp_stat")
-        self.max_hp_stat = kwargs.get("hp_stat")
-        self.atk_stat = kwargs.get("atk_stat")
-        self.def_stat = kwargs.get("def_stat") 
-        self.spd_stat = kwargs.get("spd_stat")
-        self.income_stat = kwargs.get("income_stat")
+        self.kingdom = kwargs.get("kingdom", "reptalia")
+        self.animal = kwargs.get("animal", "fox")
+        self.hp_stat = kwargs.get("hp_stat", 10)
+        self.max_hp_stat = kwargs.get("hp_stat", 10)
+        self.atk_stat = kwargs.get("atk_stat", 2)
+        self.def_stat = kwargs.get("def_stat", 0)
+        self.spd_stat = kwargs.get("spd_stat", 4)
+        self.income_stat = kwargs.get("income_stat", 2)
         
         self.statuses = StatusManager()
         self.statuses.owner = self
 
-        self.base_commands = kwargs.get("commands", [])
-        self.commands = CommandList(owner=self)
+        self.base_commands = kwargs.get("commands_ids", [])
+        self.commands = CommandList(owner=self, command_ids=self.base_commands)
 
         self.job = kwargs.get("job", None)
         if self.job:

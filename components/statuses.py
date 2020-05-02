@@ -6,8 +6,8 @@ class StatusManager():
 
     def add_statuses_to_actor(self, statuses: list):       
         '''
-            Recieves a list containing new instances of stati. If a given status is a buff 
-            (or debuff) it applies this buff to its owner.
+            Recieves a list containing new instances of stati. If a given status
+            is a buff (or debuff) it applies this buff to its owner.
         ''' 
         for status in statuses:
             status.owner = self.owner
@@ -21,8 +21,8 @@ class StatusManager():
 
     def pass_time(self):
         '''
-            All statuses are influenced by pass_time(), all statuses have their timer 
-            attr diminished by 1.
+            All statuses are influenced by pass_time(), all statuses have their 
+            timer attr diminished by 1.
         '''
         msg_list = []
         for status in self.list:
@@ -46,7 +46,7 @@ class StatusManager():
         statuses = statuses[:-2] + '.'
         return statuses
 
-class ComponentStatusList():#CommandStatusList
+class ComponentStatusList():
     def __init__(self):
         self.list = []
 
@@ -171,8 +171,7 @@ def get_statuses_dict():
 
     return statuses
 
-def get_new_statuses_by_ids(ids_list=[]: list)-> lit:
-    ids_list = kwargs.get("ids_list", False)
+def get_new_statuses_by_ids(ids_list: list = [])-> list:
     statuses = []
     status_dict = get_statuses_dict()
     for id_ in ids_list:

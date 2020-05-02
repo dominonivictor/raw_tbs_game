@@ -13,8 +13,9 @@ class CommandList():
         self.equip_list = []
         self.job_list = []
         self.list = []
-        self.init(self.owner.base_commands)
-
+        commands_ids = kwargs.get("commands_ids", [])
+        self.init(commands_ids)
+        
     def init(self, commands):
         for command in commands:
             self.add_command(command, "base")
@@ -91,13 +92,15 @@ class Command():
         self.max_range = kwargs.get('max_range', 1)
         self.final_value = 0
         
-        from components.statuses import CommandStatusList
-        self.statuses = CommandStatusList()
+        from components.statuses import ComponentStatusList, get_new_statuses_by_ids
+        self.statuses = ComponentStatusList()
         self.statuses.owner = self
-        self.statuses.init(kwargs.get("statuses_list", []))
+        new_statuses_dict_list = kwargs.get("statuses_list", [])
+        new_statuses_ids = list(map(lambda obj: obj["id"], new_statuses_dict_list))
+        new_statuses = get_new_statuses_by_ids(ids_list=new_statuses_ids)
+        self.statuses.add_statuses(statuses=new_statuses)
 
         self.command_dict = kwargs.get('command_dict', {})
-
         self.msg = kwargs.get("msg", "")
         self.msg_function = kwargs.get("msg_function", None)
         self.msg_args = kwargs.get("msg_args", None)
@@ -135,7 +138,7 @@ class Command():
 
     def manage_special_status_or_commands(self):
         # separate each into a self standing function
-        
+        # need to separate these functionallity into separate functions 
         owner_status_base_names, target_status_base_names = [], []
         if self.owner:
             owner_status_base_names = list(map(lambda x: x.base_name, self.owner.statuses.list))
@@ -155,21 +158,13 @@ class Command():
         return {}
 
     def manage_statuses(self):
-        # make this more manageable
-        for statuses in self.statuses.list:
-            
-            if type(statuses) is list:
-                for status in statuses:
-                    # this may not be the case, only applies the commands target if it doesn't have a target
-                    self.add_status(status)
-            else:
-                self.add_status(statuses)
+        from components.statuses import get_new_statuses_by_ids
+        statuses_ids = list(map(lambda x: x.id, self.statuses.list))
+        new_statuses_list = get_new_statuses_by_ids(ids_list=statuses_ids)
+        self.add_statuses(new_statuses_list)
 
-    def add_status(self, status):
-        if self.target:
-            # is this really necessary? probably
-            status.target = self.target 
-            self.target.statuses.add_status(status)
+    def add_statuses(self, statuses):
+        self.target.statuses.add_statuses_to_actor(statuses)
 
     def manage_commands(self, params_commands):
         execution_dict = {}
