@@ -1,5 +1,4 @@
 from components.statuses import get_new_statuses_by_ids
-from components.commands import Command, Attack, CopyCat, Mixn
 import constants.commands_cons as comm_cons
 
 class Job():
@@ -17,7 +16,6 @@ class Job():
         self.apply_commands()
 
     def apply_ownership(self):
-        # 
         if self.owner:
             for command in self.commands:
                 command.owner = self.owner
@@ -39,8 +37,8 @@ class Job():
     def learn(self, owner):
         if owner.job:
             owner.job.unlearn()
-        job.owner = owner
-        owner.job = job
+        self.owner = owner
+        owner.job = self
         owner.job.initialize()
 
 

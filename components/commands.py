@@ -13,17 +13,20 @@ class CommandList():
         self.equip_list = []
         self.job_list = []
         self.list = []
-        commands_ids = kwargs.get("commands_ids", [])
-        self.init(commands_ids)
-        
-    def init(self, commands):
+        self.raw_commands_ids = kwargs.get("raw_commands_ids", [])
+        self.init() 
+
+    def init(self):
+        from components.commands import get_new_command_by_id 
+        commands = [get_new_command_by_id(id=comm_id) for comm_id in
+        self.raw_commands_ids]
         for command in commands:
             self.add_command(command, "base")
         self.add_kingdom_command()
 
     def add_command(self, command, category=""):
         for comm in self.list:
-            if comm.name == command.name:
+            if comm.id == command.id:
                 print("Not able to add command cause it's already in the commands list")
         else:
             command.owner = self.owner
@@ -71,6 +74,11 @@ class CommandList():
         commands_str = commands_str[:-2] + '.'
         return commands_str
 
+    def get_command_by_id(self, comm_id):
+        for comm in self.list:
+            if comm.id == comm_id:
+                return comm
+        
     def pass_turn(self):
         pass
 
@@ -91,13 +99,15 @@ class Command():
         self.is_raw = kwargs.get('is_raw', False)
         self.max_range = kwargs.get('max_range', 1)
         self.final_value = 0
-        
+       
+        #THIS IS VERY MESSY FIX THIS SHIT
         from components.statuses import ComponentStatusList, get_new_statuses_by_ids
         self.statuses = ComponentStatusList()
         self.statuses.owner = self
         new_statuses_dict_list = kwargs.get("statuses_list", [])
         new_statuses_ids = list(map(lambda obj: obj["id"], new_statuses_dict_list))
         new_statuses = get_new_statuses_by_ids(ids_list=new_statuses_ids)
+        self.add_statuses_ownership(new_statuses)
         self.statuses.add_statuses(statuses=new_statuses)
 
         self.command_dict = kwargs.get('command_dict', {})
@@ -122,7 +132,6 @@ class Command():
         }
 
         self.manage_statuses()
-
         execution_dict = self.manage_commands(params_commands=params_commands)
 
         if self.msg_function:
@@ -161,6 +170,7 @@ class Command():
         from components.statuses import get_new_statuses_by_ids
         statuses_ids = list(map(lambda x: x.id, self.statuses.list))
         new_statuses_list = get_new_statuses_by_ids(ids_list=statuses_ids)
+        self.add_statuses_ownership(statuses=new_statuses_list)
         self.add_statuses(new_statuses_list)
 
     def add_statuses(self, statuses):
@@ -181,11 +191,16 @@ class Command():
 
     def calculate_final_dmg_value(self, is_raw=False):
         actor_atk_stat = self.owner.atk_stat
-        value_after_bonuses = actor_atk_stat - self.target.def_stat if not self.is_raw else 0
-        final_value =  self.value + value_after_bonuses
+        bonuses = actor_atk_stat - self.target.def_stat if not is_raw else 0
+        final_value =  self.value + bonuses
         if final_value < 0: final_value = 0
 
         self.final_value = final_value
+        return final_value
+
+    def add_statuses_ownership(self, statuses: list):
+        for status in statuses:
+            status.owner, status.target = self.owner, self.target
 
 ####################################
 ######### BASIC COMMANDS ###########
@@ -199,14 +214,13 @@ class Attack(Command):
         result = super().execute()
         if not result.get("valid_action", True):
             return result
-
-        self.deal_damage(self.final_value, is_raw=self.is_raw)
+        self.deal_damage_to_target(self.final_value, is_raw=self.is_raw)
         if not self.msg_function: return
         return self.get_msg_dict()
 
     def deal_damage_to_target(self, damage, is_raw=True):
-        self.calculate_final_dmg_value(is_raw=is_raw)
-        self.target.hp_stat -= damage
+        self.final_value = self.calculate_final_dmg_value(is_raw=is_raw)
+        self.target.take_damage(value=self.final_value)
 
 class Heal(Command):
     def __init__(self, **kwargs):
@@ -218,20 +232,13 @@ class Heal(Command):
         result = super().execute()
         if not result.get("valid_action", True):
             return result
-
-        self.heal_damage(self, final_value)
+            
+        self.heal_damage(self.value)
         if not self.msg_function: return
         return self.get_msg_dict()
 
-    def calculate_heal_damage(self, value):
-        hp = self.target.hp_stat
-        max_hp = self.target.max_hp_stat
-        final_value = value + hp if hp + value <= max_hp else max_hp 
-        return final_value
-
     def heal_damage(self, value):
-        self.heal_value = self.calculate_final_heal_damage(value)
-        self.target.hp += self.heal_value
+        self.target.heal_damage(value)
 
 class VampBite(Command):
     '''

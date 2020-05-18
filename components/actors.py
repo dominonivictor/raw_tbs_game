@@ -19,9 +19,8 @@ class Actor():
         self.statuses = StatusManager()
         self.statuses.owner = self
 
-        self.base_commands = kwargs.get("commands_ids", [])
-        self.commands = CommandList(owner=self, command_ids=self.base_commands)
-
+        commands_ids = kwargs.get("commands_ids", [])
+        self.commands = CommandList(owner=self, raw_commands_ids=commands_ids)
         self.job = kwargs.get("job", None)
         if self.job:
             self.learn_job(job)
@@ -84,3 +83,15 @@ class Actor():
         self.statuses.pass_turn()
         self.equip.pass_turn()
         self.job.pass_turn()
+
+    def take_damage(self, value):
+        hp = self.hp_stat
+        self.hp_stat = hp - value if hp - value >= 0 else 0
+
+    def heal_damage(self, value):
+        hp = self.hp_stat
+        max_hp = self.max_hp_stat
+        final_value = value + hp if hp + value <= max_hp else max_hp 
+        self.hp_stat = final_value
+
+

@@ -57,6 +57,10 @@ class ComponentStatusList():
     def remove_status(self, status): 
         status.remove_status() 
 
+    def add_statuses_ownership(self, statuses: list):
+        for status in statuses:
+            status.owner, status.target = self.owner, self.target
+
 class PassivesList():
     def __init__(self):
         self.list = []
@@ -105,7 +109,8 @@ class DoT(Status):
     def pass_time(self):
         super().pass_time()
         from components.commands import Attack
-        Attack(owner=self.owner, target=self.target).deal_damage(damage=self.value, is_raw=True)
+        Attack(owner=self.owner,
+        target=self.target).deal_damage_to_target(damage=self.value, is_raw=True)
         return {"msg": f"Basic DoT msg, value = {self.value}, current_timer = {self.timer}"}
 
 class HoT(Status):
@@ -128,8 +133,9 @@ class Buff(Status):
         setattr(self.owner, self.attr, current_value + self.value)
 
     def remove_buff(self):
+        
         current_value = getattr(self.owner, self.attr)
-        setattr(self.target, self.attr, current_value - self.value)
+        setattr(self.owner, self.attr, current_value - self.value)
         self.owner = None
 
     def pass_time(self):
