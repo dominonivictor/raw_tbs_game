@@ -3,7 +3,7 @@ FIRE ={
     "id": "fire",
     "name": "Fire",
     "timer": 2,
-    "status_ids": ["burned"]
+    "statuses_list": [{"id": "burned", "value": 2, "timer": 2}]
 }
 
 '''

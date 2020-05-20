@@ -149,7 +149,7 @@ class Buff(Status):
 # Stunned
 # Perfect Counter Stance
 
-def get_statuses_dict():
+def get_status_obj_and_params(id_: str):
     """
     {
         "name":,
@@ -161,27 +161,27 @@ def get_statuses_dict():
     }
     """
     statuses = {
-        "stunned": Status(**cons.STUNNED),
-        "perfect_counter_stance": Status(**cons.PERFECT_COUNTER_STANCE),
+        "stunned": [Status, cons.STUNNED],
+        "perfect_counter_stance": [Status, cons.PERFECT_COUNTER_STANCE],
 
-        "atk_up": Buff(**cons.ATK_UP),
-        "def_up": Buff(**cons.DEF_UP),
-        "spd_up": Buff(**cons.SPD_UP),
-        "max_hp_up": Buff(**cons.MAX_HP_UP),
-        "income_up": Buff(**cons.INCOME_UP),
+        "atk_up": [Buff, cons.ATK_UP],
+        "def_up": [Buff, cons.DEF_UP],
+        "spd_up": [Buff, cons.SPD_UP],
+        "max_hp_up": [Buff, cons.MAX_HP_UP],
+        "income_up": [Buff, cons.INCOME_UP],
         
-        "regen": HoT(**cons.REGENERATING),
-        "poisoned": DoT(**cons.POISONED),
-        "burned": DoT(**cons.BURNED),
+        "regen": [HoT, cons.REGENERATING],
+        "poisoned": [DoT, cons.POISONED],
+        "burned": [DoT, cons.BURNED],
     }
 
-    return statuses
+    return statuses.get(id_)
 
-def get_new_statuses_by_ids(ids_list: list = [])-> list:
+def get_new_statuses_by_ids(status_list: list = [])-> list:
     statuses = []
-    status_dict = get_statuses_dict()
-    for id_ in ids_list:
-        status = status_dict.get(id_)
-        statuses.append(status)
+
+    for status_dict in status_list:
+        obj, cons = get_status_obj_and_params(status_dict["id"])
+        statuses.append(obj(**{**cons, **status_dict}))
 
     return statuses

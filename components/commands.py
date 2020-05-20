@@ -17,7 +17,6 @@ class CommandList():
         self.init() 
 
     def init(self):
-        from components.commands import get_new_command_by_id 
         commands = [get_new_command_by_id(id=comm_id) for comm_id in
         self.raw_commands_ids]
         for command in commands:
@@ -100,13 +99,14 @@ class Command():
         self.max_range = kwargs.get('max_range', 1)
         self.final_value = 0
        
-        #THIS IS VERY MESSY FIX THIS SHIT
+        #TODO THIS IS VERY MESSY FIX THIS SHIT
         from components.statuses import ComponentStatusList, get_new_statuses_by_ids
         self.statuses = ComponentStatusList()
+        #aqui mostra que o Command tem que saber do funcionamento interno de
+        #ComponentStatusList?SIM demais ateh Se eu mudar o CSL oqe mais vou ter que mudar aqui?
         self.statuses.owner = self
-        new_statuses_dict_list = kwargs.get("statuses_list", [])
-        new_statuses_ids = list(map(lambda obj: obj["id"], new_statuses_dict_list))
-        new_statuses = get_new_statuses_by_ids(ids_list=new_statuses_ids)
+        self.statuses_raw_list = kwargs.get("statuses_list", [])
+        new_statuses = get_new_statuses_by_ids(status_list=self.statuses_raw_list)
         self.add_statuses_ownership(new_statuses)
         self.statuses.add_statuses(statuses=new_statuses)
 
@@ -168,8 +168,7 @@ class Command():
 
     def manage_statuses(self):
         from components.statuses import get_new_statuses_by_ids
-        statuses_ids = list(map(lambda x: x.id, self.statuses.list))
-        new_statuses_list = get_new_statuses_by_ids(ids_list=statuses_ids)
+        new_statuses_list = get_new_statuses_by_ids(status_list=self.statuses_raw_list)
         self.add_statuses_ownership(statuses=new_statuses_list)
         self.add_statuses(new_statuses_list)
 
@@ -201,7 +200,8 @@ class Command():
     def add_statuses_ownership(self, statuses: list):
         for status in statuses:
             status.owner, status.target = self.owner, self.target
-
+    def set_target(self, target):
+        self.target = target
 ####################################
 ######### BASIC COMMANDS ###########
 ####################################
@@ -290,7 +290,7 @@ class Multiply(Command):
             "animal": f"small {parent.animal}",
             "letter": parent.letter.lower(),
             "kingdom": parent.kingdom,
-            "hp_stat": int(parent.hp_stat*self.ratio),
+            "hp_stat": int(parent.get_hp()*self.ratio),
             "atk_stat": int(parent.atk_stat*(self.ratio**2)),
             "def_stat": int(parent.def_stat*(self.ratio**2)),
             "spd_stat": int(parent.spd_stat*self.ratio),

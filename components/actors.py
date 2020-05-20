@@ -56,7 +56,7 @@ class Actor():
         Name: {self.name}
         Animal: {self.animal}
         Kingdom: {self.kingdom}
-        HP: {self.hp_stat}/{self.max_hp_stat}
+        HP: {self.get_hp()}/{self.max_hp_stat}
         ATK: {self.atk_stat}
         DEF: {self.def_stat}
         SPD: {self.spd_stat}
@@ -85,13 +85,54 @@ class Actor():
         self.job.pass_turn()
 
     def take_damage(self, value):
-        hp = self.hp_stat
-        self.hp_stat = hp - value if hp - value >= 0 else 0
+        hp = self.get_hp()
+        self.set_hp(hp - value if hp - value >= 0 else 0)
 
     def heal_damage(self, value):
-        hp = self.hp_stat
+        hp = self.get_hp()
         max_hp = self.max_hp_stat
         final_value = value + hp if hp + value <= max_hp else max_hp 
-        self.hp_stat = final_value
+        self.set_hp(final_value)
 
+    def get_commands_list(self):
+        return self.commands.list
+
+    def get_command_by_id(self, id_):
+        return self.commands.get_command_by_id(id_)
+
+    def get_hp(self):
+        return self.hp_stat
+
+    def set_hp(self, value):
+        self.hp_stat = value
+
+    def get_max_hp(self):
+        return self.max_hp_stat
+
+    def set_max_hp(self, value):
+        self.max_hp_stat = value
+
+    def get_atk(self):
+        return self.atk_stat
+
+    def set_atk(self, value):
+        self.atk_stat = value
+
+    def get_def(self):
+        return self.def_stat
+
+    def set_def(self, value):
+        self.def_stat = value
+
+    def get_spd(self):
+        return self.spd_stat
+
+    def set_spd(self, value):
+        self.spd_stat = value
+
+    def get_inc(self):
+        return self.income_stat
+
+    def set_inc(self, value):
+        self.income_stat = value
 

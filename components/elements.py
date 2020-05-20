@@ -6,7 +6,7 @@ class Element():
         
         from components.statuses import get_new_statuses_by_ids
         status_ids = kwargs.get("status_ids", [])
-        self.statuses = get_new_statuses_by_ids(ids_list=status_ids)
+        self.statuses = get_new_statuses_by_ids(status_list=status_ids)
         
 
 import constants.elements_cons as cons

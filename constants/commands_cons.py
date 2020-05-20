@@ -88,9 +88,9 @@ SUN_CHARGE = {
     "id": "sun_charge",
     "name": "Sun Charge",
     "statuses_list": [
-        {"id": "atk_up", "value": 1},
-        {"id": "def_up", "value": 1},
-        {"id": "spd_up", "value": 1},
+        {"id": "atk_up", "value": 1, "timer": mid_timer,},
+        {"id": "def_up", "value": 1, "timer": mid_timer,},
+        {"id": "spd_up", "value": 1, "timer": mid_timer,},
     ],
     "timer": mid_timer,
     "description": "Sun Charge increases all stats by 1 for 1 turn.",
@@ -108,12 +108,12 @@ GOLDEN_EGG = {
     "description": "Grants 2 random bonuses for 1 turn",
     "category": "Greater Buff",
     "statuses_list": [
-        {"id": "atk_up", "value": 2},
-        {"id": "def_up", "value": 2},
-        {"id": "spd_up", "value": 2},
-        {"id": "income_up", "value": 2},
-    ],
-    
+        {"id": "atk_up", "value": 2, "timer": 2,},
+        {"id": "def_up", "value": 2, "timer": 2,},
+        {"id": "spd_up", "value": 2, "timer": 2,},
+        {"id": "income_up", "value": 2, "timer": 2,},
+    ],                                   
+                                         
     "max_range": 1,
     "msg": "{} gets buffed on {} by 2? for 1 turn",
     "msg_function": get_attrs,
@@ -156,7 +156,7 @@ TOXIC_SHOT = {
     "id": "toxic_shot",
     "name": "Toxic Shot",
     "statuses_list": [
-        {"id": "poisoned", "value": 2},
+        {"id": "poisoned", "value": 2, "timer": mid_timer,},
     ],
     "timer": mid_timer,
     "value": 2,
@@ -175,7 +175,7 @@ SHIELD_BASH = {
     "description": "Bashes oponnent, leaving him stunned",
     "category": "Basic Attack",
     "statuses_list": [
-        {"id": "stunned", "value": 2},
+        {"id": "stunned", "value": 2, "timer": 2},
     ],
     "is_raw": False,
     "max_range": 1,
@@ -191,8 +191,8 @@ RAGE = {
     "description": "Someone is mad",
     "category": "Major Buff",
     "statuses_list": [
-        {"id": "atk_up", "value": 3},
-        {"id": "def_up", "value": -2},
+        {"id": "atk_up", "value": 3, "timer": 2,},
+        {"id": "def_up", "value": -2, "timer": 2,},
     ],
     "max_range": 3,
     "msg": "{} is enraged! (+ATK, -DEF)",
@@ -211,7 +211,7 @@ PARALIZE_SHOT = {
     "id": "paralize_shot",
     "name": "Paralisis Shot",
     "statuses_list": [
-        {"id": "stunned", },
+        {"id": "stunned", "timer": short_timer},
     ],
     # "command_dict": {
     #     "attack": base_atk - 1,
@@ -237,7 +237,7 @@ PERFECT_COUNTER = {
     "description": "Full Counter",
     "category": "Major Buff",
     "statuses_list": [
-        {"id": "perfect_counter_stance"},
+        {"id": "perfect_counter_stance", "timer": 2,},
     ],
     "max_range": 0,
     "msg": "{} takes a defensive stance",
@@ -269,7 +269,7 @@ POWER_UP = {
     "id": "power_up",
     "name": "Power Up",
     "statuses_list": [
-        {"id": "atk_up", "value": 2},
+        {"id": "atk_up", "value": 2, "timer": 2,},
     ],
     "timer": 2, #only for commands with statuses_list
     "description": "Owner gets a bonus for its attack for 2 for 1 turn",
@@ -285,7 +285,7 @@ DEFENSE_UP = {
     "id": "defense_up",
     "name": "Defense Up",
     "statuses_list": [
-        {"id": "def_up", "value": 2},
+        {"id": "def_up", "value": 2, "timer": 2,},
     ],
     "timer": 2, #only for commands with statuses_list
     "description": "Owner gets a bonus for its defense for 2 for 1 turn",
@@ -301,7 +301,7 @@ SPEED_UP = {
     "id": "speed_up",
     "name": "Speed Up",
     "statuses_list": [
-        {"id": "spd_up", "value": 2},
+        {"id": "spd_up", "value": 2, "timer": 3,},
     ],
     "timer": 3, #only for commands with statuses_list
     "description": "Owner gets a bonus for its speed by 1 for 2 turns",
@@ -321,7 +321,7 @@ REGEN = {
     "description": "Owner starts to regenerate!",
     "category": "Healing",
     "statuses_list": [
-        {"id": "regen", "value": base_heal//2},
+        {"id": "regen", "value": base_heal//2, "timer": long_timer,},
     ],
     "max_range": 2,
     "msg": "{} starts regenning {} hp for {} turns",
