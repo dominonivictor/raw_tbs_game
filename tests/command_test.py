@@ -104,10 +104,17 @@ def test_golden_egg(actor):
 
     assert stats_before < get_stats_sum(actor)
 
+'''
 def multiply(actor):
     #How do I tackle this???
+    #maybe just check the return?
+    #i cant even execute... cause the board is not on...
+    #I have to make the API clear what do commands do? how do i return this?
+    #why
+    multi = actor.get_command_by_id("multiply")
+    
     pass
-
+'''
 
 ############# JOBS
 def test_perfect_counter(actor):
@@ -160,12 +167,15 @@ def test_toxic_shot(actor):
     assert actor.has_status("poisoned") 
     assert actor.get_status("poisoned")
     assert actor.get_hp() < hp_before
-    #import pdb; pdb.set_trace()
-    hp_before = actor.get_hp()
-    actor.pass_time()
 
 def test_shield_bash(actor):
-    pass
+    shield_bash = actor.get_command_by_id("shield_bash")
+    hp_before = actor.get_hp()
+    shield_bash.set_target(actor)
+    shield_bash.execute()
+
+    assert actor.has_status("stunned")
+    assert hp_before > actor.get_hp()
 
 def test_rage_soup(actor):
     atk_before = actor.get_atk()
@@ -177,15 +187,23 @@ def test_rage_soup(actor):
     assert actor.get_atk() > atk_before and actor.get_def() < def_before
 
 def test_paralize_shot(actor):
-    pass
+    para_shot = actor.get_command_by_id("paralize_shot")
+    hp_before = actor.get_hp()
+    para_shot.set_target(actor)
+    para_shot.execute()
+    
+
 ############# STATUSES
+'''There is a slight problem here that these commands are kinda testing the 
+command but are also testing the status behavior... these should be separated!
+'''
 def test_power_up(actor):
     #TODO test knows too much of statuses internals
     power_up = actor.get_command_by_id("power_up")
     actor_atk_before = actor.get_atk()
     power_up.set_target(actor)  #this is done by the tile selection
-    value = power_up.statuses.list[0].value
-    timer = power_up.statuses.list[0].timer
+    value = power_up.get_statuses_values(pos=0)
+    timer = power_up.get_timer()
     power_up.execute()
     
     assert actor_atk_before == actor.get_atk() - value 
@@ -194,13 +212,45 @@ def test_power_up(actor):
     assert actor_atk_before == actor.get_atk()
 
 def test_defense_up(actor):
-    pass
+    defense_up = actor.get_command_by_id("defense_up")
+    actor_def_before = actor.get_def()
+    defense_up.set_target(actor)  #this is done by the tile selection
+    value = defense_up.get_statuses_values(pos=0)
+    timer = defense_up.get_timer()
+    defense_up.execute()
+    
+    assert actor_def_before == actor.get_def() - value 
+    for _ in range(timer):
+        actor.pass_time()
+    assert actor_def_before == actor.get_def()
 
 def test_speed_up(actor):
-    pass
+    speed_up = actor.get_command_by_id("speed_up")
+    actor_spd_before = actor.get_spd()
+    speed_up.set_target(actor)  #this is done by the tile selection
+    value = speed_up.get_statuses_values(pos=0)
+    timer = speed_up.get_timer()
+    speed_up.execute()
+    
+    assert actor_spd_before == actor.get_spd() - value 
+    for _ in range(timer):
+        actor.pass_time()
+    assert actor_spd_before == actor.get_spd()
 
 def test_regen(actor):
-    pass
+    regen = actor.get_command_by_id("regen")
+    regen.set_target(actor)
+    timer = regen.get_timer()
+    actor.take_damage(20)
+    regen.execute()
+    assert actor.has_status("regen")
+    for _ in range(timer):
+        hp_before = actor.get_hp()
+        actor.pass_time()
+        assert hp_before < actor.get_hp()
+
+    actor.pass_time()
+    assert not actor.has_status("regen")
 
 ############# LEARN/EQUIP
 def test_learn_job_command():
@@ -225,7 +275,6 @@ def test_equip_equip_command(actor):
     equip_command.execute()
 
     assert actor.equip is equip_command.equip
-    actor.pass_time()
 
 
 

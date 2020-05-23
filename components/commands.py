@@ -200,8 +200,21 @@ class Command():
     def add_statuses_ownership(self, statuses: list):
         for status in statuses:
             status.owner, status.target = self.owner, self.target
+
     def set_target(self, target):
         self.target = target
+
+    def get_value(self):
+        return self.value
+
+    def get_timer(self):
+        return self.timer
+
+    def get_statuses_values(self, pos=None):
+        if type(pos) is int:
+            return self.statuses.list[pos].value
+        return list(map(lambda x: x.value, self.statuses.list))
+
 ####################################
 ######### BASIC COMMANDS ###########
 ####################################
@@ -303,6 +316,8 @@ class Multiply(Command):
         minion = actors.Actor(**minion_stats)
         self.game_eye.add_actor(minion)
         add_actor_at_xy(board=self.game_eye.get_board(), actor=minion, x=x, y=y)
+
+        return self.get_msg_dict()
 
 ## others
 # Toxic Shot
