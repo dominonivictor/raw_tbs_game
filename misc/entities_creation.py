@@ -31,7 +31,6 @@ def create_actor(animal, game):
 
         "game_eye": game,
     }
-    #import pdb; pdb.set_trace() 
     actor = Actor(**actor_dict)
 
     return actor

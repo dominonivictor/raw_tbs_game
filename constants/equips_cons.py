@@ -3,7 +3,7 @@
     "name": ,
     "value": ,
     "statuses_list": [],
-    "commands": [],
+    "commands_ids": [],
     "category": ,
 }
 '''
@@ -12,7 +12,7 @@ ZARABA = {
     "name": "Zarabatana",
     "value": 5,
     "statuses_list": [],
-    "commands_func_params": "toxic_shot",
+    "commands_ids": ["toxic_shot"],
     "category": "ranged",
 }
 
@@ -21,7 +21,7 @@ DAGGER = {
     "name": "Dagger",
     "value": 10,
     "statuses_list": [],
-    "commands_func_params": "true_slash",
+    "commands_ids": ["true_slash"],
     "category": "meelee",
 
 }
@@ -31,7 +31,7 @@ CAULDRON = {
     "name": "Cauldron",
     "value": 3,
     "statuses_list": [],
-    "commands_func_params": "rage",
+    "commands_ids": ["rage"],
     "category": "meelee",
 }
 
@@ -42,6 +42,6 @@ SHIELD = {
     "statuses_list": [
         {"id": "def_up", "value": 2, "timer": -1},
     ],
-    "commands_func_params": "shield_bash",
+    "commands_ids": ["shield_bash"],
     "category": "meelee",
 }

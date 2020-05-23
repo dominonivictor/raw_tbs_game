@@ -6,8 +6,13 @@ class Job():
         self.owner = kwargs.get('owner', None)
         self.name = kwargs.get('name', "Jobless")
         self.category = kwargs.get('category', "good for nothing")
-        self.commands = kwargs.get('commands', []) #which should be unique for each 
-        self.passives = kwargs.get('passives', []) #which are basically perma statuses!
+        commands_ids = kwargs.get('commands_ids', [])
+        from components.commands import get_new_command_by_id
+        self.commands = [get_new_command_by_id(id=id_) for id_ in commands_ids] 
+        from components.statuses import get_new_statuses_by_ids
+        passives_ids = kwargs.get('status_ids', [])
+        passives_ids = [{"id": id_, "timer": -1} for id_ in passives_ids]
+        self.passives = get_new_statuses_by_ids(status_list=passives_ids)
 
 
     def initialize(self):
@@ -21,12 +26,11 @@ class Job():
                 command.owner = self.owner
             for passive in self.passives:
                 passive.owner = self.owner
+                passive.target = self.owner
 
     def apply_passives(self):
         if self.owner:
-            for passive in self.passives:
-                passive.target = self.owner
-                self.owner.statuses.add_status(passive)
+            self.owner.statuses.add_statuses_to_actor(statuses=self.passives)
             
 
     def apply_commands(self):
@@ -39,7 +43,7 @@ class Job():
             owner.job.unlearn()
         self.owner = owner
         owner.job = self
-        owner.job.initialize()
+        self.initialize()
 
 
     def unlearn(self):
@@ -50,7 +54,7 @@ class Job():
 
         self.owner = None 
 
-    def pass_turn(self):
+    def pass_time(self):
         pass
 
 

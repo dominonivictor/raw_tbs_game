@@ -24,8 +24,10 @@ class Equip():
             self.passives.add_passive(passive)
 
         from components.commands import get_new_command_by_id
-        commands = kwargs.get("commands_func_params")
-        self.commands = [get_new_command_by_id(id=commands)]
+        commands = kwargs.get("commands_ids", [])
+        self.commands = []
+        for command in commands:
+            self.add_command(command)
 
     def equip(self, owner):
         self.owner = owner
@@ -67,13 +69,30 @@ class Equip():
             command.statuses.remove(element.status)
 
     def show_equip_stats(self):
-        string = f"""{self.name}, value: {self.value}, element: {self.element.name if self.element else "none"}
-            equip_statuses: {[s.name for s in self.statuses]}, equip_commands: {[c.name for c in self.commands]}
+        string = f"""
+        {self.name}, 
+        value: {self.value}, 
+        element: {self.element.name if self.element else "none"}
+        equip_statuses: {self.list_passives()}, 
+        equip_commands: {[c.name for c in self.commands]}
         """
         return string
 
-    def pass_turn(self):
+    def add_command(self, command):
+        for comm in self.commands:
+            if comm.id == command.id:
+                return
+        else:
+            #self.commands.append(command)
+            return
+    def pass_time(self):
         pass
+
+    def list_passives(self):
+        return self.passives.list
+
+    def has_element(self):
+        return bool(self.element)
 
 def get_new_equip_by_id(**kwargs):
     equips = {

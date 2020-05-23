@@ -78,7 +78,7 @@ class CommandList():
             if comm.id == comm_id:
                 return comm
         
-    def pass_turn(self):
+    def pass_time(self):
         pass
 
 
@@ -407,15 +407,15 @@ def instaciate_commands_dict(**kwargs):
         'golden_egg': GoldenEgg(**{**cons.GOLDEN_EGG, **kwargs}),
         'multiply': Multiply(**{**cons.MULTIPLY, **kwargs}),
         
+        'perfect_counter': Command(**{**cons.PERFECT_COUNTER, **kwargs}),
+        'copy_cat': CopyCat(**{**cons.COPY_CAT, **kwargs}),
+        'mixn': Mixn(**{**cons.MIXN, **kwargs}),
+        
         'true_slash': Attack(**{**cons.DAGGER_ATTACK, **kwargs}),
         'toxic_shot': Attack(**{**cons.TOXIC_SHOT, **kwargs}),
         'paralize_shot': Attack(**{**cons.PARALIZE_SHOT, **kwargs}),
         'rage': Command(**{**cons.RAGE_SOUP, **kwargs}),
         'shield_bash': Attack(**{**cons.SHIELD_BASH, **kwargs}),
-
-        'perfect_counter': Command(**{**cons.PERFECT_COUNTER, **kwargs}),
-        'copy_cat': CopyCat(**{**cons.COPY_CAT, **kwargs}),
-        'mixn': Mixn(**{**cons.MIXN, **kwargs}),
 
         'power_up': Command(**{**cons.POWER_UP, **kwargs}),
         'defense_up': Command(**{**cons.DEFENSE_UP, **kwargs}),

@@ -110,7 +110,7 @@ class DoT(Status):
         super().pass_time()
         from components.commands import Attack
         Attack(owner=self.owner,
-        target=self.target).deal_damage_to_target(damage=self.value, is_raw=True)
+        target=self.target, value=self.value).deal_damage_to_target(damage=self.value, is_raw=True)
         return {"msg": f"Basic DoT msg, value = {self.value}, current_timer = {self.timer}"}
 
 class HoT(Status):

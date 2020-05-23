@@ -27,7 +27,7 @@ class Actor():
 
         self.equip = kwargs.get("equip", None)
         if self.equip:
-            self.add_equip(equip)
+            self.add_equip(self.equip)
 
         self.x = kwargs.get("x", 0)
         self.y = kwargs.get("y", 0)
@@ -78,11 +78,11 @@ class Actor():
         self.has_acted = False
         self.has_moved = False
 
-    def pass_turn(self):
-        self.commands.pass_turn()
-        self.statuses.pass_turn()
-        self.equip.pass_turn()
-        self.job.pass_turn()
+    def pass_time(self):
+        self.commands.pass_time()
+        self.statuses.pass_time()
+        if self.equip: self.equip.pass_time()
+        if self.job: self.job.pass_time()
 
     def take_damage(self, value):
         hp = self.get_hp()
@@ -94,11 +94,28 @@ class Actor():
         final_value = value + hp if hp + value <= max_hp else max_hp 
         self.set_hp(final_value)
 
-    def get_commands_list(self):
+    def list_commands(self):
         return self.commands.list
 
     def get_command_by_id(self, id_):
         return self.commands.get_command_by_id(id_)
+
+    def list_statuses(self):
+        return self.statuses.list
+
+    def has_status(self, status_id):
+        for status in self.statuses.list:
+            if status.id == status_id:
+                return True
+
+        else: return False
+    
+    def get_status(self, status_id):
+        for status in self.statuses.list:
+            if status.id == status_id:
+                return status
+
+        else: return None
 
     def get_hp(self):
         return self.hp_stat
