@@ -23,7 +23,6 @@ class Equip():
         for passive in passives:
             self.passives.add_passive(passive)
 
-        from components.commands import get_new_command_by_id
         commands = kwargs.get("commands_ids", [])
         self.commands = []
         for command in commands:
@@ -78,13 +77,15 @@ class Equip():
         """
         return string
 
-    def add_command(self, command):
+    def add_command(self, command_id):
+        from components.commands import get_new_command_by_id
         for comm in self.commands:
-            if comm.id == command.id:
+            if comm.id == command_id:
                 return
         else:
-            #self.commands.append(command)
-            return
+            new_comm = get_new_command_by_id(id=command_id)
+            self.commands.append(new_comm)
+
     def pass_time(self):
         pass
 

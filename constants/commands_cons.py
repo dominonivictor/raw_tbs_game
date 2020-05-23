@@ -329,6 +329,12 @@ REGEN = {
     "msg_args": ["target name", "self value", "self timer"]
 }
 
+######### AOE
+WATERBALL = {
+    
+}
+
+
 '''
 {
     "name": ,

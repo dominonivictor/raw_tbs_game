@@ -8,9 +8,10 @@ from components.equips_commands import gen_equips_list
 from controllers.board_controller import highlight_attackable_spaces, clean_tiles
 
 def minor_btn_on_press(minor_btn):
+    #needs to know too much of the board...? kinda yeah... also about the framework...
     app = App.get_running_app()
     board = app.root.ids.puzzle
-    board.selected_action = "command"
+    board.set_selected_action("command")
     command = minor_btn.command
     board.selected_command = command
     start_tile = board.selected_tile

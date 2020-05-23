@@ -14,6 +14,7 @@ import constants.colors as colors
 
 import controllers.board_controller as board_con
 import controllers.buttons_controller as btn_con
+import controllers.log_controller as log_con
 
 class LogScreen(BoxLayout):
     msg_list = []
@@ -24,7 +25,7 @@ class ScrollableLog(ScrollView):
 class StatsPanel(Label):
     rgba = ListProperty(colors.BASIC_BLACK)
     def update_actor_stats(self, actor):
-        self.text = actor.show_battle_stats() if actor else "No actor selected"
+        self.text = log_con.show_actor_stats(actor) 
         
 class MinorOptionsButton(Button):
     def on_press(self):
@@ -55,7 +56,7 @@ class PuzzleGrid(Factory.GridLayout):
         self.rows = 1
         self.grid = []
         self.graph = {}
-        self.initial_spaces = [(4, 4), (6, 4), (8, 4), (4, 8), (4, 6), (8, 8), (6, 8), (8, 6)]
+        self.initial_spaces = [(4, 4), (5, 4), (6, 4), (4, 8), (4, 6), (6, 8), (5, 8), (6, 6)]
         self.highlighted_tiles = []
         board_con.board_clean_selected_things(board=self)
         self.game = Game(grid_size=self.grid_size, board=self)
@@ -70,6 +71,9 @@ class PuzzleGrid(Factory.GridLayout):
                 
     def pass_turn(self):
         board_con.pass_turn(board=self)
+
+    def set_selected_action(self, action_str):
+        self.selected_action  = action_str
 
 
 class GameApp(App):

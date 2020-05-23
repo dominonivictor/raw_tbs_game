@@ -125,6 +125,7 @@ def test_perfect_counter(actor):
     assert actor.has_status("perfect_counter_stance")
 
 def test_copy_cat(actor):
+    #still needs to test the forget method
     thief = get_new_actor(commands_ids=["copy_cat"])
     length_before = len(thief.list_commands())
     copy_cat = thief.get_command_by_id("copy_cat")
@@ -132,6 +133,8 @@ def test_copy_cat(actor):
     copy_cat.execute()
 
     assert len(thief.list_commands()) == length_before + 1
+    copy_cat.execute()
+    assert len(thief.list_commands()) == length_before
 
 def test_mixn(actor):
     #this requires more setup... need to generate equip and to test equip maybe not
@@ -275,6 +278,33 @@ def test_equip_equip_command(actor):
     equip_command.execute()
 
     assert actor.equip is equip_command.equip
+
+
+############## AOE
+def create_mock_game_board(grid_size):
+    grid = [[Tile() for _ in range(grid_size)] for _ in range(grid_size)] 
+    return list(map(list, zip(*grid))) #doing this to transpose, is it needed though?
+
+from map_objects.tile import Tile 
+
+def test_waterball(actor):
+    waterball = actor.get_command_by_id("waterball")
+    board = create_mock_game_board(grid_size=3)
+    
+    target_in_range = get_new_actor()
+    target_in_range.set_pos(x=1, y=1)
+    in_range_hp_before = target_in_range.get_hp() 
+
+    target_out_of_range = get_new_actor()
+    target_out_of_range.set_pos(x=0, y=0)
+    out_range_hp_before = target_out_of_range.get_hp() 
+
+    #put actors on the board
+    waterball.set_target_pos((1, 1))
+    waterball.execute()
+
+    assert target_in_range.get_hp() < in_range_hp_before
+    assert target_out_of_range.get_hp() == out_range_hp_before
 
 
 

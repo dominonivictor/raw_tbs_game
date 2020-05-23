@@ -84,6 +84,8 @@ class CommandList():
 
 class Command():
     def __init__(self, **kwargs):
+        #I think this is getting wayyyyy too big... maybe separate what is not needed
+        #and leave it only for the children specif commands that need it...?
         self.id = kwargs.get("id")
         self.name = kwargs.get('name', "Abyssal Lord Command")
         self.description = kwargs.get('description', "Abyssal Lord Command Description")
@@ -92,6 +94,9 @@ class Command():
         self.owner = kwargs.get('owner', None)
         self.target = kwargs.get('target', None)
         self.target_xy = (-1, -1)
+        self.target_pos = (0, 0)
+        self.target_x = 0
+        self.target_y = 0
 
         self.value = kwargs.get('value', 0)
         self.timer = kwargs.get('timer', 0)
@@ -214,6 +219,21 @@ class Command():
         if type(pos) is int:
             return self.statuses.list[pos].value
         return list(map(lambda x: x.value, self.statuses.list))
+
+    def set_target_x(self, x):
+        self.target_x = x
+
+    def set_target_y(self, y):
+        self.target_y = y
+
+    def get_target_pos(self):
+        return self.target_pos
+
+    def set_target_pos(self, pos):
+        x, y = pos
+        self.set_target_x(x)
+        self.set_target_y(y)
+        self.target_pos = (self.target_x, self.target_y)
 
 ####################################
 ######### BASIC COMMANDS ###########
@@ -390,6 +410,22 @@ class Mixn(Command):
 #IncomeUp
 #MaxHpUp
 
+
+####################################
+######### AOE COMMANDS #############
+####################################
+from constants.grid_patterns import create_grid_coords
+
+class AOE(Command):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.aoe_size = kwargs.get("aoe_size", 1) 
+        self.tile_pattern = create_grid_coords(size=self.aoe_size)
+
+    def execute(self):
+       pass 
+    
+
 def instaciate_commands_dict(**kwargs):
     '''
     cons content
@@ -438,6 +474,8 @@ def instaciate_commands_dict(**kwargs):
         # 'income_up': Command(**{**cons.INCOME_UP, **kwargs}),
         # 'max_hp_up': Command(**{**cons.MAX_HP_UP, **kwargs}),
         'regen': Command(**{**cons.REGEN, **kwargs}),
+
+        'waterball': AOE(**cons.WATERBALL, **kwargs),
     }
     return commands_dict
 
