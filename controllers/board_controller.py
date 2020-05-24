@@ -177,7 +177,7 @@ def add_actor_at_xy(board, actor, x, y):
 def highlight_movable_spaces(actor, start_tile):
     app = App.get_running_app()
 
-    n_moves = actor.spd_stat
+    n_moves = actor.get_spd()
     board = app.root.ids.puzzle
     ui_grid = board.grid
     game_grid = board.game.grid

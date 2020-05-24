@@ -13,8 +13,7 @@ class Equip():
         self.element = kwargs.get("element", None)
         self.owner = kwargs.get("owner", None)
 
-        # this is getting very complex very quickly, the idea is to try making things
-        # SRP standardized
+        #need to get this ready, not process it here...
         from components.statuses import get_new_statuses_by_ids
         status_list = kwargs.get("statuses", [])
         #all of statuses here will be passives, so the timer will be set to -1 (infinite until removed)
@@ -23,20 +22,23 @@ class Equip():
         for passive in passives:
             self.passives.add_passive(passive)
 
-        from components.commands import get_new_command_by_id
+        #this is working very differently from other components...
+        #design a basic contract and standardize for all of them...
         commands = kwargs.get("commands_ids", [])
         self.commands = []
         for command in commands:
-            self.add_command(command)
+            self.add_new_command_by_id(command)
 
     def equip(self, owner):
         self.owner = owner
         for command in self.commands:
             command.owner = self.owner
+            #TODO knows too much of actors internals... simplify api
             self.owner.commands.add_command(command, category="equip")
 
         for passive in self.passives.list:
-            passive.owner = self.owner
+            passive.set_owner(self.owner)
+            #TODO knows too much of actors internals... simplify api
             self.owner.statuses.add_status(passive)
 
         self.owner.equip = self
@@ -78,13 +80,14 @@ class Equip():
         """
         return string
 
-    def add_command(self, command):
+    def add_new_command_by_id(self, command_id):
+        from components.commands import get_new_command_by_id
         for comm in self.commands:
-            if comm.id == command.id:
+            if comm.id == command_id:
                 return
         else:
-            #self.commands.append(command)
-            return
+            self.commands.append(get_new_command_by_id(id=command_id))
+
     def pass_time(self):
         pass
 

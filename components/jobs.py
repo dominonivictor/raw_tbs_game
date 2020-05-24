@@ -6,9 +6,16 @@ class Job():
         self.owner = kwargs.get('owner', None)
         self.name = kwargs.get('name', "Jobless")
         self.category = kwargs.get('category', "good for nothing")
+
+        #separate this into a commands_list and status_list or similar
+        #make it interact with the other apis a little more easily...
+        #there is too much happening here!
+        #this should come ready...
+
         commands_ids = kwargs.get('commands_ids', [])
         from components.commands import get_new_command_by_id
         self.commands = [get_new_command_by_id(id=id_) for id_ in commands_ids] 
+
         from components.statuses import get_new_statuses_by_ids
         passives_ids = kwargs.get('status_ids', [])
         passives_ids = [{"id": id_, "timer": -1} for id_ in passives_ids]
@@ -57,6 +64,8 @@ class Job():
     def pass_time(self):
         pass
 
+    def get_name(self):
+        return self.name
 
 #TODO: next place i shall clean up
 
@@ -79,3 +88,6 @@ class Cook(Job):
 class Merchant(Job):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+
+

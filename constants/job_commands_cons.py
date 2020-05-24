@@ -9,6 +9,7 @@ BASE = {
 }
 
 GUARDIAN = {
+    "id": "guardian",
     "name": "Guardian",
     "description": " became a Guardian, + def and stuff",
     "category": "learn_job",
@@ -16,6 +17,7 @@ GUARDIAN = {
 }
 
 THIEF = {
+    "id": "thief",
     "name": "Thief",
     "description": " became a Thief, + spd and stuff",
     "category": "learn_job",
@@ -23,6 +25,7 @@ THIEF = {
 }
 
 MERCHANT = {
+    "id": "merchant",
     "name": "Merchant",
     "description": " became a Merchant, + money and stuff",
     "category": "learn_job",
@@ -30,6 +33,7 @@ MERCHANT = {
 }
 
 HUNTER = {
+    "id": "hunter",
     "name": "Hunter",
     "description": " became a Hunter, + offensive skills and stuff",
     "category": "learn_job",
@@ -37,6 +41,7 @@ HUNTER = {
 }
 
 COOK = {
+    "id": "cook",
     "name": "Cook",
     "description": " became a Cook, mixin and brewing",
     "category": "learn_job",

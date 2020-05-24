@@ -1,8 +1,21 @@
 import constants.status_cons as cons
 
 class StatusManager():
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.list = []
+        self.owner = kwargs.get("owner", None)
+        #is this all needed??? i don`t think so...
+        self.raw_statuses_ids = kwargs.get("raw_statuses_ids", [])
+        new_statuses = get_new_statuses_by_ids(status_list=self.raw_statuses_ids)
+        self.add_statuses_ownership(new_statuses)
+        self.add_statuses(statuses=new_statuses)
+
+    def add_statuses(self, statuses):
+        self.list.extend(statuses)
+
+    def add_statuses_ownership(self, new_statuses: list):
+        for status in new_statuses:
+            status.owner = self.owner
 
     def add_statuses_to_actor(self, statuses: list):       
         '''
@@ -47,8 +60,15 @@ class StatusManager():
         return statuses
 
 class ComponentStatusList():
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.list = []
+        self.owner = kwargs.get("owner", None)
+        self.raw_statuses_ids = kwargs.get("raw_statuses_ids", [])
+        self.add_statuses_from_raw_ids(raw_statuses_ids=self.raw_statuses_ids)
+
+    def add_statuses_from_raw_ids(self, raw_statuses_ids):
+        from components.statuses import get_new_statuses_by_ids
+        self.list = get_new_statuses_by_ids(status_list=raw_statuses_ids)
 
     def add_statuses(self, statuses: list):
         for status in statuses:
@@ -98,6 +118,15 @@ class Status():
     def remove_buff(self):
         pass
 
+    def get_base_name(self):
+        return self.base_name
+
+    def set_owner(self, owner):
+        self.owner = owner
+
+    def set_target(self, target):
+        self.target = target
+
 ################################################################################################        
 ########################### BASE STATUSES ######################################################
 ################################################################################################
@@ -108,9 +137,7 @@ class DoT(Status):
 
     def pass_time(self):
         super().pass_time()
-        from components.commands import Attack
-        Attack(owner=self.owner,
-        target=self.target, value=self.value).deal_damage_to_target(damage=self.value, is_raw=True)
+        self.target.take_damage(value=self.value)
         return {"msg": f"Basic DoT msg, value = {self.value}, current_timer = {self.timer}"}
 
 class HoT(Status):
@@ -119,8 +146,7 @@ class HoT(Status):
 
     def pass_time(self):
         super().pass_time()
-        from components.commands import Heal
-        Heal(owner=self.owner, target=self.target, value=self.value).heal_damage(self.value)
+        self.target.heal_damage(value=self.value)
         return {"msg": f"Basic HoT msg, value = {self.value}, current_timer = {self.timer}"}
 
 class Buff(Status):
