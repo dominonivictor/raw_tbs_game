@@ -55,6 +55,7 @@ class CommandList():
         self.game_eye = self.owner.game_eye
 
     def add_kingdom_command(self):
+        #kinda ugly, stuff needs to come ready
         kingdom = self.owner.kingdom
         command = {
             "mamalia": get_new_command_by_id(id="multiply"),
@@ -104,16 +105,10 @@ class Command():
         self.max_range = kwargs.get('max_range', 1)
         self.final_value = 0
        
-        #TODO THIS IS VERY MESSY FIX THIS SHIT
-        from components.statuses import ComponentStatusList, get_new_statuses_by_ids
-        self.statuses = ComponentStatusList()
-        #aqui mostra que o Command tem que saber do funcionamento interno de
-        #ComponentStatusList?SIM demais ateh Se eu mudar o CSL oqe mais vou ter que mudar aqui?
-        self.statuses.owner = self
-        self.statuses_raw_list = kwargs.get("statuses_list", [])
-        new_statuses = get_new_statuses_by_ids(status_list=self.statuses_raw_list)
-        self.add_statuses_ownership(new_statuses)
-        self.statuses.add_statuses(statuses=new_statuses)
+        self.raw_statuses_ids = kwargs.get("statuses_list", [])
+        from components.statuses import ComponentStatusList 
+        self.statuses = ComponentStatusList(owner=self,
+        raw_statuses_ids=self.raw_statuses_ids)
 
         self.command_dict = kwargs.get('command_dict', {})
         self.msg = kwargs.get("msg", "")
@@ -151,29 +146,13 @@ class Command():
         return {"msg": self.msg.format(*self.msg_function(*self.msg_args, self=self))}
 
     def manage_special_status_or_commands(self):
-        # separate each into a self standing function
-        # need to separate these functionallity into separate functions 
-        owner_status_base_names, target_status_base_names = [], []
-        if self.owner:
-            owner_status_base_names = list(map(lambda x: x.base_name, self.owner.statuses.list))
-        if self.target:
-            target_status_base_names = list(map(lambda x: x.base_name, self.target.statuses.list))
-
-        if "stunned" in owner_status_base_names: 
-            return {
-                'msg': f"{self.owner.name} is stunned and can't move!",
-                'valid_action': False,
-                'result': {"attack": "no attack", "final_value": 0},
-                'should_continue': False,
-            }
-        if "perfect_counter_stance" in target_status_base_names: 
-            self.target = self.owner
-
-        return {}
+        from functions.special_status_functions import special_status_handler 
+        response = special_status_handler(self)
+        return response
 
     def manage_statuses(self):
         from components.statuses import get_new_statuses_by_ids
-        new_statuses_list = get_new_statuses_by_ids(status_list=self.statuses_raw_list)
+        new_statuses_list = get_new_statuses_by_ids(status_list=self.raw_statuses_ids)
         self.add_statuses_ownership(statuses=new_statuses_list)
         self.add_statuses(new_statuses_list)
 
@@ -194,8 +173,8 @@ class Command():
         return execution_dict
 
     def calculate_final_dmg_value(self, is_raw=False):
-        actor_atk_stat = self.owner.atk_stat
-        bonuses = actor_atk_stat - self.target.def_stat if not is_raw else 0
+        actor_atk_stat = self.owner.get_atk()
+        bonuses = actor_atk_stat - self.target.get_def() if not is_raw else 0
         final_value =  self.value + bonuses
         if final_value < 0: final_value = 0
 
@@ -204,7 +183,8 @@ class Command():
 
     def add_statuses_ownership(self, statuses: list):
         for status in statuses:
-            status.owner, status.target = self.owner, self.target
+            status.set_owner(owner=self.owner)
+            status.set_target(target=self.target)
 
     def set_target(self, target):
         self.target = target
@@ -318,16 +298,17 @@ class Multiply(Command):
         self.target = parent
         x, y = self.target_xy
         #Make this better! maybe use already existing "factory", or do a proper factory
+        #too much processing inside the dictionary... extract everything
         minion_stats = {
             "name": f"{parent.name}'s minion",
             "animal": f"small {parent.animal}",
             "letter": parent.letter.lower(),
             "kingdom": parent.kingdom,
             "hp_stat": int(parent.get_hp()*self.ratio),
-            "atk_stat": int(parent.atk_stat*(self.ratio**2)),
-            "def_stat": int(parent.def_stat*(self.ratio**2)),
-            "spd_stat": int(parent.spd_stat*self.ratio),
-            "income_stat": int(parent.income_stat*self.ratio),
+            "atk_stat": int(parent.get_atk()*(self.ratio**2)),
+            "def_stat": int(parent.get_def()*(self.ratio**2)),
+            "spd_stat": int(parent.get_spd()*self.ratio),
+            "income_stat": int(parent.get_inc()*self.ratio),
             "commands": parent.commands.base_list,
             "x": x,
             "y": y,
@@ -335,6 +316,7 @@ class Multiply(Command):
         }
         minion = actors.Actor(**minion_stats)
         self.game_eye.add_actor(minion)
+        #communicates too much with board and stuff... is there a workaround?
         add_actor_at_xy(board=self.game_eye.get_board(), actor=minion, x=x, y=y)
 
         return self.get_msg_dict()
@@ -484,3 +466,7 @@ def get_new_command_by_id(**kwargs):
     commands = instaciate_commands_dict(**kwargs)
     
     return commands.get(id)
+
+def get_new_commands_by_ids(command_ids: list)-> list:
+    
+    return [get_new_command_by_id(id=c) for c in command_ids]

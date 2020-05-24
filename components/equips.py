@@ -13,29 +13,30 @@ class Equip():
         self.element = kwargs.get("element", None)
         self.owner = kwargs.get("owner", None)
 
-        # this is getting very complex very quickly, the idea is to try making things
-        # SRP standardized
+        #need to get this ready, not process it here...
         from components.statuses import get_new_statuses_by_ids
         status_list = kwargs.get("statuses", [])
         #all of statuses here will be passives, so the timer will be set to -1 (infinite until removed)
         self.passives = PassivesList()
-        passives = get_new_statuses_by_ids(status_list=status_list) 
+        passives = get_new_statuses_by_ids(status_list=status_list
         for passive in passives:
             self.passives.add_passive(passive)
 
         commands = kwargs.get("commands_ids", [])
         self.commands = []
         for command in commands:
-            self.add_command(command)
+            self.add_new_command_by_id(command)
 
     def equip(self, owner):
         self.owner = owner
         for command in self.commands:
             command.owner = self.owner
+            #TODO knows too much of actors internals... simplify api
             self.owner.commands.add_command(command, category="equip")
 
         for passive in self.passives.list:
-            passive.owner = self.owner
+            passive.set_owner(self.owner)
+            #TODO knows too much of actors internals... simplify api
             self.owner.statuses.add_status(passive)
 
         self.owner.equip = self
@@ -69,10 +70,10 @@ class Equip():
 
     def show_equip_stats(self):
         string = f"""
-        {self.name}, 
-        value: {self.value}, 
+        {self.name},
+        value: {self.value},
         element: {self.element.name if self.element else "none"}
-        equip_statuses: {self.list_passives()}, 
+        equip_statuses: {self.list_passives()},
         equip_commands: {[c.name for c in self.commands]}
         """
         return string

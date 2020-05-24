@@ -23,6 +23,7 @@ def get_attrs(*args, self=None):
             "self": self,
         }.get(obj)
 
+        #way too much logic inside these... should be cleaner
         aimed_attr = {
             "name": aimed_obj.name,
             "value": aimed_obj.value if hasattr(aimed_obj, "value") else None,

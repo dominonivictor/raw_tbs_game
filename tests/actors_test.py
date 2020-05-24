@@ -1,6 +1,5 @@
 import pytest
-from textwrap import dedent
-from factories.actor_factory import get_new_actor
+from factories.actor_factory import get_new_actor 
 
 @pytest.fixture
 def actor():

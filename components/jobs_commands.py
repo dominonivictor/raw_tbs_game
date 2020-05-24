@@ -4,7 +4,9 @@ import constants.job_commands_cons as cons
 class LearnJobCommand(Command):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.job = kwargs.get("job")
+        job_id = kwargs.get("id")
+        from factories.job_factory import get_new_job
+        self.job = get_new_job(job_id=job_id)
 
     def execute(self):
         self.target.learn_job(self.job)

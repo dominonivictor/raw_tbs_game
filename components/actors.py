@@ -56,15 +56,15 @@ class Actor():
         Name: {self.name}
         Animal: {self.animal}
         Kingdom: {self.kingdom}
-        HP: {self.get_hp()}/{self.max_hp_stat}
-        ATK: {self.atk_stat}
-        DEF: {self.def_stat}
-        SPD: {self.spd_stat}
-        In: {self.income_stat}
+        HP: {self.get_hp()}/{self.get_max_hp()}
+        ATK: {self.get_atk()}
+        DEF: {self.get_def()}
+        SPD: {self.get_spd()}
+        In: {self.get_inc()}
         Statuses: {self.show_statuses()}
         Commands: {self.show_commands()}
-        x, y: {self.x}, {self.y}
-        job: {self.job.name if self.job else "Jobless"}
+        x, y: {self.get_x()}, {self.get_y()}
+        job: {self.job.get_name() if self.job else "Jobless"}
         equip: {self.equip.show_equip_stats() if self.equip else "No Equip"}
         """
 
@@ -90,7 +90,7 @@ class Actor():
 
     def heal_damage(self, value):
         hp = self.get_hp()
-        max_hp = self.max_hp_stat
+        max_hp = self.get_max_hp()
         final_value = value + hp if hp + value <= max_hp else max_hp 
         self.set_hp(final_value)
 
@@ -169,3 +169,8 @@ class Actor():
 
     def set_y(self, y):
         self.y = y
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
