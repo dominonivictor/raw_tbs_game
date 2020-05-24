@@ -256,16 +256,26 @@ def test_regen(actor):
 def test_learn_job_command():
     #TODO test knows too much of actor and command internals
     actor = get_new_actor()
+    actor2 = get_new_actor()
+
     from components.jobs_commands import gen_jobs_list
     commands_length = len(actor.list_commands())
     status_length = len(actor.list_statuses())
+
     job_command = gen_jobs_list()[0]
+    job_command2 = gen_jobs_list()[0]
     job_command.set_target(actor)
+    job_command2.set_target(actor2)
     job_command.execute()
+    job_command2.execute()
+    #too many asserts!!!!!
     assert actor.job is job_command.job
     assert job_command.job.name == "Guardian"
-    assert commands_length + 1 == len(actor.list_commands())
-    assert status_length + 1 == len(actor.list_statuses())
+    assert commands_length + 1 == len(actor.list_commands()) 
+    assert commands_length + 1 == len(actor2.list_commands())
+    assert status_length + 1 == len(actor.list_statuses()) == len(actor2.list_statuses())
+    #test knows too much of actor internals
+    assert actor.list_commands()[-1].id == actor2.list_commands()[-1].id
 
 def test_equip_equip_command(actor):
     #TODO test is giving kind of a false positive, when clicking on the actor we get an error... 

@@ -55,6 +55,7 @@ class CommandList():
         self.game_eye = self.owner.game_eye
 
     def add_kingdom_command(self):
+        #kinda ugly, stuff needs to come ready
         kingdom = self.owner.kingdom
         command = {
             "mamalia": get_new_command_by_id(id="multiply"),
@@ -427,3 +428,7 @@ def get_new_command_by_id(**kwargs):
     commands = instaciate_commands_dict(**kwargs)
     
     return commands.get(id)
+
+def get_new_commands_by_ids(command_ids: list)-> list:
+    
+    return [get_new_command_by_id(id=c) for c in command_ids]

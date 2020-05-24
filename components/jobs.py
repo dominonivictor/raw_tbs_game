@@ -14,7 +14,11 @@ class Job():
 
         commands_ids = kwargs.get('commands_ids', [])
         from components.commands import get_new_command_by_id
-        self.commands = [get_new_command_by_id(id=id_) for id_ in commands_ids] 
+        commands = kwargs.get("commands", [])
+        if not commands: 
+            self.commands = [get_new_command_by_id(id=id_) for id_ in commands_ids] 
+        else:
+            self.commands = commands
 
         from components.statuses import get_new_statuses_by_ids
         passives_ids = kwargs.get('status_ids', [])
