@@ -3,8 +3,8 @@ from kivy.app import App
 from main import MajorOptionsButton
 import misc.game_states as gs
 
-from components.jobs_commands import jobs_list
-from components.equips_commands import equips_list
+from components.jobs_commands import gen_jobs_list
+from components.equips_commands import gen_equips_list
 from controllers.board_controller import highlight_attackable_spaces, clean_tiles
 
 def minor_btn_on_press(minor_btn):
@@ -69,8 +69,10 @@ def handle_major_options_btns(box):
     if box.text == 'move':
         major_move_btn()
     elif box.text == 'learn_job':
+        jobs_list = gen_jobs_list()
         major_btn_update_minor_box(jobs_list)
     elif box.text == 'equip_equip':
+        equips_list = gen_equips_list()
         major_btn_update_minor_box(equips_list)
     else:
         print(f"another button with no on_press func yet")

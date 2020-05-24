@@ -1,39 +1,17 @@
-from components.actors import Actor, Stat
+from components.actors import Actor
 from components.jobs import Guardian, Thief, Merchant, Hunter, Cook
-from components.equips import Zarabatana, Dagger, Cauldron, Shield
-from components.commands import instaciate_commands_dict
+from components.equips import get_new_equip_by_id
+from components.commands import get_new_command_by_id
 from constants.creature_cons import creature_stats
 
 def create_commands_list(commands):
     #not very scalable... needs improving
     commands_list = []
-    comm_dict = instaciate_commands_dict()
     for command in commands:
-        comm = comm_dict.get(command)
+        comm = get_new_command_by_id(id=command)
         commands_list.append(comm)
 
     return commands_list
-
-def create_job(job):
-    job = {
-        'g': Guardian(),
-        't': Thief(),
-        'm': Merchant(),
-        'h': Hunter(),
-        'c': Cook()
-    }.get(job)
-
-    return job
-
-def create_equip(equip):
-    equip = {
-        'z': Zarabatana(),
-        'd': Dagger(),
-        'c': Cauldron(),
-        's': Shield(),
-    }.get(equip)
-
-    return equip
 
 def create_actor(animal, game):
     #animal recieves the animal string ex: "f"
@@ -44,16 +22,15 @@ def create_actor(animal, game):
         "animal": animal["animal"],
         "letter": animal["letter"],
         "kingdom": animal["kingdom"],
-        "hp_stat": Stat(value=animal["hp_stat"]),
-        "def_stat": Stat(value=animal["def"]),
-        "atk_stat": Stat(value=animal["atk"]),
-        "spd_stat": Stat(value=animal["spd"]),
-        "income_stat": Stat(value=animal["income"]),
-        "commands": create_commands_list(animal["commands"]),
+        "hp_stat": animal["hp_stat"],
+        "def_stat": animal["def"],
+        "atk_stat": animal["atk"],
+        "spd_stat": animal["spd"],
+        "income_stat": animal["income"],
+        "commands_ids":animal["commands_ids"],
 
         "game_eye": game,
     }
-
     actor = Actor(**actor_dict)
 
     return actor

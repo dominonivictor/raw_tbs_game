@@ -1,57 +1,47 @@
-from components.statuses import get_new_status_by_id
-import constants.status_cons as sts_cons
-from components.commands import get_new_command_by_id
-
-#FUCK THIS IS BAD, I need to instanciate every time i do this, or else i just get references and
-#things will go very badly
 '''
 {
     "name": ,
     "value": ,
-    "statuses": [],
-    "commands": [],
+    "statuses_list": [],
+    "commands_ids": [],
     "category": ,
 }
 '''
 ZARABA = {
+    "id": "zarabatana",
     "name": "Zarabatana",
     "value": 5,
-    "statuses": [],
-    "commands": [
-        get_new_command_by_id("paralize_shot")
-    ],
+    "statuses_list": [],
+    "commands_ids": ["toxic_shot"],
     "category": "ranged",
 }
 
 DAGGER = {
+    "id": "dagger",
     "name": "Dagger",
     "value": 10,
-    "statuses": [],
-    "commands": [
-        get_new_command_by_id("true_slash")
-    ],
+    "statuses_list": [],
+    "commands_ids": ["true_slash"],
     "category": "meelee",
 
 }
 
 CAULDRON = {
+    "id": "cauldron",
     "name": "Cauldron",
     "value": 3,
-    "statuses": [],
-    "commands": [
-        get_new_command_by_id("rage")
-    ],
+    "statuses_list": [],
+    "commands_ids": ["rage"],
     "category": "meelee",
 }
 
 SHIELD = {
+    "id": "shield",
     "name": "Shield",
     "value": 3,
-    "statuses": [
-        get_new_status_by_id("def_up")
+    "statuses_list": [
+        {"id": "def_up", "value": 2, "timer": -1},
     ],
-    "commands": [ 
-        get_new_command_by_id("shield_bash")
-    ],
+    "commands_ids": ["shield_bash"],
     "category": "meelee",
 }

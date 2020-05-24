@@ -1,37 +1,34 @@
-import components.equips as e
-
-
 ZARABATANA = {
-    "name": "Zarabatana equip",
+    "name": "Zarabatana",
     "description": "Ranged attack with poison",
     "category": "equip",
-    "equip": e.Zarabatana(),
+    "equip_id": "zarabatana",
 }
 
 DAGGER = {
-    "name": "Dagger equip",
+    "name": "Dagger",
     "description": "Ignores attk and defense bonuses",
     "category": "equip",
-    "equip": e.Dagger(),
+    "equip_id": "dagger",
 }
 
 CAULDRON = {
-    "name": "Cauldron equip",
+    "name": "Cauldron",
     "description": "Big pot good for brewing",
     "category": "equip",
-    "equip": e.Cauldron(),
+    "equip_id": "cauldron",
 }
 
 SHIELD = {
-    "name": "Shield equip",
+    "name": "Shield",
     "description": "A shield to mirror back attacks",
     "category": "equip",
-    "equip": e.Shield(),
+    "equip_id": "shield",
 }
 
 '''
     "name": ,
     "description": ,
     "category": "equip",
-    "equip": ,
+    "equip_id": ,
 '''

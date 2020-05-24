@@ -1,20 +1,42 @@
-import components.commands as com
 import constants.status_cons as cons
 
-
-class StatusList():
-    def __init__(self):
+class StatusManager():
+    def __init__(self, **kwargs):
         self.list = []
+        self.owner = kwargs.get("owner", None)
+        #is this all needed??? i don`t think so...
+        self.raw_statuses_ids = kwargs.get("raw_statuses_ids", [])
+        new_statuses = get_new_statuses_by_ids(status_list=self.raw_statuses_ids)
+        self.add_statuses_ownership(new_statuses)
+        self.add_statuses(statuses=new_statuses)
 
-    def add_status(self, status):
-        self.list.append(status)
-        status.apply_buff()
+    def add_statuses(self, statuses):
+        self.list.extend(statuses)
+
+    def add_statuses_ownership(self, new_statuses: list):
+        for status in new_statuses:
+            status.owner = self.owner
+
+    def add_statuses_to_actor(self, statuses: list):       
+        '''
+            Recieves a list containing new instances of stati. If a given status
+            is a buff (or debuff) it applies this buff to its owner.
+        ''' 
+        for status in statuses:
+            status.owner = self.owner
+            status.apply_buff()
+
+        self.list.extend(statuses)
 
     def remove_status(self, status): 
         status.remove_status()   
         self.list.remove(status)
 
     def pass_time(self):
+        '''
+            All statuses are influenced by pass_time(), all statuses have their 
+            timer attr diminished by 1.
+        '''
         msg_list = []
         for status in self.list:
             msg = status.pass_time()
@@ -26,22 +48,53 @@ class StatusList():
 
         return msg_list
 
-class CommandStatusList():
-    def __init__(self):
+    def show_statuses(self):
+        '''
+            Returns a string listing organizedly every status.
+        '''
+        statuses = ''
+        for status in self.list:
+            statuses += f'{status.name}({status.timer if status.timer >= 0 else "p"}), '
+
+        statuses = statuses[:-2] + '.'
+        return statuses
+
+class ComponentStatusList():
+    def __init__(self, **kwargs):
         self.list = []
+        self.owner = kwargs.get("owner", None)
+        self.raw_statuses_ids = kwargs.get("raw_statuses_ids", [])
+        self.add_statuses_from_raw_ids(raw_statuses_ids=self.raw_statuses_ids)
 
-    def init(self, statuses):
+    def add_statuses_from_raw_ids(self, raw_statuses_ids):
+        from components.statuses import get_new_statuses_by_ids
+        self.list = get_new_statuses_by_ids(status_list=raw_statuses_ids)
+
+    def add_statuses(self, statuses: list):
         for status in statuses:
-            self.add_status(status)
-
-    def add_status(self, status):
-        self.list.append(status)
+            self.list.append(status)        
 
     def remove_status(self, status): 
         status.remove_status() 
 
+    def add_statuses_ownership(self, statuses: list):
+        for status in statuses:
+            status.owner, status.target = self.owner, self.target
+
+class PassivesList():
+    def __init__(self):
+        self.list = []
+
+    def add_passive(self, passive):
+        self.list.append(passive)
+
+#########################################################################################
+############################ MOTHER STATUS ##############################################
+#########################################################################################
+
 class Status():
     def __init__(self, **kwargs):
+        self.id = kwargs.get("id")
         self.name = kwargs.get("name", "Curse of The Deep")
         self.base_name = kwargs.get("base_name", "Curse of The Deep")
         self.value = kwargs.get("value", 0)
@@ -49,7 +102,7 @@ class Status():
         self.owner = kwargs.get("owner", None)
         self.target = kwargs.get("target", None)
         self.category = kwargs.get("category", "Deep")
-        self.statuses = kwargs.get("statuses", [self]) if kwargs.get("statuses", False) else [self]
+        self.statuses = kwargs.get("statuses", [self]) if kwargs.get("statuses", []) else [self]
 
     def apply_buff(self):
         pass
@@ -59,76 +112,102 @@ class Status():
         return {"msg": "Basic Status MSG, shouldn't be visible in normal circumstances"}
 
     def remove_status(self):
+        self.remove_buff()
         pass
 
-#BASE MAIN ARCHETYPES
+    def remove_buff(self):
+        pass
+
+    def get_base_name(self):
+        return self.base_name
+
+    def set_owner(self, owner):
+        self.owner = owner
+
+    def set_target(self, target):
+        self.target = target
+
+################################################################################################        
+########################### BASE STATUSES ######################################################
+################################################################################################
+
 class DoT(Status):
-    def __init__(self, target=None, owner=None, name="Amaterasu", base_name="dot", value=0, timer=0, category='dot', statuses=[]):
-        super().__init__(name=name, base_name=base_name, value=value, timer=timer, target=target, owner=owner, category=category, statuses=statuses)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def pass_time(self):
         super().pass_time()
-        com.Attack(owner=self.owner, target=self.target).deal_damage(damage=self.value, is_raw=True)
+        self.target.take_damage(value=self.value)
         return {"msg": f"Basic DoT msg, value = {self.value}, current_timer = {self.timer}"}
 
 class HoT(Status):
-    def __init__(self, target=None, owner=None, value=0, timer=0, base_name="hot", name="Seeds of Love", category='hot', statuses=[]):
-        super().__init__(name=name, base_name=base_name, value=value, timer=timer, target=target, owner=owner, category=category, statuses=statuses)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def pass_time(self):
         super().pass_time()
-        com.Heal(owner=self.owner, target=self.target, value=self.value).execute()
+        self.target.heal_damage(value=self.value)
         return {"msg": f"Basic HoT msg, value = {self.value}, current_timer = {self.timer}"}
 
 class Buff(Status):
-    def __init__(self, target=None, owner=None, name="Ronacse's Grace", base_name="buff", timer=0, statuses=[], category='buff', value=0, attr=None):
-        super().__init__(name=name, base_name=base_name, value=value, timer=timer, target=target, owner=owner, category=category, statuses=statuses)
-        self.attr = attr
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.attr = kwargs.get("attr")
 
     def apply_buff(self):
+        current_value = getattr(self.owner, self.attr)
+        setattr(self.owner, self.attr, current_value + self.value)
+
+    def remove_buff(self):
         
-        for status in self.statuses:
-            old_value = getattr(getattr(self.target, self.attr), 'value')
-            setattr(getattr(self.target, self.attr), 'value', old_value + self.value)
+        current_value = getattr(self.owner, self.attr)
+        setattr(self.owner, self.attr, current_value - self.value)
+        self.owner = None
 
     def pass_time(self):
         super().pass_time()
         return {"msg": f"{self.name} Pass Time"}
 
-    def remove_status(self):
-        for status in self.statuses:
-            old_value = getattr(getattr(self.target, self.attr), 'value')
-            setattr(getattr(self.target, self.attr), 'value', old_value - self.value)
+################################################################################################        
+################################ SPECIAL STATUSES ##############################################
+################################################################################################
 
-        self.owner = None
+# Stunned
+# Perfect Counter Stance
 
-################################        
-####### SPECIAL STATUSES #######
-################################
+def get_status_obj_and_params(id_: str):
+    """
+    {
+        "name":,
+        "base_name": ,
+        "value":,
+        "timer":,
+        "category":,
+        "attr": ,#optional, if impacts an actor attr
+    }
+    """
+    statuses = {
+        "stunned": [Status, cons.STUNNED],
+        "perfect_counter_stance": [Status, cons.PERFECT_COUNTER_STANCE],
 
-class Stunned(Status):
-    def __init__(self, target=None, owner=None, base_name=cons.STUNNED["base_name"], timer=cons.STUNNED["timer"], value=0, name=cons.STUNNED["name"], 
-    category=cons.STUNNED["category"], statuses=[]):
-        super().__init__(name=name, base_name=base_name, timer=timer, target=target, owner=owner, category=category, value=value, statuses=statuses)
-
-class PerfectCounterStance(Status):
-    def __init__(self, target=None, owner=None, base_name=cons.PERFECT_COUNTER_STANCE["base_name"], timer=cons.PERFECT_COUNTER_STANCE["timer"], 
-    value=0, name=cons.PERFECT_COUNTER_STANCE["name"], category=cons.PERFECT_COUNTER_STANCE["category"], statuses=[]):
-        super().__init__(name=name, base_name=base_name, timer=timer, target=target, owner=owner, category=category, value=value, statuses=statuses)
+        "atk_up": [Buff, cons.ATK_UP],
+        "def_up": [Buff, cons.DEF_UP],
+        "spd_up": [Buff, cons.SPD_UP],
+        "max_hp_up": [Buff, cons.MAX_HP_UP],
+        "income_up": [Buff, cons.INCOME_UP],
         
+        "regen": [HoT, cons.REGENERATING],
+        "poisoned": [DoT, cons.POISONED],
+        "burned": [DoT, cons.BURNED],
+    }
 
-def get_new_status_by_id(id, **kwargs):
-    status = {
-        "atk_up": Buff(**{**cons.ATK_UP, **kwargs}),
-        "def_up": Buff(**{**cons.DEF_UP, **kwargs}),
-        "spd_up": Buff(**{**cons.SPD_UP, **kwargs}),
-        "max_hp_up": Buff(**{**cons.MAX_HP_UP, **kwargs}),
-        "income_up": Buff(**{**cons.INCOME_UP, **kwargs}),
-        "regen": HoT(**{**cons.REGENERATING, **kwargs}),
-        "poisoned": DoT(**{**cons.POISONED, **kwargs}),
-        "burned": HoT(**{**cons.BURNED, **kwargs}),
-        "stunned": Stunned(**{**cons.STUNNED, **kwargs}),
-        "perfect_counter_stance": PerfectCounterStance(**{**cons.PERFECT_COUNTER_STANCE, **kwargs}),
-    }.get(id)
+    return statuses.get(id_)
 
-    return status
+def get_new_statuses_by_ids(status_list: list = [])-> list:
+    statuses = []
+
+    for status_dict in status_list:
+        obj, cons = get_status_obj_and_params(status_dict["id"])
+        statuses.append(obj(**{**cons, **status_dict}))
+
+    return statuses

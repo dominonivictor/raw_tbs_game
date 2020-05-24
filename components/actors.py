@@ -1,4 +1,4 @@
-from components.statuses import StatusList
+from components.statuses import StatusManager
 from components.commands import CommandList
 from game_eye import GameEye
 
@@ -7,27 +7,27 @@ class Actor():
     def __init__(self, **kwargs):
         self.name = kwargs.get("name", "Nameless")
         self.letter = kwargs.get("letter", "X")
-        self.kingdom = kwargs.get("kingdom", "No kingdom")
-        self.animal = kwargs.get("animal", "scrub")
-        self.hp_stat = kwargs.get("hp_stat")
-        self.max_hp_stat = Stat(value=kwargs.get("hp_stat").value)
-        self.def_stat = kwargs.get("def_stat") 
-        self.atk_stat = kwargs.get("atk_stat")
-        self.spd_stat = kwargs.get("spd_stat")
-        self.income_stat = kwargs.get("income_stat")
-        self.statuses = StatusList()
+        self.kingdom = kwargs.get("kingdom", "reptalia")
+        self.animal = kwargs.get("animal", "fox")
+        self.hp_stat = kwargs.get("hp_stat", 10)
+        self.max_hp_stat = kwargs.get("hp_stat", 10)
+        self.atk_stat = kwargs.get("atk_stat", 2)
+        self.def_stat = kwargs.get("def_stat", 0)
+        self.spd_stat = kwargs.get("spd_stat", 4)
+        self.income_stat = kwargs.get("income_stat", 2)
+        
+        self.statuses = StatusManager()
         self.statuses.owner = self
 
-        self.base_commands = kwargs.get("commands", [])
-        self.commands = CommandList(owner=self)
-
+        commands_ids = kwargs.get("commands_ids", [])
+        self.commands = CommandList(owner=self, raw_commands_ids=commands_ids)
         self.job = kwargs.get("job", None)
         if self.job:
             self.learn_job(job)
 
         self.equip = kwargs.get("equip", None)
         if self.equip:
-            self.add_equip(equip)
+            self.add_equip(self.equip)
 
         self.x = kwargs.get("x", 0)
         self.y = kwargs.get("y", 0)
@@ -37,52 +37,35 @@ class Actor():
         self.game_eye = GameEye.instance()
 
     def show_statuses(self):
-        statuses = ''
-        for status in self.statuses.list:
-            statuses += f'{status.name}, '
-
-        statuses = statuses[:-2] + '.'
-        return statuses
+        return self.statuses.show_statuses()
 
     def show_commands(self):
-        commands_str = ''
-        i = 1
-        for command in self.commands.list:
-            commands_str = commands_str + f'({i}) {command.name} - '
-            i += 1
-
-        commands_str = commands_str[:-2] + '.'
-        return commands_str
-
+        return self.commands.show_commands()
+        
     def learn_job(self, job):
-        if self.job:
-            self.job.unlearn()
-        job.owner = self
-        self.job = job
-        self.job.initialize()
-
+        job.learn(owner=self)
+        
     def add_equip(self, item):
         item.equip(owner=self)
 
     def unequip(self):
         self.equip.unequip()
-        self.equip = None
 
     def show_battle_stats(self):
         string = f"""
         Name: {self.name}
         Animal: {self.animal}
         Kingdom: {self.kingdom}
-        HP: {self.hp_stat.value}/{self.max_hp_stat.value}
-        ATK: {self.atk_stat.value}
-        DEF: {self.def_stat.value}
-        SPD: {self.spd_stat.value}
-        In: {self.income_stat.value}
+        HP: {self.get_hp()}/{self.get_max_hp()}
+        ATK: {self.get_atk()}
+        DEF: {self.get_def()}
+        SPD: {self.get_spd()}
+        In: {self.get_inc()}
         Statuses: {self.show_statuses()}
         Commands: {self.show_commands()}
-        x, y: {self.x}, {self.y}
-        job: {self.job.name if self.job else "Jobless"}
-        equip: {self.equip.name if self.equip else "No Equip"}
+        x, y: {self.get_x()}, {self.get_y()}
+        job: {self.job.get_name() if self.job else "Jobless"}
+        equip: {self.equip.show_equip_stats() if self.equip else "No Equip"}
         """
 
         return string
@@ -95,7 +78,83 @@ class Actor():
         self.has_acted = False
         self.has_moved = False
 
-class Stat():
-    def __init__(self, value):
-        self.value = value
+    def pass_time(self):
+        self.commands.pass_time()
+        self.statuses.pass_time()
+        if self.equip: self.equip.pass_time()
+        if self.job: self.job.pass_time()
 
+    def take_damage(self, value):
+        hp = self.get_hp()
+        self.set_hp(hp - value if hp - value >= 0 else 0)
+
+    def heal_damage(self, value):
+        hp = self.get_hp()
+        max_hp = self.get_max_hp()
+        final_value = value + hp if hp + value <= max_hp else max_hp 
+        self.set_hp(final_value)
+
+    def list_commands(self):
+        return self.commands.list
+
+    def get_command_by_id(self, id_):
+        return self.commands.get_command_by_id(id_)
+
+    def list_statuses(self):
+        return self.statuses.list
+
+    def has_status(self, status_id):
+        for status in self.statuses.list:
+            if status.id == status_id:
+                return True
+
+        else: return False
+    
+    def get_status(self, status_id):
+        for status in self.statuses.list:
+            if status.id == status_id:
+                return status
+
+        else: return None
+
+    def get_hp(self):
+        return self.hp_stat
+
+    def set_hp(self, value):
+        self.hp_stat = value
+
+    def get_max_hp(self):
+        return self.max_hp_stat
+
+    def set_max_hp(self, value):
+        self.max_hp_stat = value
+
+    def get_atk(self):
+        return self.atk_stat
+
+    def set_atk(self, value):
+        self.atk_stat = value
+
+    def get_def(self):
+        return self.def_stat
+
+    def set_def(self, value):
+        self.def_stat = value
+
+    def get_spd(self):
+        return self.spd_stat
+
+    def set_spd(self, value):
+        self.spd_stat = value
+
+    def get_inc(self):
+        return self.income_stat
+
+    def set_inc(self, value):
+        self.income_stat = value
+
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y

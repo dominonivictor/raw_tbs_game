@@ -1,5 +1,3 @@
-from components.statuses import get_new_status_by_id
-
 default = None
 base_atk = 3
 base_heal = 4
@@ -25,8 +23,10 @@ def get_attrs(*args, self=None):
             "self": self,
         }.get(obj)
 
+        #way too much logic inside these... should be cleaner
         aimed_attr = {
             "name": aimed_obj.name,
+            "value": aimed_obj.value if hasattr(aimed_obj, "value") else None,
             "final_value": aimed_obj.final_value if hasattr(aimed_obj, "final_value") else None,
             "heal_value": aimed_obj.heal_value if hasattr(aimed_obj, "heal_value") else None,
             "choices": aimed_obj.choices if hasattr(aimed_obj, "choices") else None,
@@ -88,10 +88,10 @@ VAMP_BITE = {
 SUN_CHARGE = {
     "id": "sun_charge",
     "name": "Sun Charge",
-    "statuses": [
-        get_new_status_by_id("atk_up", value=1),
-        get_new_status_by_id("def_up", value=1),
-        get_new_status_by_id("spd_up", value=1),
+    "statuses_list": [
+        {"id": "atk_up", "value": 1, "timer": mid_timer,},
+        {"id": "def_up", "value": 1, "timer": mid_timer,},
+        {"id": "spd_up", "value": 1, "timer": mid_timer,},
     ],
     "timer": mid_timer,
     "description": "Sun Charge increases all stats by 1 for 1 turn.",
@@ -105,15 +105,16 @@ SUN_CHARGE = {
 GOLDEN_EGG = {
     "id": "golden_egg",
     "name": "Golden Egg",
-    "timer": 2, #only for commands with statuses
+    "timer": 2, #only for commands with statuses_list
     "description": "Grants 2 random bonuses for 1 turn",
     "category": "Greater Buff",
-    "statuses": [
-        get_new_status_by_id("atk_up", value=2),
-        get_new_status_by_id("def_up", value=2),
-        get_new_status_by_id("spd_up", value=2),
-        get_new_status_by_id("income_up", value=2),
-    ],
+    "statuses_list": [
+        {"id": "atk_up", "value": 2, "timer": 2,},
+        {"id": "def_up", "value": 2, "timer": 2,},
+        {"id": "spd_up", "value": 2, "timer": 2,},
+        {"id": "income_up", "value": 2, "timer": 2,},
+    ],                                   
+                                         
     "max_range": 1,
     "msg": "{} gets buffed on {} by 2? for 1 turn",
     "msg_function": get_attrs,
@@ -152,14 +153,30 @@ DAGGER_ATTACK = {
 
 }
 
+TOXIC_SHOT = {
+    "id": "toxic_shot",
+    "name": "Toxic Shot",
+    "statuses_list": [
+        {"id": "poisoned", "value": 2, "timer": mid_timer,},
+    ],
+    "timer": mid_timer,
+    "value": 2,
+    "description": "Shoots target and poisons for 3 turns",
+    "category": "Attack and DoT",
+    "max_range": 3,
+    "msg": "{} shots {} for {} damage and {} is poisoned for {} turns",
+    "msg_function": get_attrs,
+    "msg_args": ["owner name", "target name", "self final_value", "target name", "self timer"],
+}
+
 SHIELD_BASH = {
     "id": "shield_bash",
     "name": "Shield Bash",
     "value": 3, #only for commands that deal/heal <value> hp
     "description": "Bashes oponnent, leaving him stunned",
     "category": "Basic Attack",
-    "statuses": [
-        get_new_status_by_id("stunned", value=2),
+    "statuses_list": [
+        {"id": "stunned", "value": 2, "timer": 2},
     ],
     "is_raw": False,
     "max_range": 1,
@@ -171,12 +188,12 @@ SHIELD_BASH = {
 RAGE = {
     "id": "rage",
     "name": "Rage",
-    "timer": 2, #only for commands with statuses
+    "timer": 2, #only for commands with statuses_list
     "description": "Someone is mad",
     "category": "Major Buff",
-    "statuses": [
-        get_new_status_by_id("atk_up", value=3),
-        get_new_status_by_id("def_up", value=-2),
+    "statuses_list": [
+        {"id": "atk_up", "value": 3, "timer": 2,},
+        {"id": "def_up", "value": -2, "timer": 2,},
     ],
     "max_range": 3,
     "msg": "{} is enraged! (+ATK, -DEF)",
@@ -189,31 +206,13 @@ RAGE_SOUP = {
     'name': 'Rage Soup'
 }
 
-TOXIC_SHOT = {
-    "id": "toxic_shot",
-    "name": "Toxic Shot",
-    "statuses":[
-        get_new_status_by_id("poisoned"),
-    ],
-    # "command_dict": {
-    #     "attack": 2,
-    # },
-    "timer": mid_timer,
-    "value": 2,
-    "description": "Shoots target and poisons for 3 turns",
-    "category": "Attack and DoT",
-    "max_range": 3,
-    "msg": "{} shots {} for {} damage and {} is posioned for {} turns",
-    "msg_function": get_attrs,
-    "msg_args": ["owner name", "target name", "self final_value", "target name", "self timer"],
-}
 
 #toxic and zaraba should be the same, probably remove this or rework it
 PARALIZE_SHOT = {
     "id": "paralize_shot",
     "name": "Paralisis Shot",
-    "statuses":[
-        get_new_status_by_id("stunned", value=2),
+    "statuses_list": [
+        {"id": "stunned", "timer": short_timer},
     ],
     # "command_dict": {
     #     "attack": base_atk - 1,
@@ -235,11 +234,11 @@ PARALIZE_SHOT = {
 PERFECT_COUNTER = {
     "id": "perfect_counter",
     "name": "Perfect Counter",
-    "timer": 2, #only for commands with statuses
+    "timer": 2, #only for commands with statuses_list
     "description": "Full Counter",
     "category": "Major Buff",
-    "statuses": [
-        get_new_status_by_id("perfect_counter_stance"),
+    "statuses_list": [
+        {"id": "perfect_counter_stance", "timer": 2,},
     ],
     "max_range": 0,
     "msg": "{} takes a defensive stance",
@@ -270,10 +269,10 @@ MIXN = {
 POWER_UP = {
     "id": "power_up",
     "name": "Power Up",
-    "statuses": [
-        get_new_status_by_id("atk_up"),
+    "statuses_list": [
+        {"id": "atk_up", "value": 2, "timer": 2,},
     ],
-    "timer": 2, #only for commands with statuses
+    "timer": 2, #only for commands with statuses_list
     "description": "Owner gets a bonus for its attack for 2 for 1 turn",
     "category": "Minor Buff",
     # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
@@ -286,10 +285,10 @@ POWER_UP = {
 DEFENSE_UP = {
     "id": "defense_up",
     "name": "Defense Up",
-    "statuses": [
-        get_new_status_by_id("def_up"),
+    "statuses_list": [
+        {"id": "def_up", "value": 2, "timer": 2,},
     ],
-    "timer": 2, #only for commands with statuses
+    "timer": 2, #only for commands with statuses_list
     "description": "Owner gets a bonus for its defense for 2 for 1 turn",
     "category": "Minor Buff",
     # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
@@ -302,10 +301,10 @@ DEFENSE_UP = {
 SPEED_UP = {
     "id": "speed_up",
     "name": "Speed Up",
-    "statuses": [
-        get_new_status_by_id("spd_up"),
+    "statuses_list": [
+        {"id": "spd_up", "value": 2, "timer": 3,},
     ],
-    "timer": 3, #only for commands with statuses
+    "timer": 3, #only for commands with statuses_list
     "description": "Owner gets a bonus for its speed by 1 for 2 turns",
     "category": "Minor Buff",
     # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
@@ -318,30 +317,30 @@ SPEED_UP = {
 REGEN = {
     "id": "regen",
     "name": "Regeneration",
-    "timer": long_timer, #only for commands with statuses
+    "timer": long_timer, #only for commands with statuses_list
     "value": base_heal//2, #only for commands that deal/heal <value> hp
     "description": "Owner starts to regenerate!",
     "category": "Healing",
-    "statuses":[
-        get_new_status_by_id("regen", value=base_heal//2),
+    "statuses_list": [
+        {"id": "regen", "value": base_heal//2, "timer": long_timer,},
     ],
     "max_range": 2,
-    "msg": "{} starts regenning 2 hp for 4 turns",
+    "msg": "{} starts regenning {} hp for {} turns",
     "msg_function": get_attrs,
-    "msg_args": ["target name"]
+    "msg_args": ["target name", "self value", "self timer"]
 }
 
 '''
 {
     "name": ,
-    "timer": , #only for commands with statuses
+    "timer": , #only for commands with statuses_list
     "value": , #only for commands that deal/heal <value> hp
     "description": ,
     "category": ,
     "eff" : , #for now only for VampBite(), it shows the efficiency of the vampire bite heal
     "is_raw": , # default is False, only valid for commands that use Attack()
     # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
-    "statuses": { #optional if command has stat buffs
+    "statuses_list": { #optional if command has stat buffs
         <status_name>: status_value
     },
     "command_dict": {

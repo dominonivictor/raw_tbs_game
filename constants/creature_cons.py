@@ -13,7 +13,20 @@ def_plus = 2
 def_minus = -1
 spd_plus = 1
 spd_minus = -1
-
+'''
+commands_ids:
+    
+    "attack",
+    "heal",
+    "power_up",
+    "rage",
+    "speed_up",
+    "regen",
+    "toxic_shot",
+    "defense_up",
+    "vamp_bite",
+    "speed_up",
+'''
 creature_stats = {
     "f":{
         "animal": "fox",
@@ -25,7 +38,7 @@ creature_stats = {
         "spd": base_spd,
         "income": base_income,
         "kingdom": "mamalia",
-        "commands":[
+        "commands_ids":[
             "attack",
             "vamp_bite",
             "speed_up",
@@ -41,7 +54,7 @@ creature_stats = {
         "spd": base_spd + spd_minus,
         "income": base_income,
         "kingdom": "reptalia",
-        "commands":[
+        "commands_ids":[
             "attack",
             "regen",
             "defense_up",
@@ -57,7 +70,7 @@ creature_stats = {
         "spd": base_spd + spd_plus,
         "income": base_income,
         "kingdom": "aves",
-        "commands":[
+        "commands_ids":[
             "attack",
             "rage",
             "speed_up",
@@ -73,7 +86,7 @@ creature_stats = {
         "spd": base_spd + spd_minus,
         "income": base_income,
         "kingdom": "reptalia",
-        "commands":[
+        "commands_ids":[
             "attack",
             "vamp_bite",
             "power_up",
@@ -89,7 +102,7 @@ creature_stats = {
         "spd": base_spd + spd_minus,
         "income": base_income,
         "kingdom": "mamalia",
-        "commands":[
+        "commands_ids":[
             "attack",
             "toxic_shot",
             "power_up",
@@ -105,7 +118,7 @@ creature_stats = {
         "spd": base_spd,
         "income": base_income,
         "kingdom": "aves",
-        "commands":[
+        "commands_ids":[
             "attack",
             "heal",
             "power_up",
@@ -123,8 +136,7 @@ creature_stats = {
         "def": ,
         "spd": ,
         "kingdom": "",
-        "commands":[
-            "vamp_bite",
+        "commands_ids":[
             "toxic_shot",
             "power_up",
             "attack"

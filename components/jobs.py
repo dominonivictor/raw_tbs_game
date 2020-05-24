@@ -1,5 +1,4 @@
-from components.statuses import get_new_status_by_id
-from components.commands import Command, Attack, CopyCat, Mixn
+from components.statuses import get_new_statuses_by_ids
 import constants.commands_cons as comm_cons
 
 class Job():
@@ -7,8 +6,24 @@ class Job():
         self.owner = kwargs.get('owner', None)
         self.name = kwargs.get('name', "Jobless")
         self.category = kwargs.get('category', "good for nothing")
-        self.commands = kwargs.get('commands', []) #which should be unique for each 
-        self.passives = kwargs.get('passives', []) #which are basically perma statuses!
+
+        #separate this into a commands_list and status_list or similar
+        #make it interact with the other apis a little more easily...
+        #there is too much happening here!
+        #this should come ready...
+
+        commands_ids = kwargs.get('commands_ids', [])
+        from components.commands import get_new_command_by_id
+        commands = kwargs.get("commands", [])
+        if not commands: 
+            self.commands = [get_new_command_by_id(id=id_) for id_ in commands_ids] 
+        else:
+            self.commands = commands
+
+        from components.statuses import get_new_statuses_by_ids
+        passives_ids = kwargs.get('status_ids', [])
+        passives_ids = [{"id": id_, "timer": -1} for id_ in passives_ids]
+        self.passives = get_new_statuses_by_ids(status_list=passives_ids)
 
 
     def initialize(self):
@@ -22,12 +37,11 @@ class Job():
                 command.owner = self.owner
             for passive in self.passives:
                 passive.owner = self.owner
+                passive.target = self.owner
 
     def apply_passives(self):
         if self.owner:
-            for passive in self.passives:
-                passive.target = self.owner
-                self.owner.statuses.add_status(passive)
+            self.owner.statuses.add_statuses_to_actor(statuses=self.passives)
             
 
     def apply_commands(self):
@@ -35,34 +49,49 @@ class Job():
             for command in self.commands:
                 self.owner.commands.add_command(command, category="job")
     
+    def learn(self, owner):
+        if owner.job:
+            owner.job.unlearn()
+        self.owner = owner
+        owner.job = self
+        self.initialize()
+
+
     def unlearn(self):
-        if self.owner:
-            for command in self.commands:
-                self.owner.commands.remove_command(command, category="job")
-            for status in self.passives:
-                self.owner.statuses.remove_status(status)
+        for command in self.commands:
+            self.owner.commands.remove_command(command, category="job")
+        for status in self.passives:
+            self.owner.statuses.remove_status(status)
 
-            self.owner = None 
+        self.owner = None 
 
+    def pass_time(self):
+        pass
+
+    def get_name(self):
+        return self.name
 
 #TODO: next place i shall clean up
 
 class Guardian(Job):
-    def __init__(self, owner=None, name="Guardian", category="Tank/Utility", commands=[Command(**comm_cons.PERFECT_COUNTER)], passives=[get_new_status_by_id("def_up", timer=-1)]):
-        super().__init__(owner=owner, name=name, category=category, commands=commands, passives=passives)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 class Thief(Job):
-    def __init__(self, owner=None, name="Thief", category="DPS/Utility", commands=[CopyCat(**comm_cons.COPY_CAT)], passives=[get_new_status_by_id("spd_up", timer=-1)]):
-        super().__init__(owner=owner, name=name, category=category, commands=commands, passives=passives)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 class Hunter(Job):
-    def __init__(self, owner=None, name="Hunter", category="DPS/Tank", commands=[Attack(**comm_cons.TOXIC_SHOT)], passives=[get_new_status_by_id("atk_up", timer=-1)]):
-        super().__init__(owner=owner, name=name, category=category, commands=commands, passives=passives)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 class Cook(Job):
-    def __init__(self, owner=None, name="Cook", category="Utility/Tank", commands=[Mixn(**comm_cons.MIXN)], passives=[get_new_status_by_id("max_hp_up", timer=-1)]):
-        super().__init__(owner=owner, name=name, category=category, commands=commands, passives=passives)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 class Merchant(Job):
-    def __init__(self, owner=None, name="Merchant", category="Utility/DPS", commands=[Attack(**comm_cons.TOXIC_SHOT)], passives=[get_new_status_by_id("income_up", timer=-1)]):
-        super().__init__(owner=owner, name=name, category=category, commands=commands, passives=passives)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+

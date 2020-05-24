@@ -1,9 +1,16 @@
-from components.statuses import get_new_status_by_id
 
 FIRE ={
+    "id": "fire",
     "name": "Fire",
     "timer": 2,
-    "statuses":[
-        get_new_status_by_id("burned")
-    ],
+    "statuses_list": [{"id": "burned", "value": 2, "timer": 2}]
 }
+
+'''
+{
+    "id": ,
+    "name": ,
+    "timer": ,
+    "status_ids": [<status_id>]
+}
+'''
