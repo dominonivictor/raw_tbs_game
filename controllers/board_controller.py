@@ -90,6 +90,7 @@ def select_tile_targeting_state(board, target_tile):
     clean_tiles(board.highlighted_tiles, board)
 
 def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
+    #TOO MUCH LOGIC HERE, NEED TO MAKE FLOW EASIER TO READ
     app = App.get_running_app()
     log_text = app.root.ids.log_text
     if actor.has_moved:
@@ -99,6 +100,7 @@ def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
     elif((target_tile.grid_x, target_tile.grid_y) not in movable_tiles):
         log_text.text += "Destination out of range!\n"
     else:
+        change_actor_coords_in_game_grid(grid, from_coord, to_coord)
         target_tile.actor = actor
         current_tile.actor = None
         x, y = target_tile.grid_x, target_tile.grid_y
@@ -112,6 +114,10 @@ def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
         actor.has_moved = True
 
     clean_tiles(board.highlighted_tiles, board)
+
+def change_actor_coords_in_game_grid(game, from_coord, to_coord):
+    actor = game.pop_actor_at_coord(from_coord)
+    game.add_actor_at_coord(actor, to_coord)
 
 def targeting_command(board, actor, target_tile, commandable_tiles):
     app = App.get_running_app()
@@ -127,7 +133,7 @@ def targeting_command(board, actor, target_tile, commandable_tiles):
     else:
         target = target_tile.actor
         command.set_target(target)
-        command.set_target_pos(target_tile.grid_x, target_tile.grid_y)
+        command.set_target_pos((target_tile.grid_x, target_tile.grid_y))
         actor.has_acted = True
 
         board.selected_tile.rgba = colors.WALKABLE_BLUE
@@ -164,12 +170,16 @@ def pass_turn(board):
 ############## Temporary / Auxiliary functions
 
 def add_actors_in_starting_positions(board):
+    #this is linked with game self.initial_setup()
     for i, (x, y) in enumerate(board.initial_spaces):
         actor = board.game.actors[i]
         add_actor_at_xy(board, actor, x, y)
 
 def add_actor_at_xy(board, actor, x, y):
+    #this is doing way too much, need to centralize all this info...
+    game = board.game
     tile = board.grid[x][y]
+    game.add_actor_at_coord(actor, (x, y))
     tile.text = actor.letter
     tile.actor = actor
     actor.update_pos(x=x, y=y)

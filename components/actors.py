@@ -1,5 +1,5 @@
 from components.statuses import StatusManager
-from components.commands import CommandList
+from components.command_list import CommandList
 from game_eye import GameEye
 
 
@@ -15,7 +15,7 @@ class Actor():
         self.def_stat = kwargs.get("def_stat", 0)
         self.spd_stat = kwargs.get("spd_stat", 4)
         self.income_stat = kwargs.get("income_stat", 2)
-        
+
         self.statuses = StatusManager()
         self.statuses.owner = self
 

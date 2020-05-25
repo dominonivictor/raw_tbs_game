@@ -25,12 +25,12 @@ class ScrollableLog(ScrollView):
 class StatsPanel(Label):
     rgba = ListProperty(colors.BASIC_BLACK)
     def update_actor_stats(self, actor):
-        self.text = log_con.show_actor_stats(actor) 
-        
+        self.text = log_con.show_actor_stats(actor)
+
 class MinorOptionsButton(Button):
     def on_press(self):
         btn_con.minor_btn_on_press(self)
-        
+
 
 class MinorOptionsBox(Factory.BoxLayout):
     commands_list = []
@@ -56,10 +56,11 @@ class PuzzleGrid(Factory.GridLayout):
         self.rows = 1
         self.grid = []
         self.graph = {}
-        self.initial_spaces = [(4, 4), (5, 4), (6, 4), (4, 8), (4, 6), (6, 8), (5, 8), (6, 6)]
+        self.initial_spaces = [(4, 4), (5, 4), (6, 4), (4, 8), (4, 6), (6, 8)]
         self.highlighted_tiles = []
         board_con.board_clean_selected_things(board=self)
-        self.game = Game(grid_size=self.grid_size, board=self)
+        self.game = Game(grid_size=self.grid_size, board=self,
+                         ini_spaces=self.initial_spaces)
         game_eye = GameEye.instance()
         game_eye.game = self.game
 
@@ -68,7 +69,7 @@ class PuzzleGrid(Factory.GridLayout):
 
     def select_tile(self, target_tile):
         board_con.select_tile(board=self, target_tile=target_tile)
-                
+
     def pass_turn(self):
         board_con.pass_turn(board=self)
 

@@ -48,7 +48,7 @@ class GameEye():
         return self.game.board
 
     def get_actor_on_xy(self, x, y):
-        return self.grid[x][y].actor
+        return self.game.grid[x][y].actor
 
     def set_actor_on_xy(self, actor, x, y):
         self.game.grid[x][y].actor = actor
