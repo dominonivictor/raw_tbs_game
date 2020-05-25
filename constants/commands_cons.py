@@ -33,8 +33,8 @@ def get_attrs(*args, self=None):
             "timer": aimed_obj.timer if hasattr(aimed_obj, "timer") else None,
         }.get(attr)
 
-        result.append(aimed_attr)   
-        
+        result.append(aimed_attr)
+
     return result
 
 ####################################
@@ -46,12 +46,12 @@ ATTACK = {
     "name": "Punch",
     "value": base_atk, #only for commands that deal/heal <value> hp
     "description": "Gives a good old punch to the face",
-    "category": "Basic Attack",  
+    "category": "Basic Attack",
     "is_raw": False,
     "max_range": 1,
     "msg": "{} attacks {} for {} damage!",
     "msg_function": get_attrs,
-    "msg_args": ["owner name", "target name", "self final_value"],  
+    "msg_args": ["owner name", "target name", "self final_value"],
 }
 
 HEAL = {
@@ -332,12 +332,26 @@ REGEN = {
 
 ######### AOE
 WATERBALL = {
-    
+    "id": "waterball",
+    "name": "Waterball",
+    "value": 3, #only for commands that deal/heal <value> hp
+    "description": "Aoe attack like fireball but with water",
+    "category": "aoe",
+    "is_raw": False, # default is False, only valid for commands that use Attack()
+    # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+    "command_dict": {
+        "attack": 3,
+    },
+    "max_range": 1,
+    "msg": "{} deals damage!",
+    "msg_function": get_attrs,
+    "msg_args": ["target name"]
 }
 
 
 '''
 {
+    "id": ,
     "name": ,
     "timer": , #only for commands with statuses_list
     "value": , #only for commands that deal/heal <value> hp
@@ -353,6 +367,9 @@ WATERBALL = {
         <command_name>: command_value
     },
     "max_range": 1,
+    "msg": "{} deals damage!",
+    "msg_function": get_attrs,
+    "msg_args": ["target name"]
 }
 "id": ,
 attack

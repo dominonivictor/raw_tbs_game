@@ -18,14 +18,14 @@ class Equip():
         status_list = kwargs.get("statuses", [])
         #all of statuses here will be passives, so the timer will be set to -1 (infinite until removed)
         self.passives = PassivesList()
-        passives = get_new_statuses_by_ids(status_list=status_list
+        passives = get_new_statuses_by_ids(status_list=status_list)
         for passive in passives:
             self.passives.add_passive(passive)
 
-        commands = kwargs.get("commands_ids", [])
+        commands_ids = kwargs.get("commands_ids", [])
         self.commands = []
-        for command in commands:
-            self.add_new_command_by_id(command)
+        for command_id in commands_ids:
+            self.add_command(command_id=command_id)
 
     def equip(self, owner):
         self.owner = owner

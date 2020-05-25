@@ -18,7 +18,7 @@ def create_grid(board, size):
     board.clear_widgets()
     board.rows = size
     board.cols = size
-    
+
     #making the grid
     PT = Factory.PuzzleTile
     for i in range(board.rows):
@@ -40,11 +40,11 @@ def create_grid(board, size):
 
 def select_tile(board, target_tile):
     app = App.get_running_app()
-    
+
     if board.state == gs.NORMAL:
         clean_tiles(board.highlighted_tiles, board)
         select_tile_normal_state(app=app, board=board, target_tile=target_tile)
-    
+
     elif board.state == gs.TARGETING:
         select_tile_targeting_state(board=board, target_tile=target_tile)
 
@@ -117,7 +117,8 @@ def targeting_command(board, actor, target_tile, commandable_tiles):
     app = App.get_running_app()
     log_text = app.root.ids.log_text
     command = board.selected_command
-    if not target_tile.actor and command.name != "Multiply":
+    #ok this is not scalable at all..
+    if not target_tile.actor and command.id not in ["multiply", "waterball"]:
         log_text.text += "No target selected!\n"
     elif board.selected_tile.actor.has_acted:
         log_text.text += "Actor has already acted!\n"
@@ -125,9 +126,8 @@ def targeting_command(board, actor, target_tile, commandable_tiles):
         log_text.text += "Destination out of range!\n"
     else:
         target = target_tile.actor
-        
-        command.target = target
-        command.target_xy = target_tile.grid_x, target_tile.grid_y
+        command.set_target(target)
+        command.set_target_pos(target_tile.grid_x, target_tile.grid_y)
         actor.has_acted = True
 
         board.selected_tile.rgba = colors.WALKABLE_BLUE
@@ -165,7 +165,7 @@ def pass_turn(board):
 
 def add_actors_in_starting_positions(board):
     for i, (x, y) in enumerate(board.initial_spaces):
-        actor = board.game.actors[i]    
+        actor = board.game.actors[i]
         add_actor_at_xy(board, actor, x, y)
 
 def add_actor_at_xy(board, actor, x, y):
@@ -183,7 +183,7 @@ def highlight_movable_spaces(actor, start_tile):
     game_grid = board.game.grid
 
     closed_list = calculate_dijkstras(start_tile, board, game_grid, calculate_cost_to_move, n_moves)
-    
+
     for x, y in closed_list:
         ui_grid[x][y].rgba = colors.WALKABLE_BLUE
 
@@ -198,7 +198,7 @@ def highlight_attackable_spaces(command, start_tile):
     game_grid = board.game.grid
 
     closed_list = calculate_dijkstras(start_tile, board, game_grid, calculate_cost_to_attack, n_moves)
-    
+
     for x, y in closed_list:
         ui_grid[x][y].rgba = colors.ATTACKABLE_RED
 
@@ -215,7 +215,7 @@ def calculate_dijkstras(start_tile, board, game_grid, step_cost_function, n_move
         tile_xy = min(open_dict, key=lambda k: open_dict[k]["dist"]) if open_dict else None
         if tile_xy:
             tile_dict = open_dict.pop(tile_xy)
-            tile_neighbors = get_tile_neighbors(tile_xy=tile_xy, max_size=board.grid_size, 
+            tile_neighbors = get_tile_neighbors(tile_xy=tile_xy, max_size=board.grid_size,
                                                 game_grid=game_grid, closed_list=closed_list)
 
             for neigh_xy in tile_neighbors:
@@ -263,7 +263,7 @@ def clean_tiles(tiles, board):
         grid[x][y].rgba = board.game.grid[x][y].color
 
     board.highlighted_tiles = []
-    
+
 '''
 def create_graph(board, size):
     graph = {}

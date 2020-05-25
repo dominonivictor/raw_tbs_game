@@ -8,7 +8,7 @@ import constants.colors as colors
 
 class Game():
     def __init__(self, **kwargs):
-        
+
         self.state = game_states.START
         self.log = []
         self.event_list = []
@@ -21,6 +21,8 @@ class Game():
         self.p1 = Player(name='P1')
         self.p2 = Player(name='P2')
         self.grid_size = kwargs.get("grid_size", 13)
+
+        #need to remember the diff from grid and board, i think board is the kv board
         self.grid = self.create_grid(grid_size=self.grid_size)
 
         self.board = kwargs.get("board")

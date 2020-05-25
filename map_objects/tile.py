@@ -8,3 +8,4 @@ class Tile():
         self.terrain = kwargs.get('terrain', None)
         self.structure = kwargs.get('structure', None)
         self.color = kwargs.get('color', BASIC_BLACK)
+        self.actor = None

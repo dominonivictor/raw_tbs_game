@@ -14,7 +14,7 @@ class CommandList():
         self.job_list = []
         self.list = []
         self.raw_commands_ids = kwargs.get("raw_commands_ids", [])
-        self.init() 
+        self.init()
 
     def init(self):
         commands = [get_new_command_by_id(id=comm_id) for comm_id in
@@ -39,8 +39,8 @@ class CommandList():
             if("kingdom" in category):
                 self.kingdom_list.append(command)
 
-    def remove_command(self, command, category=""): 
-        command.owner = None  
+    def remove_command(self, command, category=""):
+        command.owner = None
         self.list.remove(command)
         if("base" in category):
             self.base_list.remove(command)
@@ -78,7 +78,7 @@ class CommandList():
         for comm in self.list:
             if comm.id == comm_id:
                 return comm
-        
+
     def pass_time(self):
         pass
 
@@ -91,7 +91,7 @@ class Command():
         self.name = kwargs.get('name', "Abyssal Lord Command")
         self.description = kwargs.get('description', "Abyssal Lord Command Description")
         self.category = kwargs.get('category', "Abyssal")
-        
+
         self.owner = kwargs.get('owner', None)
         self.target = kwargs.get('target', None)
         self.target_xy = (-1, -1)
@@ -104,9 +104,9 @@ class Command():
         self.is_raw = kwargs.get('is_raw', False)
         self.max_range = kwargs.get('max_range', 1)
         self.final_value = 0
-       
+
         self.raw_statuses_ids = kwargs.get("statuses_list", [])
-        from components.statuses import ComponentStatusList 
+        from components.statuses import ComponentStatusList
         self.statuses = ComponentStatusList(owner=self,
         raw_statuses_ids=self.raw_statuses_ids)
 
@@ -200,6 +200,12 @@ class Command():
             return self.statuses.list[pos].value
         return list(map(lambda x: x.value, self.statuses.list))
 
+    def get_target_x(self):
+        return self.target_x
+
+    def get_target_y(self):
+        return self.target_y
+
     def set_target_x(self, x):
         self.target_x = x
 
@@ -284,9 +290,9 @@ class GoldenEgg(Command):
         super().__init__(**kwargs)
         self.original_statuses_list = self.statuses.list
 
-    def execute(self): 
+    def execute(self):
         self.statuses.list = sample(self.original_statuses_list, k=2)
-        super().execute()        
+        super().execute()
 
 class Multiply(Command):
     def __init__(self, **kwargs):
@@ -379,7 +385,7 @@ class Mixn(Command):
         from components.elements import get_new_element_by_id
         element = get_new_element_by_id(id="fire")
         self.target.equip.add_element(element)
-        
+
         return {"msg": f"{self.owner.name} adds {element.name} element to a {self.target.equip.name}"}
 
 ####################################
@@ -401,12 +407,26 @@ from constants.grid_patterns import create_grid_coords
 class AOE(Command):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.aoe_size = kwargs.get("aoe_size", 1) 
+        self.aoe_size = kwargs.get("aoe_size", 1)
         self.tile_pattern = create_grid_coords(size=self.aoe_size)
 
     def execute(self):
-       pass 
-    
+        import pdb; pdb.set_trace()
+        target_list = []
+        for tile_x, tile_y in self.tile_pattern:
+            target_x = self.get_target_x() + tile_x
+            target_y = self.get_target_y() + tile_y
+            if self.game_eye.has_actor_on_xy(target_x, target_y):
+                target = self.game_eye.get_actor_on_xy(target_x, target_y)
+                target_list.append(target)
+                self.set_target(target)
+                super().execute()
+
+        msg = f"{target_list} took dmg to waterball"
+
+        return {"msg": msg}
+
+
 
 def instaciate_commands_dict(**kwargs):
     '''
@@ -439,11 +459,11 @@ def instaciate_commands_dict(**kwargs):
         'sun_charge': Command(**{**cons.SUN_CHARGE, **kwargs}),
         'golden_egg': GoldenEgg(**{**cons.GOLDEN_EGG, **kwargs}),
         'multiply': Multiply(**{**cons.MULTIPLY, **kwargs}),
-        
+
         'perfect_counter': Command(**{**cons.PERFECT_COUNTER, **kwargs}),
         'copy_cat': CopyCat(**{**cons.COPY_CAT, **kwargs}),
         'mixn': Mixn(**{**cons.MIXN, **kwargs}),
-        
+
         'true_slash': Attack(**{**cons.DAGGER_ATTACK, **kwargs}),
         'toxic_shot': Attack(**{**cons.TOXIC_SHOT, **kwargs}),
         'paralize_shot': Attack(**{**cons.PARALIZE_SHOT, **kwargs}),
@@ -457,16 +477,18 @@ def instaciate_commands_dict(**kwargs):
         # 'max_hp_up': Command(**{**cons.MAX_HP_UP, **kwargs}),
         'regen': Command(**{**cons.REGEN, **kwargs}),
 
-        'waterball': AOE(**cons.WATERBALL, **kwargs),
+        'waterball': AOE(**{**cons.WATERBALL, **kwargs}),
     }
     return commands_dict
 
 def get_new_command_by_id(**kwargs):
-    id = kwargs.get("id")
+    id_ = kwargs.get("id")
     commands = instaciate_commands_dict(**kwargs)
-    
-    return commands.get(id)
+
+    return commands.get(id_)
 
 def get_new_commands_by_ids(command_ids: list)-> list:
-    
+
     return [get_new_command_by_id(id=c) for c in command_ids]
+
+
