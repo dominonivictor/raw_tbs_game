@@ -8,9 +8,9 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 
 from game import Game
-from game_eye import GameEye
 
 import constants.colors as colors
+import constants.globalish_constants as g_cons
 
 import controllers.board_controller as board_con
 import controllers.buttons_controller as btn_con
@@ -50,19 +50,20 @@ class PuzzleTile(ButtonBehavior, Label):
     rgba = ListProperty([*colors.BASIC_BLACK])
 
 class PuzzleGrid(Factory.GridLayout):
+    #Is it having too many responsabilities?
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.grid_size = 13
+        self.grid_size = g_cons.GRID_SIZE
         self.rows = 1
         self.grid = []
         self.graph = {}
-        self.initial_spaces = [(4, 4), (5, 4), (6, 4), (4, 8), (4, 6), (6, 8)]
+        self.initial_spaces = g_cons.INITIAL_SPACES
         self.highlighted_tiles = []
         board_con.board_clean_selected_things(board=self)
+
+        #I don't think this should be here...
         self.game = Game(grid_size=self.grid_size, board=self,
                          ini_spaces=self.initial_spaces)
-        game_eye = GameEye.instance()
-        game_eye.game = self.game
 
     def create_grid(self):
         board_con.create_grid(board=self, size=self.grid_size)

@@ -339,7 +339,7 @@ class AOE(Command):
             target_y = self.get_target_y() + tile_y
             if self.game_eye.has_actor_on_xy(target_x, target_y):
                 target = self.game_eye.get_actor_on_xy(target_x, target_y)
-                target_list.append(target)
+                target_list.append(target.name)
                 self.set_target(target)
                 super().execute()
 

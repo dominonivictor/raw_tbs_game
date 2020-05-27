@@ -4,7 +4,17 @@ import misc.game_states as gs
 import constants.colors as colors
 from collections import deque
 
+#The truth is this whole file should maybe be a class and its functions...
+#OK stuff ain't pretty, but it's a start! Probably will have to change a lot of
+#stuff and adding tests is the most secure way to do it. LEARN KIVY TESTS ASAP!
+#Turn the code readable, separate stuff into smaller functions
+
 def board_clean_selected_things(board, but_not_selected_tile=False, target_tile=None):
+    '''
+    TAGS: BOARD
+    '''
+    #This has to know too many details from the board. Maybe call a method from
+    #board
     if not but_not_selected_tile:
         board.selected_tile = None
         board.selected_tile = target_tile
@@ -14,6 +24,9 @@ def board_clean_selected_things(board, but_not_selected_tile=False, target_tile=
     board.state = gs.NORMAL
 
 def create_grid(board, size):
+    '''
+    TAGS: BOARD, GAME
+    '''
     board.grid = []
     board.clear_widgets()
     board.rows = size
@@ -21,12 +34,14 @@ def create_grid(board, size):
 
     #making the grid
     PT = Factory.PuzzleTile
+    #could this be a region?
     for i in range(board.rows):
         grid_cols = []
         for j in range(board.cols):
             tile = PT(text=f'.')
             tile.actor = None
             tile.grid_x, tile.grid_y = j, i
+            #knows about board and game internals, make a setter here
             tile.rgba = board.game.grid[j][i].color
             board.add_widget(tile)
             grid_cols.append(tile)
@@ -39,6 +54,9 @@ def create_grid(board, size):
     add_actors_in_starting_positions(board=board)
 
 def select_tile(board, target_tile):
+    '''
+    TAGS: BOARD
+    '''
     app = App.get_running_app()
 
     if board.state == gs.NORMAL:
@@ -50,6 +68,9 @@ def select_tile(board, target_tile):
 
 
 def select_tile_normal_state(app, board, target_tile):
+    '''
+    TAGS: BOARD, GAME, ACTOR
+    '''
     game_grid = board.game.grid
     if board.selected_tile:
         x, y = board.selected_tile.grid_x, board.selected_tile.grid_y
@@ -62,12 +83,16 @@ def select_tile_normal_state(app, board, target_tile):
 
     target_tile.rgba = colors.SELECTED_RED
     board.selected_tile = target_tile
-    actor_command_list = actor.commands.list if actor else []
+    actor_command_list = actor.list_commands() if actor else []
 
     app.root.ids.stats_panel.update_actor_stats(actor)
     app.root.ids.minor_options.update_commands_list(actor_command_list)
 
 def select_tile_targeting_state(board, target_tile):
+    '''
+    TAGS: BOARD, ACTOR
+    '''
+    #This is a little better to read, but a bit messy...
     app = App.get_running_app()
     log_text = app.root.ids.log_text
     if not board.selected_tile:
@@ -90,6 +115,9 @@ def select_tile_targeting_state(board, target_tile):
     clean_tiles(board.highlighted_tiles, board)
 
 def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
+    '''
+    TAGS: BOARD, GAME, ACTOR
+    '''
     #TOO MUCH LOGIC HERE, NEED TO MAKE FLOW EASIER TO READ
     app = App.get_running_app()
     log_text = app.root.ids.log_text
@@ -100,7 +128,10 @@ def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
     elif((target_tile.grid_x, target_tile.grid_y) not in movable_tiles):
         log_text.text += "Destination out of range!\n"
     else:
-        change_actor_coords_in_game_grid(grid, from_coord, to_coord)
+        current_coord = (current_tile.grid_x, current_tile.grid_y)
+        target_coord = (target_tile.grid_x, target_tile.grid_y)
+        change_actor_coords_in_game_grid(board.game, from_coord=current_coord,
+                                         to_coord=target_coord)
         target_tile.actor = actor
         current_tile.actor = None
         x, y = target_tile.grid_x, target_tile.grid_y
@@ -116,10 +147,16 @@ def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
     clean_tiles(board.highlighted_tiles, board)
 
 def change_actor_coords_in_game_grid(game, from_coord, to_coord):
+    '''
+    TAGS: GAME, ACTOR
+    '''
     actor = game.pop_actor_at_coord(from_coord)
     game.add_actor_at_coord(actor, to_coord)
 
 def targeting_command(board, actor, target_tile, commandable_tiles):
+    '''
+    TAGS: BOARD, GAME, ACTOR
+    '''
     app = App.get_running_app()
     log_text = app.root.ids.log_text
     command = board.selected_command
@@ -140,6 +177,9 @@ def targeting_command(board, actor, target_tile, commandable_tiles):
         board.game.event_list.append(command)
 
 def pass_turn(board):
+    '''
+    TAGS: GAME, ACTOR
+    '''
     app = App.get_running_app()
     log_text = app.root.ids.log_text
     log_text.text += "turn passes!\n"
@@ -170,12 +210,18 @@ def pass_turn(board):
 ############## Temporary / Auxiliary functions
 
 def add_actors_in_starting_positions(board):
+    '''
+    TAGS: BOARD, GAME, ACTOR
+    '''
     #this is linked with game self.initial_setup()
     for i, (x, y) in enumerate(board.initial_spaces):
         actor = board.game.actors[i]
         add_actor_at_xy(board, actor, x, y)
 
 def add_actor_at_xy(board, actor, x, y):
+    '''
+    TAGS: GAME, ACTOR
+    '''
     #this is doing way too much, need to centralize all this info...
     game = board.game
     tile = board.grid[x][y]
@@ -185,6 +231,9 @@ def add_actor_at_xy(board, actor, x, y):
     actor.update_pos(x=x, y=y)
 
 def highlight_movable_spaces(actor, start_tile):
+    '''
+    TAGS: GAME, ACTOR
+    '''
     app = App.get_running_app()
 
     n_moves = actor.get_spd()
@@ -200,6 +249,9 @@ def highlight_movable_spaces(actor, start_tile):
     board.highlighted_tiles = closed_list
 
 def highlight_attackable_spaces(command, start_tile):
+    '''
+    TAGS: BOARD, GAME
+    '''
     app = App.get_running_app()
 
     n_moves = command.max_range
@@ -216,6 +268,9 @@ def highlight_attackable_spaces(command, start_tile):
 
 
 def calculate_dijkstras(start_tile, board, game_grid, step_cost_function, n_moves):
+    '''
+    TAGS: BOARD, GAME
+    '''
     #calculate_cost_to_move -> for moving, calculate_cost_to_attack -> for attacking
     x, y = start_tile.grid_x, start_tile.grid_y
     closed_list = []
@@ -242,13 +297,16 @@ def calculate_dijkstras(start_tile, board, game_grid, step_cost_function, n_move
     return closed_list
 
 def calculate_cost_to_move(pos, game_grid):
+    #ALMOST good... but knows too much of how the game_grid works inside
     x, y = pos
     return game_grid[x][y].move_cost
 
 def calculate_cost_to_attack(pos, game_grid):
+    #very anti climatic, but may change in the future
     return 1
 
 def get_tile_neighbors(tile_xy, max_size, game_grid, closed_list):
+    #ALMOST good here too, knows too much of internals of game_grid
     neighbors = []
     i, j = tile_xy
     if i - 1 >= 0:
@@ -268,6 +326,10 @@ def get_tile_neighbors(tile_xy, max_size, game_grid, closed_list):
     return neighbors
 
 def clean_tiles(tiles, board):
+    '''
+    TAGS: BOARD, GAME
+    '''
+    #knows way too much of everything
     grid = board.grid
     for x, y in tiles:
         grid[x][y].rgba = board.game.grid[x][y].color

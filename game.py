@@ -4,6 +4,7 @@ from map_objects.tile import Tile
 from random import randint
 import constants.colors as colors
 
+from game_eye import GameEye
 
 class Game():
     def __init__(self, **kwargs):
@@ -29,6 +30,8 @@ class Game():
         self.initial_setup()
         self.add_actors()
 
+        game_eye = GameEye.instance()
+        game_eye.set_game(self)
 
     def show_actors(self):
         actor_str = ''
@@ -130,5 +133,4 @@ class Game():
 
     def has_actor_on_xy(self, x, y):
         return bool(self.grid[x][y].actor)
-
 

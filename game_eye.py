@@ -41,6 +41,9 @@ class GameEye():
     def __init__(self, **kwargs):
         self.game = kwargs.get("game", None)
 
+    def set_game(self, game):
+        self.game = game
+
     def add_actor(self, actor):
         self.game.actors.append(actor)
 
