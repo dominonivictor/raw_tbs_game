@@ -27,6 +27,16 @@ class StatsPanel(Label):
     def update_actor_stats(self, actor):
         self.text = log_con.show_actor_stats(actor)
 
+class CreateGridButton(Button):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.app = App.get_running_app()
+        self.app.create_grid_btn = self
+
+    def on_release(self):
+        puzzle = self.app.puzzle
+        puzzle.create_grid()
+
 class MinorOptionsButton(Button):
     def on_press(self):
         btn_con.minor_btn_on_press(self)
@@ -53,6 +63,8 @@ class PuzzleGrid(Factory.GridLayout):
     #Is it having too many responsabilities?
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.app = App.get_running_app()
+        self.app.puzzle = self
         self.grid_size = g_cons.GRID_SIZE
         self.rows = 1
         self.grid = []

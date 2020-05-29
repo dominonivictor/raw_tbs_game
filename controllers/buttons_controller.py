@@ -1,6 +1,5 @@
 from kivy.factory import Factory
 from kivy.app import App
-from main import MajorOptionsButton
 import misc.game_states as gs
 
 from components.jobs_commands import gen_jobs_list
@@ -35,7 +34,7 @@ def minor_box_update_list(box, new_list):
         for item in new_list:
             # Everything needs to be a command, learn job comm(ex), cause then the maintanance will be trivial
             new_btn = btn_factory(text=item.name)
-            new_btn.command = item 
+            new_btn.command = item
             box.add_widget(new_btn)
             box.current_list.append(item)
 
@@ -72,6 +71,7 @@ def gen_major_box_widgets(box):
     '''
     TAGS: MAJOR BOX
     '''
+    from main import MajorOptionsButton
     #too hard coded! but okish
     text_list = ["move", "learn_job", "equip_equip"]
     box.btns_list = (MajorOptionsButton(text=t) for t in text_list)

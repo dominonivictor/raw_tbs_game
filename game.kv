@@ -78,12 +78,14 @@ BoxLayout:
                 BoxLayout:
                     orientation: 'vertical'
                     Button:
+                        id: 'pass_turn_btn'
                         text: "pass turn"
                         on_press:
                             puzzle.pass_turn()
-                    Button:
+                    CreateGridButton:
+                        id: 'create_grid_btn'
                         text: "create grid"
-                        on_press:
+                        on_release:
                             puzzle.create_grid()
 
     #>>>>>>>>>>>>>>>>>>>>> RIGHT SIDE
