@@ -1,5 +1,6 @@
 from kivy.factory import Factory
 from kivy.app import App
+from kivy.core.window import Window
 from kivy.properties import ListProperty, StringProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.label import Label
@@ -15,6 +16,9 @@ import constants.globalish_constants as g_cons
 import controllers.board_controller as board_con
 import controllers.buttons_controller as btn_con
 import controllers.log_controller as log_con
+
+from time import sleep
+
 
 class LogScreen(BoxLayout):
     msg_list = []
@@ -58,6 +62,10 @@ class MajorOptionsBox(BoxLayout):
 
 class PuzzleTile(ButtonBehavior, Label):
     rgba = ListProperty([*colors.BASIC_BLACK])
+    original_color = None
+
+    def on_hover(self):
+        board_con.tile_on_hover(self)
 
 class PuzzleGrid(Factory.GridLayout):
     #Is it having too many responsabilities?
@@ -65,6 +73,10 @@ class PuzzleGrid(Factory.GridLayout):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
         self.app.puzzle = self
+
+        self.selected_command = None
+        self.temp_highlighted_tiles = []
+
         self.grid_size = g_cons.GRID_SIZE
         self.rows = 1
         self.grid = []
@@ -91,7 +103,15 @@ class PuzzleGrid(Factory.GridLayout):
 
 
 class GameApp(App):
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Window.bind(mouse_pos=self.on_mouse_pos)
+
+    def on_mouse_pos(self, window, pos):
+        for row in self.root.ids.puzzle.grid:
+            for tile in row:
+                if tile.collide_point(*pos):
+                    tile.on_hover()
 
 if __name__ == '__main__':
     GameApp().run()

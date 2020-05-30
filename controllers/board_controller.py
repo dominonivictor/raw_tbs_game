@@ -42,7 +42,9 @@ def create_grid(board, size):
             tile.actor = None
             tile.grid_x, tile.grid_y = j, i
             #knows about board and game internals, make a setter here
-            tile.rgba = board.game.grid[j][i].color
+            tile_color = board.game.grid[j][i].color
+            tile.rgba = tile_color
+            tile.original_color = tile_color
             board.add_widget(tile)
             grid_cols.append(tile)
 
@@ -336,6 +338,19 @@ def clean_tiles(tiles, board):
 
     board.highlighted_tiles = []
 
+def tile_on_hover(tile):
+        app = App.get_running_app()
+        board = app.puzzle
+        if(board.selected_command and board.selected_command.category == "aoe"):
+            c_x, c_y = tile.grid_x, tile.grid_y
+            affected_tiles = [(c_x + x, c_y + y) for x, y in
+                              board.selected_command.tile_pattern]
+            highlighted_tiles = board.temp_highlighted_tiles
+            clean_tiles(highlighted_tiles, board)
+            for i, j in affected_tiles:
+                board.grid[i][j].rgba = colors.AOE_PURPLE
+
+            board.temp_highlighted_tiles  = affected_tiles
 '''
 def create_graph(board, size):
     graph = {}
