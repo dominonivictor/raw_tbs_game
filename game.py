@@ -134,3 +134,5 @@ class Game():
     def has_actor_on_xy(self, x, y):
         return bool(self.grid[x][y].actor)
 
+    def get_tile(self, x, y):
+        return self.grid[x][y]

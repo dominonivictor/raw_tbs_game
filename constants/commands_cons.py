@@ -345,7 +345,8 @@ WATERBALL = {
     "max_range": 1,
     "msg": "{} deals damage!",
     "msg_function": get_attrs,
-    "msg_args": ["target name"]
+    "msg_args": ["target name"],
+    "aoe_size": 1,
 }
 
 

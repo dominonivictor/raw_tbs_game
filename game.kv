@@ -4,7 +4,7 @@
     size_hint: None, None
     size: "50dp", "50dp"
     original_color: (1, 1, 1, .2)
-    on_press:
+    on_release:
         self.parent.select_tile(target_tile=self)
         
     canvas.before:
@@ -72,7 +72,7 @@ BoxLayout:
                         size: self.size
 
                 Button:
-                    on_press: print("nice")
+                    on_release: print("nice")
             MajorOptionsBox:
                 id: major_options
                 BoxLayout:
@@ -80,7 +80,7 @@ BoxLayout:
                     Button:
                         id: 'pass_turn_btn'
                         text: "pass turn"
-                        on_press:
+                        on_release:
                             puzzle.pass_turn()
                     CreateGridButton:
                         id: 'create_grid_btn'

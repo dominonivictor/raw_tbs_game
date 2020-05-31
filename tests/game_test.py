@@ -10,7 +10,7 @@ def test_initial_game_setup():
     game = Game(grid_size=GRID_SIZE, initial_values=initial_v, ini_spaces=ini_spaces)
     game.initial_setup()
     count_actors = 0
-    for x, y in region(0, GRID_SIZE - 1, 0, GRID_SIZE - 1):
+    for x, y in region(GRID_SIZE - 1, GRID_SIZE - 1):
         if  game.has_actor_on_xy(x, y):
             count_actors += 1
 

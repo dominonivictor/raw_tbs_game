@@ -42,7 +42,7 @@ class CreateGridButton(Button):
         puzzle.create_grid()
 
 class MinorOptionsButton(Button):
-    def on_press(self):
+    def on_release(self):
         btn_con.minor_btn_on_press(self)
 
 
@@ -52,7 +52,7 @@ class MinorOptionsBox(Factory.BoxLayout):
         btn_con.minor_box_update_list(self, commands_list)
 
 class MajorOptionsButton(Button):
-    def on_press(self):
+    def on_release(self):
         btn_con.handle_major_options_btns(box=self)
 
 class MajorOptionsBox(BoxLayout):
@@ -63,9 +63,32 @@ class MajorOptionsBox(BoxLayout):
 class PuzzleTile(ButtonBehavior, Label):
     rgba = ListProperty([*colors.BASIC_BLACK])
     original_color = None
+    last_color = None
+    temp_color = None
 
     def on_hover(self):
         board_con.tile_on_hover(self)
+
+    def set_color(self, color):
+        self.set_last_color(self.rgba)
+        self.rgba = color
+
+    def get_color(self):
+        return self.rgba
+
+    def set_last_color(self, color):
+        if color != colors.AOE_PURPLE:
+            self.last_color = color
+
+    def get_last_color(self):
+        return self.last_color
+
+    def set_original_color(self, color):
+        self.last_color = self.rgba
+        self.original_color = color
+
+    def get_original_color(self):
+        return self.original_color
 
 class PuzzleGrid(Factory.GridLayout):
     #Is it having too many responsabilities?
@@ -88,6 +111,15 @@ class PuzzleGrid(Factory.GridLayout):
         #I don't think this should be here...
         self.game = Game(grid_size=self.grid_size, board=self,
                          ini_spaces=self.initial_spaces)
+
+    def get_width(self):
+        return len(self.grid)
+
+    def get_height(self):
+        return len(self.grid[0])
+
+    def get_tile(self, x, y):
+        return self.grid[x][y]
 
     def create_grid(self):
         board_con.create_grid(board=self, size=self.grid_size)

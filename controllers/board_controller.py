@@ -3,6 +3,7 @@ from kivy.factory import Factory
 import misc.game_states as gs
 import constants.colors as colors
 from collections import deque
+from functions.grid_patterns import region
 
 #The truth is this whole file should maybe be a class and its functions...
 #OK stuff ain't pretty, but it's a start! Probably will have to change a lot of
@@ -41,10 +42,10 @@ def create_grid(board, size):
             tile = PT(text=f'.')
             tile.actor = None
             tile.grid_x, tile.grid_y = j, i
-            #knows about board and game internals, make a setter here
-            tile_color = board.game.grid[j][i].color
-            tile.rgba = tile_color
-            tile.original_color = tile_color
+            tile_color = board.game.get_tile(j, i).color
+            tile.set_color(tile_color)
+            tile.set_original_color(tile_color)
+            tile.set_last_color(tile_color)
             board.add_widget(tile)
             grid_cols.append(tile)
 
@@ -63,6 +64,7 @@ def select_tile(board, target_tile):
 
     if board.state == gs.NORMAL:
         clean_tiles(board.highlighted_tiles, board)
+        clean_tiles(board.temp_highlighted_tiles, board)
         select_tile_normal_state(app=app, board=board, target_tile=target_tile)
 
     elif board.state == gs.TARGETING:
@@ -81,9 +83,10 @@ def select_tile_normal_state(app, board, target_tile):
     actor = target_tile.actor if target_tile.actor else None
     if actor and not actor.has_moved:
         clean_tiles(board.highlighted_tiles, board)
+        clean_tiles(board.temp_highlighted_tiles, board)
         highlight_movable_spaces(actor=actor, start_tile=target_tile)
 
-    target_tile.rgba = colors.SELECTED_RED
+    target_tile.set_color(colors.SELECTED_RED)
     board.selected_tile = target_tile
     actor_command_list = actor.list_commands() if actor else []
 
@@ -115,6 +118,7 @@ def select_tile_targeting_state(board, target_tile):
 
         board_clean_selected_things(board=board, but_not_selected_tile=True, target_tile=target_tile)
     clean_tiles(board.highlighted_tiles, board)
+    clean_tiles(board.temp_highlighted_tiles, board)
 
 def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
     '''
@@ -140,13 +144,14 @@ def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
         current_tile.rgba = board.game.grid[x][y].color
         current_tile.text = "."
         target_tile.text = target_tile.actor.letter
-        target_tile.rgba = colors.WALKABLE_BLUE
+        target_tile.set_color(colors.WALKABLE_BLUE)
 
         board.selected_tile = target_tile
         actor.update_pos(target_tile.grid_x, target_tile.grid_y)
         actor.has_moved = True
 
     clean_tiles(board.highlighted_tiles, board)
+    clean_tiles(board.temp_highlighted_tiles, board)
 
 def change_actor_coords_in_game_grid(game, from_coord, to_coord):
     '''
@@ -169,13 +174,17 @@ def targeting_command(board, actor, target_tile, commandable_tiles):
         log_text.text += "Actor has already acted!\n"
     elif((target_tile.grid_x, target_tile.grid_y) not in commandable_tiles):
         log_text.text += "Destination out of range!\n"
+        #print(f"t_tile current: {target_tile.get_color()}, last:{target_tile.get_last_color()}")
+        clean_tiles(((x, y) for x, y in region(board.get_width(),
+                                            board.get_height())), board,
+                   color='last_color')
     else:
         target = target_tile.actor
         command.set_target(target)
         command.set_target_pos((target_tile.grid_x, target_tile.grid_y))
         actor.has_acted = True
 
-        board.selected_tile.rgba = colors.WALKABLE_BLUE
+        board.selected_tile.set_color(colors.WALKABLE_BLUE)
         board.game.event_list.append(command)
 
 def pass_turn(board):
@@ -226,7 +235,7 @@ def add_actor_at_xy(board, actor, x, y):
     '''
     #this is doing way too much, need to centralize all this info...
     game = board.game
-    tile = board.grid[x][y]
+    tile = board.get_tile(x, y)
     game.add_actor_at_coord(actor, (x, y))
     tile.text = actor.letter
     tile.actor = actor
@@ -240,13 +249,12 @@ def highlight_movable_spaces(actor, start_tile):
 
     n_moves = actor.get_spd()
     board = app.root.ids.puzzle
-    ui_grid = board.grid
     game_grid = board.game.grid
 
     closed_list = calculate_dijkstras(start_tile, board, game_grid, calculate_cost_to_move, n_moves)
 
     for x, y in closed_list:
-        ui_grid[x][y].rgba = colors.WALKABLE_BLUE
+        board.get_tile(x, y).set_color(colors.WALKABLE_BLUE)
 
     board.highlighted_tiles = closed_list
 
@@ -258,13 +266,12 @@ def highlight_attackable_spaces(command, start_tile):
 
     n_moves = command.max_range
     board = app.root.ids.puzzle
-    ui_grid = board.grid
     game_grid = board.game.grid
 
     closed_list = calculate_dijkstras(start_tile, board, game_grid, calculate_cost_to_attack, n_moves)
 
     for x, y in closed_list:
-        ui_grid[x][y].rgba = colors.ATTACKABLE_RED
+        board.get_tile(x, y).set_color(colors.ATTACKABLE_RED)
 
     board.highlighted_tiles = closed_list
 
@@ -327,28 +334,52 @@ def get_tile_neighbors(tile_xy, max_size, game_grid, closed_list):
 
     return neighbors
 
-def clean_tiles(tiles, board):
+def clean_tiles(tiles, board, color=''):
     '''
     TAGS: BOARD, GAME
     '''
     #knows way too much of everything
-    grid = board.grid
+    grid = board.game.grid
     for x, y in tiles:
-        grid[x][y].rgba = board.game.grid[x][y].color
+        if is_xy_valid(x, y, board):
+            tile = board.get_tile(x, y)
+            if color == 'last_color':
+                tile.set_color(tile.get_last_color())
+            elif color == 'original_color':
+                tile.set_color(tile.get_original_color())
+            else:
+                tile.set_color(grid[x][y].color)
 
     board.highlighted_tiles = []
+    board.temp_highlighted_tiles = []
+
+def clean_all_tiles(board, color=''):
+    clean_tiles(region(board.get_width(), board.get_height()), board,
+                color=color)
+
+
+def is_xy_valid(x, y, board):
+    return 0 <= x < board.grid_size and 0 <= y < board.grid_size
 
 def tile_on_hover(tile):
         app = App.get_running_app()
         board = app.puzzle
+        #this scales badly as more categories come here... maybe all comms
+        #should have their selected area
         if(board.selected_command and board.selected_command.category == "aoe"):
             c_x, c_y = tile.grid_x, tile.grid_y
-            affected_tiles = [(c_x + x, c_y + y) for x, y in
-                              board.selected_command.tile_pattern]
-            highlighted_tiles = board.temp_highlighted_tiles
-            clean_tiles(highlighted_tiles, board)
+            affected_tiles = set()
+            for x, y in board.selected_command.tile_pattern:
+                if is_xy_valid(c_x + x, c_y + y, board):
+                    affected_tiles.add((c_x + x, c_y + y))
+
+            high_tiles = set(board.temp_highlighted_tiles)
+            clean_tiles(high_tiles, board,
+                        color='last_color')
             for i, j in affected_tiles:
-                board.grid[i][j].rgba = colors.AOE_PURPLE
+                    affected_tile = board.get_tile(i, j)
+                    affected_tile.set_last_color(affected_tile.get_color())
+                    affected_tile.set_color(colors.AOE_PURPLE)
 
             board.temp_highlighted_tiles  = affected_tiles
 '''
