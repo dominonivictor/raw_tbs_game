@@ -78,7 +78,7 @@ def select_tile_normal_state(app, board, target_tile):
     game_grid = board.game.grid
     if board.selected_tile:
         x, y = board.selected_tile.grid_x, board.selected_tile.grid_y
-        board.selected_tile.rgba = game_grid[x][y].color
+        board.selected_tile.set_color(game_grid[x][y].color)
 
     actor = target_tile.actor if target_tile.actor else None
     if actor and not actor.has_moved:
@@ -245,6 +245,7 @@ def highlight_movable_spaces(actor, start_tile):
     '''
     TAGS: GAME, ACTOR
     '''
+    #TODO This needs to be generic to any amount of tiles and color
     app = App.get_running_app()
 
     n_moves = actor.get_spd()
@@ -253,10 +254,13 @@ def highlight_movable_spaces(actor, start_tile):
 
     closed_list = calculate_dijkstras(start_tile, board, game_grid, calculate_cost_to_move, n_moves)
 
-    for x, y in closed_list:
-        board.get_tile(x, y).set_color(colors.WALKABLE_BLUE)
+    highlight_tiles(tiles=closed_list, color=colors.WALKABLE_BLUE, board=board)
 
     board.highlighted_tiles = closed_list
+
+def highlight_tiles(tiles, color, board):
+    for x, y in tiles:
+        board.get_tile(x, y).set_color(color)
 
 def highlight_attackable_spaces(command, start_tile):
     '''

@@ -3,8 +3,10 @@ from player import Player
 from map_objects.tile import Tile
 from random import randint
 import constants.colors as colors
+import constants.globalish_constants as g_cons
 
 from game_eye import GameEye
+import functions.map_functions as map_funcs
 
 class Game():
     def __init__(self, **kwargs):
@@ -13,17 +15,15 @@ class Game():
         self.log = []
         self.event_list = []
         self.actors = []
-        self.initial_values = kwargs.get("initial_values", {
-            "actors_num": 3,
-            "jobs_num": 2,
-            "equips_num": 2
-        })
+        self.actors_num = kwargs.get("actors_num", g_cons.INITIAL_ACTORS_NUM)
         self.p1 = Player(name='P1')
         self.p2 = Player(name='P2')
         self.grid_size = kwargs.get("grid_size", 13)
         self.ini_spaces = kwargs.get("ini_spaces", [])
         #need to remember the diff from grid and board, i think board is the kv board
-        self.grid = self.create_grid(grid_size=self.grid_size)
+        terrain_coords = kwargs.get("terrain_coords", {})
+        self.grid = self.create_grid(grid_size=self.grid_size,
+                                     terrain_coords=terrain_coords)
 
         self.board = kwargs.get("board")
 
@@ -62,22 +62,18 @@ class Game():
         for i, actor in enumerate(self.actors):
             self.add_actor_at_coord(actor, self.ini_spaces[i])
 
-    def create_grid(self, grid_size=13):
+    def create_grid(self, grid_size=13, terrain_coords={}):
+        #TODO this is messy having to change the stuff in the middle of the process
         grid = []
+        #use region here prob...
         for i in range(grid_size):
             row = []
             for j in range(grid_size):
-                r = randint(1, 12)
-                if r in [1, 2]:
-                    move_cost = 2
-                    tile_color = colors.FOREST_GREEN
-                elif r in [3, 4]:
-                    move_cost = 3
-                    tile_color = colors.MOUNTAIN_ORANGE
+                if(not terrain_coords): #random selected terrain
+                    move_cost, tile_color = map_funcs.random_map_cost_tile_gen()
                 else:
-                    move_cost = 1
-                    tile_color = colors.BASIC_BLACK
-
+                    move_cost, tile_color = map_funcs.defined_map_cost_tile_gen(
+                                x=j, y=i, terrain_coords=terrain_coords)
                 tile = Tile(move_cost=move_cost, color=tile_color)
 
                 row.append(tile)
@@ -90,27 +86,22 @@ class Game():
 
     def initial_setup(self):
 
-        actors_num = self.initial_values["actors_num"]
-        jobs_num = self.initial_values["jobs_num"]
-        equips_num = self.initial_values["equips_num"]
+        actors_num = self.actors_num
 
         players = [self.p1, self.p2]
 
         # actors_options()
 
         for player in players:
-            self.select_initial_actor_job_equip(player, actors_num, jobs_num,
-                                                equips_num)
+            self.select_initial_actor_job_equip(player, actors_num)
 
-    def select_initial_actor_job_equip(self, player, n_actors, n_jobs, n_equips):
+    def select_initial_actor_job_equip(self, player, n_actors):
         from random import choice
         from misc.entities_creation import create_actor
         player_actors = []
         player_equips = []
         player_jobs = []
         actors_l = ["t", "f", "c", "a", "p", "o"]
-        jobs_l = ["g", "t", "c", "h", "m"]
-        equips_l = ["z", "d", "c", "s"]
 
         #actors =  "".join([choice(actors_l) for _ in range(n_actors)]) #p_choice if p_choice else
         actors = "".join(actors_l)

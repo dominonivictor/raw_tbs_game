@@ -66,6 +66,10 @@ class PuzzleTile(ButtonBehavior, Label):
     last_color = None
     temp_color = None
 
+    def on_release(self):
+        app = App.get_running_app()
+        app.puzzle.select_tile(target_tile=self)
+
     def on_hover(self):
         board_con.tile_on_hover(self)
 
@@ -100,7 +104,7 @@ class PuzzleGrid(Factory.GridLayout):
         self.selected_command = None
         self.temp_highlighted_tiles = []
 
-        self.grid_size = g_cons.GRID_SIZE
+        self.grid_size = self.app.grid_size
         self.rows = 1
         self.grid = []
         self.graph = {}
@@ -110,7 +114,7 @@ class PuzzleGrid(Factory.GridLayout):
 
         #I don't think this should be here...
         self.game = Game(grid_size=self.grid_size, board=self,
-                         ini_spaces=self.initial_spaces)
+            ini_spaces=self.initial_spaces, terrain_coords=g_cons.TEST_MAP_MOVE_SPACES_1)
 
     def get_width(self):
         return len(self.grid)
@@ -138,12 +142,18 @@ class GameApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Window.bind(mouse_pos=self.on_mouse_pos)
+        self.current_hover_tile = None
+        self.last_hover_tile = None
+        self.grid_size = kwargs.get("grid_size", g_cons.GRID_SIZE)
 
     def on_mouse_pos(self, window, pos):
         for row in self.root.ids.puzzle.grid:
             for tile in row:
                 if tile.collide_point(*pos):
-                    tile.on_hover()
+                    self.current_hover_tile = tile
+                    if self.current_hover_tile is not self.last_hover_tile:
+                        self.last_hover_tile = tile
+                        tile.on_hover()
 
 if __name__ == '__main__':
     GameApp().run()

@@ -67,6 +67,12 @@ class Test(unittest.TestCase):
 
         app.stop()
 
+    def check_blue_movement_tiles_test(self, app, *args):
+        Clock.schedule_interval(self.pause, 0.000001)
+        board = app.puzzle
+
+        app.stop()
+
     def test_btn(self):
         app = GameApp()
         p = partial(self.create_grid_test, app)
