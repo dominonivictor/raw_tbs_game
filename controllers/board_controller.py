@@ -80,8 +80,8 @@ def select_tile(board, target_tile):
     app = App.get_running_app()
 
     if board.state == gs.NORMAL:
-        clean_tiles(board.highlighted_tiles, board)
-        clean_tiles(board.temp_highlighted_tiles, board)
+        clean_tiles(board.hl_tiles, board)
+        clean_tiles(board.temp_hl_tiles, board)
         select_tile_normal_state(app=app, board=board, target_tile=target_tile)
 
     elif board.state == gs.TARGETING:
@@ -93,19 +93,21 @@ def select_tile_normal_state(app, board, target_tile):
     TAGS: BOARD, GAME, ACTOR
     '''
     game_grid = board.game.grid
-    if board.selected_tile:
-        x, y = board.selected_tile.grid_x, board.selected_tile.grid_y
-        board.selected_tile.set_color(game_grid[x][y].color)
+    selected_tile = board.selected_tile
+    if selected_tile:
+        #reset color
+        selected_tile.set_color(selected_tile.get_original_color())
 
     actor = target_tile.actor if target_tile.actor else None
     if actor and not actor.has_moved:
-        clean_tiles(board.highlighted_tiles, board)
-        clean_tiles(board.temp_highlighted_tiles, board)
+        clean_tiles(board.movable_hl_tiles, board)
+        clean_tiles(board.hl_tiles, board)
+        clean_tiles(board.temp_hl_tiles, board)
         highlight_movable_spaces(actor=actor, start_tile=target_tile)
 
     target_tile.set_color(colors.SELECTED_RED)
     board.selected_tile = target_tile
-    actor_command_list = actor.list_commands() if actor else []
+    actor_command_list = actor.list_commands()
 
     app.root.ids.stats_panel.update_actor_stats(actor)
     app.root.ids.minor_options.update_commands_list(actor_command_list)
@@ -126,16 +128,17 @@ def select_tile_targeting_state(board, target_tile):
     else:
         current_tile = board.selected_tile
         actor = current_tile.actor
-        high_tiles = board.highlighted_tiles
         if board.selected_action == "move":
-            targeting_move(actor=actor, current_tile=current_tile, target_tile=target_tile, movable_tiles=high_tiles, board=board)
+            tiles = board.movable_hl_tiles
+            targeting_move(actor=actor, current_tile=current_tile, target_tile=target_tile, movable_tiles=tiles, board=board)
 
         elif board.selected_action == "command":
-            targeting_command(board=board, actor=actor, target_tile=target_tile, commandable_tiles=high_tiles)
+            tiles = board.attackable_hl_tiles
+            targeting_command(board=board, actor=actor, target_tile=target_tile, commandable_tiles=tiles)
 
         board_clean_selected_things(board=board, but_not_selected_tile=True, target_tile=target_tile)
-    clean_tiles(board.highlighted_tiles, board)
-    clean_tiles(board.temp_highlighted_tiles, board)
+    clean_tiles(board.hl_tiles, board)
+    clean_tiles(board.temp_hl_tiles, board)
 
 def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
     '''
@@ -167,8 +170,8 @@ def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
         actor.update_pos(target_tile.grid_x, target_tile.grid_y)
         actor.has_moved = True
 
-    clean_tiles(board.highlighted_tiles, board)
-    clean_tiles(board.temp_highlighted_tiles, board)
+    clean_tiles(board.hl_tiles, board)
+    clean_tiles(board.temp_hl_tiles, board)
 
 def change_actor_coords_in_game_grid(game, from_coord, to_coord):
     '''
@@ -190,7 +193,7 @@ def targeting_command(board, actor, target_tile, commandable_tiles):
     elif board.selected_tile.actor.has_acted:
         log_text.text += "Actor has already acted!\n"
     elif((target_tile.grid_x, target_tile.grid_y) not in commandable_tiles):
-        log_text.text += "Destination out of range!\n"
+        log_text.text += "Attack out of range!\n"
         clean_tiles(((x, y) for x, y in region(board.get_width(),
                                             board.get_height())), board,
                    color='last_color')
@@ -272,7 +275,7 @@ def highlight_movable_spaces(actor, start_tile):
 
     highlight_tiles(tiles=closed_list, color=colors.WALKABLE_BLUE, board=board)
 
-    board.highlighted_tiles = closed_list
+    board.set_movable_hl_tiles(closed_list)
 
 def highlight_tiles(tiles, color, board):
     for x, y in tiles:
@@ -293,7 +296,7 @@ def highlight_attackable_spaces(command, start_tile):
     for x, y in closed_list:
         board.get_tile(x, y).set_color(colors.ATTACKABLE_RED)
 
-    board.highlighted_tiles = closed_list
+    board.set_attackable_hl_tiles(closed_list)
 
 
 def calculate_dijkstras(start_tile, board, game_grid, step_cost_function, n_moves):
@@ -370,8 +373,6 @@ def clean_tiles(tiles, board, color=''):
             else:
                 tile.set_color(grid[x][y].color)
 
-    board.highlighted_tiles = []
-    board.temp_highlighted_tiles = []
 
 def clean_all_tiles(board, color=''):
     clean_tiles(region(board.get_width(), board.get_height()), board,
@@ -393,7 +394,7 @@ def tile_on_hover(tile):
                 if is_xy_valid(c_x + x, c_y + y, board):
                     affected_tiles.add((c_x + x, c_y + y))
 
-            high_tiles = set(board.temp_highlighted_tiles)
+            high_tiles = set(board.temp_hl_tiles)
             clean_tiles(high_tiles, board,
                         color='last_color')
             for i, j in affected_tiles:
@@ -401,7 +402,7 @@ def tile_on_hover(tile):
                     affected_tile.set_last_color(affected_tile.get_color())
                     affected_tile.set_color(colors.AOE_PURPLE)
 
-            board.temp_highlighted_tiles  = affected_tiles
+            board.temp_hl_tiles  = affected_tiles
 '''
 def create_graph(board, size):
     graph = {}

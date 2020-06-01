@@ -18,7 +18,7 @@ def minor_btn_on_press(minor_btn):
     board.selected_command = command
     start_tile = board.selected_tile
 
-    clean_tiles(board.highlighted_tiles, board)
+    clean_tiles(board.hl_tiles, board)
     highlight_attackable_spaces(command, start_tile)
     board.state = gs.TARGETING
 

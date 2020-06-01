@@ -44,7 +44,7 @@ class CreateGridButton(Button):
         i_spaces = app.i_spaces
         actors = []
         puzzle.create_grid(t_coords=t_coords, i_spaces=i_spaces, actors=actors)
-        import pdb; pdb.set_trace()
+
 class MinorOptionsButton(Button):
     def on_release(self):
         btn_con.minor_btn_on_press(self)
@@ -106,7 +106,7 @@ class PuzzleGrid(Factory.GridLayout):
         self.app.puzzle = self
 
         self.selected_command = None
-        self.temp_highlighted_tiles = []
+        self.reset_hl_tiles()
 
         self.grid_size = self.app.grid_size
         self.i_spaces = self.app.i_spaces
@@ -114,12 +114,29 @@ class PuzzleGrid(Factory.GridLayout):
         self.rows = 1
         self.grid = []
         self.graph = {}
-        self.highlighted_tiles = []
         board_con.board_clean_selected_things(board=self)
 
         #I don't think this should be here...
         self.game = Game(grid_size=self.grid_size, board=self,
             ini_spaces=self.i_spaces, t_coords=self.t_coords)
+
+    def reset_hl_tiles(self):
+        self.temp_hl_tiles = []
+        self.movable_hl_tiles = []
+        self.attackable_hl_tiles = []
+        self.hl_tiles = []
+
+    def set_temp_hl_tiles(self, tiles):
+        self.temp_hl_tiles = tiles
+
+    def set_movable_hl_tiles(self, tiles):
+        self.movable_hl_tiles = tiles
+
+    def set_attackable_hl_tiles(self, tiles):
+        self.attackable_hl_tiles = tiles
+
+    def set_hl_tiles(self, tiles):
+        self.hl_tiles = tiles
 
     def get_width(self):
         return len(self.grid)
