@@ -9,6 +9,7 @@ from kivy.clock import Clock
 
 from main import GameApp
 import constants.colors as colors
+import constants.globalish_constants
 # when you have a test in <root>/tests/test.py
 #main_path = op.dirname(op.dirname(op.abspath(__file__)))
 #sys.path.append(main_path)
@@ -69,7 +70,14 @@ class Test(unittest.TestCase):
 
     def check_blue_movement_tiles_test(self, app, *args):
         Clock.schedule_interval(self.pause, 0.000001)
+        #needs to be specific map, initial spaces, actor config
         board = app.puzzle
+        actor = Actor(spd_stat=2)
+        initial_space = INITIAL_SPACE_1
+        map_grid = TEST_MAP_MOVE_SPACES_1
+
+        board.create_grid(grid=map_grid, initial_spaces=initial_spaces, actors=[actor])
+
 
         app.stop()
 

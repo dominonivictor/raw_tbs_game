@@ -38,9 +38,13 @@ class CreateGridButton(Button):
         self.app.create_grid_btn = self
 
     def on_release(self):
-        puzzle = self.app.puzzle
-        puzzle.create_grid()
-
+        app = self.app
+        puzzle = app.puzzle
+        t_coords = app.t_coords
+        i_spaces = app.i_spaces
+        actors = []
+        puzzle.create_grid(t_coords=t_coords, i_spaces=i_spaces, actors=actors)
+        import pdb; pdb.set_trace()
 class MinorOptionsButton(Button):
     def on_release(self):
         btn_con.minor_btn_on_press(self)
@@ -105,16 +109,17 @@ class PuzzleGrid(Factory.GridLayout):
         self.temp_highlighted_tiles = []
 
         self.grid_size = self.app.grid_size
+        self.i_spaces = self.app.i_spaces
+        self.t_coords = self.app.t_coords
         self.rows = 1
         self.grid = []
         self.graph = {}
-        self.initial_spaces = g_cons.INITIAL_SPACES
         self.highlighted_tiles = []
         board_con.board_clean_selected_things(board=self)
 
         #I don't think this should be here...
         self.game = Game(grid_size=self.grid_size, board=self,
-            ini_spaces=self.initial_spaces, terrain_coords=g_cons.TEST_MAP_MOVE_SPACES_1)
+            ini_spaces=self.i_spaces, t_coords=self.t_coords)
 
     def get_width(self):
         return len(self.grid)
@@ -125,8 +130,9 @@ class PuzzleGrid(Factory.GridLayout):
     def get_tile(self, x, y):
         return self.grid[x][y]
 
-    def create_grid(self):
-        board_con.create_grid(board=self, size=self.grid_size)
+    def create_grid(self, t_coords={}, i_spaces=[], actors=[]):
+        board_con.create_grid(board=self, size=self.grid_size,
+                        t_coords=t_coords, i_spaces=i_spaces, actors=actors)
 
     def select_tile(self, target_tile):
         board_con.select_tile(board=self, target_tile=target_tile)
@@ -144,7 +150,9 @@ class GameApp(App):
         Window.bind(mouse_pos=self.on_mouse_pos)
         self.current_hover_tile = None
         self.last_hover_tile = None
-        self.grid_size = kwargs.get("grid_size", g_cons.GRID_SIZE)
+        self.grid_size = kwargs.get("grid_size", g_cons.GRID_SIZE_BASE)
+        self.i_spaces = kwargs.get("i_spaces", g_cons.I_SPACES_BASE)
+        self.t_coords = kwargs.get("t_coords", g_cons.T_COORDS_RANDOM)
 
     def on_mouse_pos(self, window, pos):
         for row in self.root.ids.puzzle.grid:

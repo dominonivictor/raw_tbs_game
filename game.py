@@ -15,20 +15,19 @@ class Game():
         self.log = []
         self.event_list = []
         self.actors = []
-        self.actors_num = kwargs.get("actors_num", g_cons.INITIAL_ACTORS_NUM)
+        self.actors_num = kwargs.get("actors_num", g_cons.I_ACTORS_NUM)
         self.p1 = Player(name='P1')
-        self.p2 = Player(name='P2')
         self.grid_size = kwargs.get("grid_size", 13)
         self.ini_spaces = kwargs.get("ini_spaces", [])
         #need to remember the diff from grid and board, i think board is the kv board
-        terrain_coords = kwargs.get("terrain_coords", {})
-        self.grid = self.create_grid(grid_size=self.grid_size,
-                                     terrain_coords=terrain_coords)
+        self.t_coords = kwargs.get("t_coords", {})
+        self.create_grid(grid_size=self.grid_size,
+                                     t_coords=self.t_coords)
 
         self.board = kwargs.get("board")
 
         self.initial_setup()
-        self.add_actors()
+        self.add_actors_to_init_tiles()
 
         game_eye = GameEye.instance()
         game_eye.set_game(self)
@@ -53,61 +52,69 @@ class Game():
         equip_str = equip_str[:-2] + '.'
         return equip_str
 
-    def add_actors(self):
+    def add_actors_to_init_tiles(self):
         p1_actors = [actor for actor in self.p1.actors]
-        p2_actors = [actor for actor in self.p2.actors]
         self.actors.extend(p1_actors)
-        self.actors.extend(p2_actors)
         #very ugly for now, but need to make a major refine on the apis 
         for i, actor in enumerate(self.actors):
-            self.add_actor_at_coord(actor, self.ini_spaces[i])
+            try:
+                self.add_actor_at_coord(actor, self.ini_spaces[i])
+            except IndexError:
+                break
 
-    def create_grid(self, grid_size=13, terrain_coords={}):
+    def create_grid(self, grid_size=13, t_coords={}):
         #TODO this is messy having to change the stuff in the middle of the process
         grid = []
         #use region here prob...
         for i in range(grid_size):
             row = []
             for j in range(grid_size):
-                if(not terrain_coords): #random selected terrain
+                if(not t_coords): #random selected terrain
                     move_cost, tile_color = map_funcs.random_map_cost_tile_gen()
                 else:
                     move_cost, tile_color = map_funcs.defined_map_cost_tile_gen(
-                                x=j, y=i, terrain_coords=terrain_coords)
+                                x=j, y=i, t_coords=t_coords)
                 tile = Tile(move_cost=move_cost, color=tile_color)
 
                 row.append(tile)
             grid.append(row)
 
+        #this is very ugly... should it be here?
         grid = list(map(list, zip(*grid))) #doing this to transpose
+
+        self.grid = grid
         return grid
 
-
-
-    def initial_setup(self):
+    def initial_setup(self, actors=[]):
 
         actors_num = self.actors_num
 
-        players = [self.p1, self.p2]
+        players = [self.p1]
 
         # actors_options()
 
         for player in players:
-            self.select_initial_actor_job_equip(player, actors_num)
+            self.select_initial_actor(player, actors_num if not
+                                                actors else actors)
 
-    def select_initial_actor_job_equip(self, player, n_actors):
+    def select_initial_actor(self, player, n_actors):
         from random import choice
         from misc.entities_creation import create_actor
-        player_actors = []
-        player_equips = []
-        player_jobs = []
-        actors_l = ["t", "f", "c", "a", "p", "o"]
+        if type(n_actors) is not list:
+            player_actors = []
+            actors_l = ["t", "f", "c", "a", "p", "o"]
 
-        #actors =  "".join([choice(actors_l) for _ in range(n_actors)]) #p_choice if p_choice else
-        actors = "".join(actors_l)
-        actors = list(actors[:n_actors])
-        for actor in actors:
-            player.add_actor(create_actor(actor, self))
+            #actors =  "".join([choice(actors_l) for _ in range(n_actors)]) #p_choice if p_choice else
+            actors = "".join(actors_l)
+            actors = list(actors[:n_actors])
+
+            for actor in actors:
+                player.add_actor(create_actor(actor, self))
+        else:
+            actors = n_actors
+
+            for actor in actors:
+                player.add_actor(actor)
 
 
     def add_actor_at_coord(self, actor, coord):

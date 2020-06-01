@@ -24,28 +24,43 @@ def board_clean_selected_things(board, but_not_selected_tile=False, target_tile=
     board.selected_command = None
     board.state = gs.NORMAL
 
-def create_grid(board, size):
+def create_grid(board, size, t_coords={}, i_spaces=[], actors=[]):
     '''
     TAGS: BOARD, GAME
     '''
     board.grid = []
     board.clear_widgets()
-    board.rows = size
-    board.cols = size
+    board.rows, board.cols = size, size
+    if(t_coords):
+        t_coords = t_coords
+    else:
+        t_coords = {}
 
-    #making the grid
+    board.game.create_grid(grid_size=board.grid_size, t_coords=t_coords)
+
+    create_ui_grid(board, size)
+
+def create_ui_tile(x, y, color):
     PT = Factory.PuzzleTile
-    #could this be a region?
+    tile = PT()
+    tile.grid_x, tile.grid_y = x, y
+    set_tile_colors(tile, color)
+    tile.actor = None
+
+    return tile
+
+def set_tile_colors(tile, color):
+    tile.set_color(color)
+    tile.set_original_color(color)
+    tile.set_last_color(color)
+
+def create_ui_grid(board, size):
+    #could this be a region? maybe not due to the list of lists thing
     for i in range(board.rows):
         grid_cols = []
         for j in range(board.cols):
-            tile = PT(text=f'.')
-            tile.actor = None
-            tile.grid_x, tile.grid_y = j, i
-            tile_color = board.game.get_tile(j, i).color
-            tile.set_color(tile_color)
-            tile.set_original_color(tile_color)
-            tile.set_last_color(tile_color)
+            color = board.game.get_tile(x=j, y=i).color
+            tile = create_ui_tile(x=j, y=i, color=color)
             board.add_widget(tile)
             grid_cols.append(tile)
 
@@ -55,6 +70,8 @@ def create_grid(board, size):
 
     #adding actors initially
     add_actors_in_starting_positions(board=board)
+
+
 
 def select_tile(board, target_tile):
     '''
@@ -174,7 +191,6 @@ def targeting_command(board, actor, target_tile, commandable_tiles):
         log_text.text += "Actor has already acted!\n"
     elif((target_tile.grid_x, target_tile.grid_y) not in commandable_tiles):
         log_text.text += "Destination out of range!\n"
-        #print(f"t_tile current: {target_tile.get_color()}, last:{target_tile.get_last_color()}")
         clean_tiles(((x, y) for x, y in region(board.get_width(),
                                             board.get_height())), board,
                    color='last_color')
@@ -225,7 +241,7 @@ def add_actors_in_starting_positions(board):
     TAGS: BOARD, GAME, ACTOR
     '''
     #this is linked with game self.initial_setup()
-    for i, (x, y) in enumerate(board.initial_spaces):
+    for i, (x, y) in enumerate(board.i_spaces):
         actor = board.game.actors[i]
         add_actor_at_xy(board, actor, x, y)
 
