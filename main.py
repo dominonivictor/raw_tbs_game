@@ -109,7 +109,9 @@ class PuzzleGrid(Factory.GridLayout):
         self.reset_hl_tiles()
 
         self.grid_size = self.app.grid_size
+        #initial spaces
         self.i_spaces = self.app.i_spaces
+        #target_coords
         self.t_coords = self.app.t_coords
         self.rows = 1
         self.grid = []

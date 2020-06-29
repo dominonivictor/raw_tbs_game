@@ -80,8 +80,7 @@ def select_tile(board, target_tile):
     app = App.get_running_app()
 
     if board.state == gs.NORMAL:
-        clean_tiles(board.hl_tiles, board)
-        clean_tiles(board.temp_hl_tiles, board)
+        clean_hl_tiles(board, color='original_color')
         select_tile_normal_state(app=app, board=board, target_tile=target_tile)
 
     elif board.state == gs.TARGETING:
@@ -92,6 +91,7 @@ def select_tile_normal_state(app, board, target_tile):
     '''
     TAGS: BOARD, GAME, ACTOR
     '''
+    clean_hl_tiles(board, color='original_color')
     game_grid = board.game.grid
     selected_tile = board.selected_tile
     if selected_tile:
@@ -103,11 +103,13 @@ def select_tile_normal_state(app, board, target_tile):
         clean_tiles(board.movable_hl_tiles, board)
         clean_tiles(board.hl_tiles, board)
         clean_tiles(board.temp_hl_tiles, board)
+        clean_tiles(board.attackable_hl_tiles, board)
         highlight_movable_spaces(actor=actor, start_tile=target_tile)
 
     target_tile.set_color(colors.SELECTED_RED)
     board.selected_tile = target_tile
-    actor_command_list = actor.list_commands()
+    #checking if tile has actor
+    actor_command_list = actor.list_commands() if actor else ""
 
     app.root.ids.stats_panel.update_actor_stats(actor)
     app.root.ids.minor_options.update_commands_list(actor_command_list)
@@ -137,8 +139,7 @@ def select_tile_targeting_state(board, target_tile):
             targeting_command(board=board, actor=actor, target_tile=target_tile, commandable_tiles=tiles)
 
         board_clean_selected_things(board=board, but_not_selected_tile=True, target_tile=target_tile)
-    clean_tiles(board.hl_tiles, board)
-    clean_tiles(board.temp_hl_tiles, board)
+    clean_all_tiles(board, color='original_color')
 
 def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
     '''
@@ -162,7 +163,7 @@ def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
         current_tile.actor = None
         x, y = target_tile.grid_x, target_tile.grid_y
         current_tile.rgba = board.game.grid[x][y].color
-        current_tile.text = "."
+        current_tile.text = ""
         target_tile.text = target_tile.actor.letter
         target_tile.set_color(colors.WALKABLE_BLUE)
 
@@ -271,11 +272,11 @@ def highlight_movable_spaces(actor, start_tile):
     board = app.root.ids.puzzle
     game_grid = board.game.grid
 
-    closed_list = calculate_dijkstras(start_tile, board, game_grid, calculate_cost_to_move, n_moves)
+    movable_spaces = calculate_dijkstras(start_tile, board, game_grid, calculate_cost_to_move, n_moves)
 
-    highlight_tiles(tiles=closed_list, color=colors.WALKABLE_BLUE, board=board)
+    highlight_tiles(tiles=movable_spaces, color=colors.WALKABLE_BLUE, board=board)
 
-    board.set_movable_hl_tiles(closed_list)
+    board.set_movable_hl_tiles(movable_spaces)
 
 def highlight_tiles(tiles, color, board):
     for x, y in tiles:
@@ -291,12 +292,12 @@ def highlight_attackable_spaces(command, start_tile):
     board = app.root.ids.puzzle
     game_grid = board.game.grid
 
-    closed_list = calculate_dijkstras(start_tile, board, game_grid, calculate_cost_to_attack, n_moves)
+    attackable_spaces = calculate_dijkstras(start_tile, board, game_grid, calculate_cost_to_attack, n_moves)
 
-    for x, y in closed_list:
+    for x, y in attackable_spaces:
         board.get_tile(x, y).set_color(colors.ATTACKABLE_RED)
 
-    board.set_attackable_hl_tiles(closed_list)
+    board.set_attackable_hl_tiles(attackable_spaces)
 
 
 def calculate_dijkstras(start_tile, board, game_grid, step_cost_function, n_moves):
@@ -377,7 +378,14 @@ def clean_tiles(tiles, board, color=''):
 def clean_all_tiles(board, color=''):
     clean_tiles(region(board.get_width(), board.get_height()), board,
                 color=color)
+    board.reset_hl_tiles()
 
+def clean_hl_tiles(board, color=''):
+    clean_tiles(board.temp_hl_tiles, board, color=color)
+    clean_tiles(board.movable_hl_tiles, board, color=color)
+    clean_tiles(board.attackable_hl_tiles, board, color=color)
+    clean_tiles(board.hl_tiles, board, color=color)
+    board.reset_hl_tiles()
 
 def is_xy_valid(x, y, board):
     return 0 <= x < board.grid_size and 0 <= y < board.grid_size

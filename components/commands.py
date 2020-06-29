@@ -68,7 +68,7 @@ class Command():
         return {"msg": self.msg.format(*self.msg_function(*self.msg_args, self=self))}
 
     def manage_special_status_or_commands(self):
-        from functions.special_status_functions import special_status_handler 
+        from functions.special_status_functions import special_status_handler
         response = special_status_handler(self)
         return response
 
@@ -210,10 +210,11 @@ class VampBite(Command):
 class GoldenEgg(Command):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.original_raw_ids = self.raw_statuses_ids
         self.original_statuses_list = self.statuses.list
 
     def execute(self):
-        self.statuses.list = sample(self.original_statuses_list, k=2)
+        self.raw_statuses_ids = sample(self.original_raw_ids, k=2)
         super().execute()
 
 class Multiply(Command):

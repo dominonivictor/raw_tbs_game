@@ -59,11 +59,11 @@ HEAL = {
     "name": "Healing Salve",
     "value": base_heal, #only for commands that deal/heal <value> hp
     "description": "Gives a healing salve to the target",
-    "category": "Basic Heal",  
-    "max_range": 2, 
+    "category": "Basic Heal",
+    "max_range": 2,
     "msg": "{} heals {} for {} hp!",
     "msg_function": get_attrs,
-    "msg_args": ["owner name", "target name", "self heal_value"], 
+    "msg_args": ["owner name", "target name", "self heal_value"],
 }
 
 VAMP_BITE = {
@@ -113,8 +113,8 @@ GOLDEN_EGG = {
         {"id": "def_up", "value": 2, "timer": 2,},
         {"id": "spd_up", "value": 2, "timer": 2,},
         {"id": "income_up", "value": 2, "timer": 2,},
-    ],                                   
-                                         
+    ],
+
     "max_range": 1,
     "msg": "{} gets buffed on {} by 2? for 1 turn",
     "msg_function": get_attrs,
@@ -144,7 +144,7 @@ DAGGER_ATTACK = {
     "name": "True Slash",
     "value": 10, #only for commands that deal/heal <value> hp
     "description": "True dmg dealing dagger",
-    "category": "Basic Attack",  
+    "category": "Basic Attack",
     "is_raw": True,
     "max_range": 1,
     "msg": "{} pierces {} for {} damage",

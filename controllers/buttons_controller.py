@@ -4,7 +4,8 @@ import misc.game_states as gs
 
 from components.jobs_commands import gen_jobs_list
 from components.equips_commands import gen_equips_list
-from controllers.board_controller import highlight_attackable_spaces, clean_tiles
+from controllers.board_controller import (highlight_attackable_spaces,
+clean_tiles, clean_hl_tiles)
 
 def minor_btn_on_press(minor_btn):
     '''
@@ -18,7 +19,7 @@ def minor_btn_on_press(minor_btn):
     board.selected_command = command
     start_tile = board.selected_tile
 
-    clean_tiles(board.hl_tiles, board)
+    clean_hl_tiles(board, color='original_color')
     highlight_attackable_spaces(command, start_tile)
     board.state = gs.TARGETING
 
