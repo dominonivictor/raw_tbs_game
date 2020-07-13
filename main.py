@@ -3,10 +3,13 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.properties import ListProperty, StringProperty
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
+from kivy.graphics.vertex_instructions import Line
+from kivy.graphics.context_instructions import Color
 
 from game import Game
 
@@ -69,6 +72,20 @@ class PuzzleTile(ButtonBehavior, Label):
     original_color = None
     last_color = None
     temp_color = None
+    lines = []
+
+    def add_line(self, line):
+        self.add_widget(line)
+        self.lines.append(line)
+
+    def remove_lines(self):
+        for line in self.lines:
+            self.remove_line(line)
+
+        self.lines = []
+
+    def remove_line(self, line):
+        self.remove_widget(line)
 
     def on_release(self):
         app = App.get_running_app()
@@ -98,6 +115,9 @@ class PuzzleTile(ButtonBehavior, Label):
     def get_original_color(self):
         return self.original_color
 
+    def get_center_xy(self):
+        return self.center_x, self.center_y
+
 class PuzzleGrid(Factory.GridLayout):
     #Is it having too many responsabilities?
     def __init__(self, **kwargs):
@@ -121,6 +141,32 @@ class PuzzleGrid(Factory.GridLayout):
         #I don't think this should be here...
         self.game = Game(grid_size=self.grid_size, board=self,
             ini_spaces=self.i_spaces, t_coords=self.t_coords)
+
+        self.tiles_with_lines = []
+
+    def add_line(self, target_tile, x0, y0, x1, y1):
+        x0, y0, x1, y1 = int(x0), int(y0), int(x1), int(y1)
+        line = MoveLine(x0=x0, y0=y0, x1=x1, y1=y1)
+        #target_tile = self.grid[x1][y1]
+        target_tile.add_line(line)
+        self.tiles_with_lines.append(target_tile)
+
+    def add_line_path(self, from_coord, to_coord):
+        if(to_coord == final_coord):
+            return
+        next_to_coord = self.movable_spaces[to_coord]["via"]
+        x0, y0 = to_coord
+        x1, y1 = next_to_coord
+        target_real_xy = self.grid[x0][y0].get_center_xy()
+        next_real_xy = self.grid[x1][y1].get_center_xy()
+        self.add_line(*target_real_xy, *next_real_xy)
+        self.add_line_path(from_coord, next_to_coord)
+
+
+
+    def remove_lines(self):
+        for tile in self.tiles_with_lines:
+            tile.remove_lines()
 
     def reset_hl_tiles(self):
         self.temp_hl_tiles = []
@@ -162,6 +208,18 @@ class PuzzleGrid(Factory.GridLayout):
     def set_selected_action(self, action_str):
         self.selected_action  = action_str
 
+class MoveLine(Widget):
+    def __init__(self, **kwargs):
+        super().__init__()
+        x0 = kwargs.get("x0")
+        y0 = kwargs.get("y0")
+        x1 = kwargs.get("x1")
+        y1 = kwargs.get("y1")
+        print(f"VALUES: ({x0}, {y0}) ({y0}, {y1})")
+        with self.canvas.before:
+            Color(0, 0, 1, 1)
+            Line(points=[x0, y0, x1, y1], width=2)
+
 
 class GameApp(App):
     def __init__(self, **kwargs):
@@ -181,6 +239,7 @@ class GameApp(App):
                     if self.current_hover_tile is not self.last_hover_tile:
                         self.last_hover_tile = tile
                         tile.on_hover()
+
 
 if __name__ == '__main__':
     GameApp().run()

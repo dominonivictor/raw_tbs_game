@@ -4,6 +4,8 @@ import misc.game_states as gs
 import constants.colors as colors
 from collections import deque
 from functions.grid_patterns import region
+from components.ui_commands import UIMoveCommand
+
 
 #The truth is this whole file should maybe be a class and its functions...
 #OK stuff ain't pretty, but it's a start! Probably will have to change a lot of
@@ -155,21 +157,19 @@ def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
     elif((target_tile.grid_x, target_tile.grid_y) not in movable_tiles):
         log_text.text += "Destination out of range!\n"
     else:
-        current_coord = (current_tile.grid_x, current_tile.grid_y)
-        target_coord = (target_tile.grid_x, target_tile.grid_y)
-        change_actor_coords_in_game_grid(board.game, from_coord=current_coord,
-                                         to_coord=target_coord)
-        target_tile.actor = actor
-        current_tile.actor = None
-        x, y = target_tile.grid_x, target_tile.grid_y
-        current_tile.rgba = board.game.grid[x][y].color
-        current_tile.text = ""
-        target_tile.text = target_tile.actor.letter
-        target_tile.set_color(colors.WALKABLE_BLUE)
-
-        board.selected_tile = target_tile
-        actor.update_pos(target_tile.grid_x, target_tile.grid_y)
-        actor.has_moved = True
+        #add this to commands list
+        command = UIMoveCommand(
+            current_tile=current_tile,
+            target_tile=target_tile,
+            board=board,
+            actor=actor
+        )
+        board.game.event_list.append(command)
+        #x0, y0 = current_tile.grid_x, current_tile.grid_y
+        #x1, y1 = target_tile.grid_x, target_tile.grid_y
+        x0, y0 = current_tile.center_x, current_tile.center_y
+        x1, y1 = target_tile.center_x, target_tile.center_y
+        board.add_line(target_tile, *(x0, y0), *(x1, y1))
 
     clean_tiles(board.hl_tiles, board)
     clean_tiles(board.temp_hl_tiles, board)
@@ -236,6 +236,8 @@ def pass_turn(board):
         for tile in row:
             x, y = tile.grid_x, tile.grid_y
             tile.rgba = board.game.grid[x][y].color
+
+    board.remove_lines()
 
 
 ############## Temporary / Auxiliary functions
@@ -306,15 +308,18 @@ def calculate_dijkstras(start_tile, board, game_grid, step_cost_function, n_move
     '''
     #calculate_cost_to_move -> for moving, calculate_cost_to_attack -> for attacking
     x, y = start_tile.grid_x, start_tile.grid_y
-    closed_list = []
+    closed_list = {}
     open_dict = {(x, y): {"dist": 0, "via": None}}
     tile_xy = True #just for getting in the loop
     while(tile_xy):
         tile_xy = min(open_dict, key=lambda k: open_dict[k]["dist"]) if open_dict else None
         if tile_xy:
             tile_dict = open_dict.pop(tile_xy)
-            tile_neighbors = get_tile_neighbors(tile_xy=tile_xy, max_size=board.grid_size,
-                                                game_grid=game_grid, closed_list=closed_list)
+            tile_neighbors = get_tile_neighbors(
+                tile_xy=tile_xy, max_size=board.grid_size,
+                game_grid=game_grid,
+                closed_list=closed_list
+            )
 
             for neigh_xy in tile_neighbors:
                 neigh_dict = open_dict.get(neigh_xy, None)
@@ -325,7 +330,7 @@ def calculate_dijkstras(start_tile, board, game_grid, step_cost_function, n_move
                     if(not neigh_dict or final_dist < neigh_dict["dist"]):
                         open_dict[neigh_xy] = {"dist": final_dist, "via": tile_xy}
 
-            closed_list.append(tile_xy)
+            closed_list[tile_xy] = tile_dict
 
     return closed_list
 
