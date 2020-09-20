@@ -4,9 +4,6 @@
     size_hint: None, None
     size: "50dp", "50dp"
     original_color: (1, 1, 1, .2)
-    on_press: 
-        self.parent.select_tile(target_tile=self)
-        
     canvas.before:
         Color:
             rgba: self.rgba
@@ -72,18 +69,20 @@ BoxLayout:
                         size: self.size
 
                 Button:
-                    on_press: print("nice")
+                    on_release: print("nice")
             MajorOptionsBox:
                 id: major_options
                 BoxLayout:
                     orientation: 'vertical'
                     Button:
+                        id: 'pass_turn_btn'
                         text: "pass turn"
-                        on_press:
+                        on_release:
                             puzzle.pass_turn()
-                    Button:
+                    CreateGridButton:
+                        id: 'create_grid_btn'
                         text: "create grid"
-                        on_press: 
+                        on_release:
                             puzzle.create_grid()
 
     #>>>>>>>>>>>>>>>>>>>>> RIGHT SIDE
@@ -94,7 +93,7 @@ BoxLayout:
             orientation: 'vertical'
             id: stats_screen
             size_hint_y: 50
-            Label: 
+            Label:
                 id: debug_label
                 size_hint_y: 10
                 text: "Actor Stats below (click on actor to check stats)"
@@ -111,7 +110,7 @@ BoxLayout:
                 text: "Stats info here"
 
         # >>>>>>>>>>>>>>>>>>>>>>>>>> LOG SCREEN
-        BoxLayout:  
+        BoxLayout:
             orientation: 'vertical'
             id: log_screen
             size_hint_y: 50
@@ -126,7 +125,7 @@ BoxLayout:
                         size: self.size
                     Line:
                         width: 1
-                        rectangle: self.x, self.y, self.width, self.height    
+                        rectangle: self.x, self.y, self.width, self.height
             BoxLayout:
                 size_hint_y: 90
                 ScrollableLog:

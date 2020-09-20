@@ -1,5 +1,5 @@
 from components.statuses import StatusManager
-from components.commands import CommandList
+from components.command_list import CommandList
 from game_eye import GameEye
 
 
@@ -15,7 +15,7 @@ class Actor():
         self.def_stat = kwargs.get("def_stat", 0)
         self.spd_stat = kwargs.get("spd_stat", 4)
         self.income_stat = kwargs.get("income_stat", 2)
-        
+
         self.statuses = StatusManager()
         self.statuses.owner = self
 
@@ -97,6 +97,13 @@ class Actor():
     def list_commands(self):
         return self.commands.list
 
+    def has_command(self, command_id):
+        for comm in self.commands.list:
+            if comm.id == command_id:
+                return True
+        
+        else: return False
+
     def get_command_by_id(self, id_):
         return self.commands.get_command_by_id(id_)
 
@@ -153,6 +160,15 @@ class Actor():
     def set_inc(self, value):
         self.income_stat = value
 
+    def set_pos(self, x, y):
+        self.set_x(x)
+        self.set_y(y)
+
+    def set_x(self, x):
+        self.x = x
+
+    def set_y(self, y):
+        self.y = y
     def get_x(self):
         return self.x
 

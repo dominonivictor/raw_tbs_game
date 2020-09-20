@@ -33,8 +33,8 @@ def get_attrs(*args, self=None):
             "timer": aimed_obj.timer if hasattr(aimed_obj, "timer") else None,
         }.get(attr)
 
-        result.append(aimed_attr)   
-        
+        result.append(aimed_attr)
+
     return result
 
 ####################################
@@ -46,12 +46,12 @@ ATTACK = {
     "name": "Punch",
     "value": base_atk, #only for commands that deal/heal <value> hp
     "description": "Gives a good old punch to the face",
-    "category": "Basic Attack",  
+    "category": "Basic Attack",
     "is_raw": False,
     "max_range": 1,
     "msg": "{} attacks {} for {} damage!",
     "msg_function": get_attrs,
-    "msg_args": ["owner name", "target name", "self final_value"],  
+    "msg_args": ["owner name", "target name", "self final_value"],
 }
 
 HEAL = {
@@ -59,11 +59,11 @@ HEAL = {
     "name": "Healing Salve",
     "value": base_heal, #only for commands that deal/heal <value> hp
     "description": "Gives a healing salve to the target",
-    "category": "Basic Heal",  
-    "max_range": 2, 
+    "category": "Basic Heal",
+    "max_range": 2,
     "msg": "{} heals {} for {} hp!",
     "msg_function": get_attrs,
-    "msg_args": ["owner name", "target name", "self heal_value"], 
+    "msg_args": ["owner name", "target name", "self heal_value"],
 }
 
 VAMP_BITE = {
@@ -113,8 +113,8 @@ GOLDEN_EGG = {
         {"id": "def_up", "value": 2, "timer": 2,},
         {"id": "spd_up", "value": 2, "timer": 2,},
         {"id": "income_up", "value": 2, "timer": 2,},
-    ],                                   
-                                         
+    ],
+
     "max_range": 1,
     "msg": "{} gets buffed on {} by 2? for 1 turn",
     "msg_function": get_attrs,
@@ -144,7 +144,7 @@ DAGGER_ATTACK = {
     "name": "True Slash",
     "value": 10, #only for commands that deal/heal <value> hp
     "description": "True dmg dealing dagger",
-    "category": "Basic Attack",  
+    "category": "Basic Attack",
     "is_raw": True,
     "max_range": 1,
     "msg": "{} pierces {} for {} damage",
@@ -330,8 +330,29 @@ REGEN = {
     "msg_args": ["target name", "self value", "self timer"]
 }
 
+######### AOE
+WATERBALL = {
+    "id": "waterball",
+    "name": "Waterball",
+    "value": 3, #only for commands that deal/heal <value> hp
+    "description": "Aoe attack like fireball but with water",
+    "category": "aoe",
+    "is_raw": False, # default is False, only valid for commands that use Attack()
+    # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+    "command_dict": {
+        "attack": 3,
+    },
+    "max_range": 1,
+    "msg": "{} deals damage!",
+    "msg_function": get_attrs,
+    "msg_args": ["target name"],
+    "aoe_size": 1,
+}
+
+
 '''
 {
+    "id": ,
     "name": ,
     "timer": , #only for commands with statuses_list
     "value": , #only for commands that deal/heal <value> hp
@@ -347,6 +368,9 @@ REGEN = {
         <command_name>: command_value
     },
     "max_range": 1,
+    "msg": "{} deals damage!",
+    "msg_function": get_attrs,
+    "msg_args": ["target name"]
 }
 "id": ,
 attack

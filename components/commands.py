@@ -5,103 +5,30 @@ from controllers.board_controller import add_actor_at_xy
 from game_eye import GameEye
 
 
-class CommandList():
-    def __init__(self, **kwargs):
-        self.owner = kwargs.get("owner")
-        self.base_list = []
-        self.kingdom_list = []
-        self.equip_list = []
-        self.job_list = []
-        self.list = []
-        self.raw_commands_ids = kwargs.get("raw_commands_ids", [])
-        self.init() 
-
-    def init(self):
-        commands = [get_new_command_by_id(id=comm_id) for comm_id in
-        self.raw_commands_ids]
-        for command in commands:
-            self.add_command(command, "base")
-        self.add_kingdom_command()
-
-    def add_command(self, command, category=""):
-        for comm in self.list:
-            if comm.id == command.id:
-                print("Not able to add command cause it's already in the commands list")
-        else:
-            command.owner = self.owner
-            self.list.append(command)
-            if("base" in category):
-                self.base_list.append(command)
-            if("equip" in category):
-                self.equip_list.append(command)
-            if("job" in category):
-                self.job_list.append(command)
-            if("kingdom" in category):
-                self.kingdom_list.append(command)
-
-    def remove_command(self, command, category=""): 
-        command.owner = None  
-        self.list.remove(command)
-        if("base" in category):
-            self.base_list.remove(command)
-        if("equip" in category):
-            self.equip_list.remove(command)
-        if("job" in category):
-            self.job_list.remove(command)
-        if("kingdom" in category):
-            self.kingdom_list.remove(command)
-
-    def add_eye(self):
-        self.game_eye = self.owner.game_eye
-
-    def add_kingdom_command(self):
-        #kinda ugly, stuff needs to come ready
-        kingdom = self.owner.kingdom
-        command = {
-            "mamalia": get_new_command_by_id(id="multiply"),
-            "reptalia": get_new_command_by_id(id="sun_charge"),
-            "aves": get_new_command_by_id(id="golden_egg"),
-        }.get(kingdom)
-        self.add_command(command, category="kingdom")
-
-    def show_commands(self):
-        commands_str = ''
-        i = 1
-        for command in self.list:
-            commands_str = commands_str + f'({i}) {command.name} - '
-            i += 1
-
-        commands_str = commands_str[:-2] + '.'
-        return commands_str
-
-    def get_command_by_id(self, comm_id):
-        for comm in self.list:
-            if comm.id == comm_id:
-                return comm
-        
-    def pass_time(self):
-        pass
-
-
 class Command():
     def __init__(self, **kwargs):
+        #I think this is getting wayyyyy too big... maybe separate what is not needed
+        #and leave it only for the children specif commands that need it...?
         self.id = kwargs.get("id")
         self.name = kwargs.get('name', "Abyssal Lord Command")
         self.description = kwargs.get('description', "Abyssal Lord Command Description")
         self.category = kwargs.get('category', "Abyssal")
-        
+
         self.owner = kwargs.get('owner', None)
         self.target = kwargs.get('target', None)
         self.target_xy = (-1, -1)
+        self.target_pos = (0, 0)
+        self.target_x = 0
+        self.target_y = 0
 
         self.value = kwargs.get('value', 0)
         self.timer = kwargs.get('timer', 0)
         self.is_raw = kwargs.get('is_raw', False)
         self.max_range = kwargs.get('max_range', 1)
         self.final_value = 0
-       
+
         self.raw_statuses_ids = kwargs.get("statuses_list", [])
-        from components.statuses import ComponentStatusList 
+        from components.statuses import ComponentStatusList
         self.statuses = ComponentStatusList(owner=self,
         raw_statuses_ids=self.raw_statuses_ids)
 
@@ -141,7 +68,7 @@ class Command():
         return {"msg": self.msg.format(*self.msg_function(*self.msg_args, self=self))}
 
     def manage_special_status_or_commands(self):
-        from functions.special_status_functions import special_status_handler 
+        from functions.special_status_functions import special_status_handler
         response = special_status_handler(self)
         return response
 
@@ -195,6 +122,27 @@ class Command():
             return self.statuses.list[pos].value
         return list(map(lambda x: x.value, self.statuses.list))
 
+    def get_target_x(self):
+        return self.target_x
+
+    def get_target_y(self):
+        return self.target_y
+
+    def set_target_x(self, x):
+        self.target_x = x
+
+    def set_target_y(self, y):
+        self.target_y = y
+
+    def get_target_pos(self):
+        return self.target_pos
+
+    def set_target_pos(self, pos):
+        x, y = pos
+        self.set_target_x(x)
+        self.set_target_y(y)
+        self.target_pos = (self.target_x, self.target_y)
+
 ####################################
 ######### BASIC COMMANDS ###########
 ####################################
@@ -219,13 +167,13 @@ class Heal(Command):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.heal_value = 0
-        
+
 
     def execute(self):
         result = super().execute()
         if not result.get("valid_action", True):
             return result
-            
+
         self.heal_damage(self.value)
         if not self.msg_function: return
         return self.get_msg_dict()
@@ -241,7 +189,7 @@ class VampBite(Command):
         super().__init__(**kwargs)
         self.eff = kwargs.get('eff', 0)
         self.heal_value = 0
- 
+
     def execute(self):
         result = super().execute()
         if not result.get("valid_action", True):
@@ -262,11 +210,12 @@ class VampBite(Command):
 class GoldenEgg(Command):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.original_raw_ids = self.raw_statuses_ids
         self.original_statuses_list = self.statuses.list
 
-    def execute(self): 
-        self.statuses.list = sample(self.original_statuses_list, k=2)
-        super().execute()        
+    def execute(self):
+        self.raw_statuses_ids = sample(self.original_raw_ids, k=2)
+        super().execute()
 
 class Multiply(Command):
     def __init__(self, **kwargs):
@@ -359,7 +308,7 @@ class Mixn(Command):
         from components.elements import get_new_element_by_id
         element = get_new_element_by_id(id="fire")
         self.target.equip.add_element(element)
-        
+
         return {"msg": f"{self.owner.name} adds {element.name} element to a {self.target.equip.name}"}
 
 ####################################
@@ -371,6 +320,35 @@ class Mixn(Command):
 #SpeedUp
 #IncomeUp
 #MaxHpUp
+
+
+####################################
+######### AOE COMMANDS #############
+####################################
+from functions.grid_patterns import create_grid_coords
+
+class AOE(Command):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.aoe_size = kwargs.get("aoe_size", 1)
+        self.tile_pattern = create_grid_coords(size=self.aoe_size)
+
+    def execute(self):
+        target_list = []
+        for tile_x, tile_y in self.tile_pattern:
+            target_x = self.get_target_x() + tile_x
+            target_y = self.get_target_y() + tile_y
+            if self.game_eye.has_actor_on_xy(target_x, target_y):
+                target = self.game_eye.get_actor_on_xy(target_x, target_y)
+                target_list.append(target.name)
+                self.set_target(target)
+                super().execute()
+
+        msg = f"{target_list} took dmg to waterball"
+
+        return {"msg": msg}
+
+
 
 def instaciate_commands_dict(**kwargs):
     '''
@@ -403,11 +381,11 @@ def instaciate_commands_dict(**kwargs):
         'sun_charge': Command(**{**cons.SUN_CHARGE, **kwargs}),
         'golden_egg': GoldenEgg(**{**cons.GOLDEN_EGG, **kwargs}),
         'multiply': Multiply(**{**cons.MULTIPLY, **kwargs}),
-        
+
         'perfect_counter': Command(**{**cons.PERFECT_COUNTER, **kwargs}),
         'copy_cat': CopyCat(**{**cons.COPY_CAT, **kwargs}),
         'mixn': Mixn(**{**cons.MIXN, **kwargs}),
-        
+
         'true_slash': Attack(**{**cons.DAGGER_ATTACK, **kwargs}),
         'toxic_shot': Attack(**{**cons.TOXIC_SHOT, **kwargs}),
         'paralize_shot': Attack(**{**cons.PARALIZE_SHOT, **kwargs}),
@@ -420,15 +398,19 @@ def instaciate_commands_dict(**kwargs):
         # 'income_up': Command(**{**cons.INCOME_UP, **kwargs}),
         # 'max_hp_up': Command(**{**cons.MAX_HP_UP, **kwargs}),
         'regen': Command(**{**cons.REGEN, **kwargs}),
+
+        'waterball': AOE(**{**cons.WATERBALL, **kwargs}),
     }
     return commands_dict
 
 def get_new_command_by_id(**kwargs):
-    id = kwargs.get("id")
+    id_ = kwargs.get("id")
     commands = instaciate_commands_dict(**kwargs)
-    
-    return commands.get(id)
+
+    return commands.get(id_)
 
 def get_new_commands_by_ids(command_ids: list)-> list:
-    
+
     return [get_new_command_by_id(id=c) for c in command_ids]
+
+

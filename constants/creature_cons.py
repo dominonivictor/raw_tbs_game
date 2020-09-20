@@ -15,7 +15,7 @@ spd_plus = 1
 spd_minus = -1
 '''
 commands_ids:
-    
+
     "attack",
     "heal",
     "power_up",
@@ -55,7 +55,7 @@ creature_stats = {
         "income": base_income,
         "kingdom": "reptalia",
         "commands_ids":[
-            "attack",
+            "waterball",
             "regen",
             "defense_up",
         ]

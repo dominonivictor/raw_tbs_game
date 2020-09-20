@@ -41,9 +41,20 @@ class GameEye():
     def __init__(self, **kwargs):
         self.game = kwargs.get("game", None)
 
+    def set_game(self, game):
+        self.game = game
+
     def add_actor(self, actor):
         self.game.actors.append(actor)
 
     def get_board(self):
         return self.game.board
 
+    def get_actor_on_xy(self, x, y):
+        return self.game.grid[x][y].actor
+
+    def set_actor_on_xy(self, actor, x, y):
+        self.game.grid[x][y].actor = actor
+
+    def has_actor_on_xy(self, x, y):
+        return bool(self.game.grid[x][y].actor)

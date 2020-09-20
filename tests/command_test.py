@@ -1,6 +1,6 @@
 import pytest
 from factories.actor_factory import get_new_actor
-from factories.equip_factory import get_new_equip 
+from factories.equip_factory import get_new_equip
 '''
 ### BASICS
 attack OK
@@ -9,7 +9,7 @@ vamp_bite OK
 
 ### KINGDOM
 sun_charge OK
-golden_egg 
+golden_egg
 multiply
 
 ### JOBS
@@ -68,13 +68,13 @@ def test_vamp_bite(actor):
     attacking_actor = get_new_actor(test=True)
     vamp_bite = attacking_actor.get_command_by_id("vamp_bite")
     attacking_actor.take_damage(5)
-    
+
     vamp_bite.set_target(actor)
     victim_hp_before = actor.get_hp()
     attacker_hp_before = attacking_actor.get_hp()
 
     vamp_bite.execute()
-    
+
     assert attacking_actor.get_hp() > attacker_hp_before
     assert actor.get_hp() < victim_hp_before
 
@@ -112,7 +112,7 @@ def multiply(actor):
     #I have to make the API clear what do commands do? how do i return this?
     #why
     multi = actor.get_command_by_id("multiply")
-    
+
     pass
 '''
 
@@ -125,6 +125,7 @@ def test_perfect_counter(actor):
     assert actor.has_status("perfect_counter_stance")
 
 def test_copy_cat(actor):
+    #still needs to test the forget method
     thief = get_new_actor(commands_ids=["copy_cat"])
     length_before = len(thief.list_commands())
     copy_cat = thief.get_command_by_id("copy_cat")
@@ -132,6 +133,8 @@ def test_copy_cat(actor):
     copy_cat.execute()
 
     assert len(thief.list_commands()) == length_before + 1
+    copy_cat.execute()
+    assert len(thief.list_commands()) == length_before
 
 def test_mixn(actor):
     #this requires more setup... need to generate equip and to test equip maybe not
@@ -164,7 +167,7 @@ def test_toxic_shot(actor):
     value = toxic_shot.statuses.list[0].value
     toxic_shot.execute()
 
-    assert actor.has_status("poisoned") 
+    assert actor.has_status("poisoned")
     assert actor.get_status("poisoned")
     assert actor.get_hp() < hp_before
 
@@ -191,10 +194,10 @@ def test_paralize_shot(actor):
     hp_before = actor.get_hp()
     para_shot.set_target(actor)
     para_shot.execute()
-    
+
 
 ############# STATUSES
-'''There is a slight problem here that these commands are kinda testing the 
+'''There is a slight problem here that these commands are kinda testing the
 command but are also testing the status behavior... these should be separated!
 '''
 def test_power_up(actor):
@@ -205,8 +208,8 @@ def test_power_up(actor):
     value = power_up.get_statuses_values(pos=0)
     timer = power_up.get_timer()
     power_up.execute()
-    
-    assert actor_atk_before == actor.get_atk() - value 
+
+    assert actor_atk_before == actor.get_atk() - value
     for _ in range(timer):
         actor.pass_time()
     assert actor_atk_before == actor.get_atk()
@@ -218,8 +221,8 @@ def test_defense_up(actor):
     value = defense_up.get_statuses_values(pos=0)
     timer = defense_up.get_timer()
     defense_up.execute()
-    
-    assert actor_def_before == actor.get_def() - value 
+
+    assert actor_def_before == actor.get_def() - value
     for _ in range(timer):
         actor.pass_time()
     assert actor_def_before == actor.get_def()
@@ -231,8 +234,8 @@ def test_speed_up(actor):
     value = speed_up.get_statuses_values(pos=0)
     timer = speed_up.get_timer()
     speed_up.execute()
-    
-    assert actor_spd_before == actor.get_spd() - value 
+
+    assert actor_spd_before == actor.get_spd() - value
     for _ in range(timer):
         actor.pass_time()
     assert actor_spd_before == actor.get_spd()
@@ -271,7 +274,7 @@ def test_learn_job_command():
     #too many asserts!!!!!
     assert actor.job is job_command.job
     assert job_command.job.name == "Guardian"
-    assert commands_length + 1 == len(actor.list_commands()) 
+    assert commands_length + 1 == len(actor.list_commands())
     assert commands_length + 1 == len(actor2.list_commands())
     assert status_length + 1 == len(actor.list_statuses()) == len(actor2.list_statuses())
     #test knows too much of actor internals
@@ -285,6 +288,53 @@ def test_equip_equip_command(actor):
     equip_command.execute()
 
     assert actor.equip is equip_command.equip
+
+
+############## AOE
+def create_mock_game_board(grid_size):
+    grid = [[Tile() for _ in range(grid_size)] for _ in range(grid_size)]
+    return list(map(list, zip(*grid))) #doing this to transpose, is it needed though?
+
+from map_objects.tile import Tile
+
+class MockGame():
+    def __init__(self):
+
+        grid = [[Tile() for _ in range(3)] for _ in range(3)]
+        self.grid = list(map(list, zip(*grid)))
+
+    def set_actor_on_xy(self, actor, x, y):
+        self.grid[x][y].actor = actor
+
+    def has_actor_on_xy(self, x, y):
+        return bool(self.grid[x][y].actor)
+
+    def get_actor_on_xy(self, x, y):
+        return self.grid[x][y].actor
+
+
+
+def test_waterball(actor):
+    waterball = actor.get_command_by_id("waterball")
+    mock_game = MockGame()
+    waterball.game_eye = mock_game
+
+    target_in_range = get_new_actor()
+    target_in_range.set_pos(x=1, y=1)
+    in_range_hp_before = target_in_range.get_hp()
+
+    target_out_of_range = get_new_actor()
+    target_out_of_range.set_pos(x=0, y=0)
+    out_range_hp_before = target_out_of_range.get_hp()
+
+    mock_game.set_actor_on_xy(target_out_of_range, 0, 0)
+    mock_game.set_actor_on_xy(target_in_range, 1, 1)
+    #put actors on the board
+    waterball.set_target_pos((1, 1))
+    waterball.execute()
+
+    assert target_in_range.get_hp() < in_range_hp_before
+    assert target_out_of_range.get_hp() == out_range_hp_before
 
 
 

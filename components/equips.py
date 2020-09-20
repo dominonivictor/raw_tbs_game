@@ -18,16 +18,14 @@ class Equip():
         status_list = kwargs.get("statuses", [])
         #all of statuses here will be passives, so the timer will be set to -1 (infinite until removed)
         self.passives = PassivesList()
-        passives = get_new_statuses_by_ids(status_list=status_list) 
+        passives = get_new_statuses_by_ids(status_list=status_list)
         for passive in passives:
             self.passives.add_passive(passive)
 
-        #this is working very differently from other components...
-        #design a basic contract and standardize for all of them...
-        commands = kwargs.get("commands_ids", [])
+        commands_ids = kwargs.get("commands_ids", [])
         self.commands = []
-        for command in commands:
-            self.add_new_command_by_id(command)
+        for command_id in commands_ids:
+            self.add_command(command_id=command_id)
 
     def equip(self, owner):
         self.owner = owner
@@ -72,21 +70,22 @@ class Equip():
 
     def show_equip_stats(self):
         string = f"""
-        {self.name}, 
-        value: {self.value}, 
+        {self.name},
+        value: {self.value},
         element: {self.element.name if self.element else "none"}
-        equip_statuses: {self.list_passives()}, 
+        equip_statuses: {self.list_passives()},
         equip_commands: {[c.name for c in self.commands]}
         """
         return string
 
-    def add_new_command_by_id(self, command_id):
+    def add_command(self, command_id):
         from components.commands import get_new_command_by_id
         for comm in self.commands:
             if comm.id == command_id:
                 return
         else:
-            self.commands.append(get_new_command_by_id(id=command_id))
+            new_comm = get_new_command_by_id(id=command_id)
+            self.commands.append(new_comm)
 
     def pass_time(self):
         pass

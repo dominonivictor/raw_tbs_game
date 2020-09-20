@@ -17,19 +17,19 @@ class StatusManager():
         for status in new_statuses:
             status.owner = self.owner
 
-    def add_statuses_to_actor(self, statuses: list):       
+    def add_statuses_to_actor(self, statuses: list):
         '''
             Recieves a list containing new instances of stati. If a given status
             is a buff (or debuff) it applies this buff to its owner.
-        ''' 
+        '''
         for status in statuses:
             status.owner = self.owner
             status.apply_buff()
 
         self.list.extend(statuses)
 
-    def remove_status(self, status): 
-        status.remove_status()   
+    def remove_status(self, status):
+        status.remove_status()
         self.list.remove(status)
 
     def pass_time(self):
@@ -72,10 +72,10 @@ class ComponentStatusList():
 
     def add_statuses(self, statuses: list):
         for status in statuses:
-            self.list.append(status)        
+            self.list.append(status)
 
-    def remove_status(self, status): 
-        status.remove_status() 
+    def remove_status(self, status):
+        status.remove_status()
 
     def add_statuses_ownership(self, statuses: list):
         for status in statuses:
@@ -159,7 +159,7 @@ class Buff(Status):
         setattr(self.owner, self.attr, current_value + self.value)
 
     def remove_buff(self):
-        
+
         current_value = getattr(self.owner, self.attr)
         setattr(self.owner, self.attr, current_value - self.value)
         self.owner = None
