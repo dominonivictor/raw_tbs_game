@@ -1,0 +1,57 @@
+<PlayerConfigScreen>:
+    player_config_screen: 'player_config_screen'
+    name: 'player_config_screen'
+    id: 'player_config_screen'
+    BoxLayout:
+        id: root_layout
+        orientation:'vertical'
+        BoxLayout:
+            size_hint_y: 15
+            Button:
+                text: 'go back'
+                on_release: root.go_to_main_menu()
+            Label:
+                text: root.current_player_text
+            Button:
+                text: 'Debug'
+                on_release: root.print_debug()
+
+        # Players Choice
+        BoxLayout:
+            size_hint_y: 15
+            orientation: 'horizontal'
+            Button:
+                text: 'P1'
+                on_release: root.set_current_player('p1')
+            Button:
+                text: 'P2'
+                on_release: root.set_current_player('p2')
+        # Actors Choice
+        BoxLayout:
+            id: actors_choice_layout
+            size_hint_y: 70
+            orientation:'horizontal'
+            BoxLayout:
+                orientation:'vertical'
+                Label:
+                    text: root.current_actors_text[0]
+                Label:
+                    text: root.current_actors_text[1]
+                Label:
+                    text: root.current_actors_text[2]
+
+            BoxLayout:
+                orientation: 'vertical'
+                id: actor_choice_btns
+                ActorChoiceButton:
+                    id: actor_choice_btn_1
+                    text: root.actors[self.current_index]
+                    on_release: root.cycle_actors(0, self)
+                ActorChoiceButton:
+                    id: actor_choice_btn_2
+                    text: root.actors[self.current_index]
+                    on_release: root.cycle_actors(1, self)
+                ActorChoiceButton:
+                    id: actor_choice_btn_3
+                    text: root.actors[self.current_index]
+                    on_release: root.cycle_actors(2, self)

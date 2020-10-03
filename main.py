@@ -1,7 +1,7 @@
 from kivy.factory import Factory
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.properties import ListProperty, StringProperty, ObjectProperty
+from kivy.properties import ListProperty, StringProperty, ObjectProperty, NumericProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
@@ -14,6 +14,7 @@ from kivy.graphics.context_instructions import Color
 from kivy.clock import Clock
 
 from game import Game
+from config import Config
 
 import constants.colors as colors
 import constants.globalish_constants as g_cons
@@ -34,6 +35,9 @@ class MainMenuScreen(Screen):
     def start_game(self):
         self.manager.current = "main_game_screen"
 
+    def config(self):
+        self.manager.current = "player_config_screen"
+
 class MainGameScreen(Screen):
     main_game_screen = ObjectProperty()
 
@@ -47,12 +51,59 @@ class MainGameScreen(Screen):
             app.root.ids[id_key] = obj
 
 class PlayerConfigScreen(Screen):
-    current_index = 0 # IntegerProperty?
-    actors = ["actor1", "actor2", "actor3"]
-    def cycle_actors(self):
-        current_index = (current_index + 1)%len(self.actors)
-        
-        
+    player_config_screen = ObjectProperty()
+    current_index = NumericProperty(0)
+    actors = "foaptc".upper()
+    #actors = ["actor1", "actor2", "actor3"]
+    current_player = Config.p1
+    config = Config
+    current_player_text = StringProperty('Current Player: P1')
+    current_actors_text = ListProperty([
+        *current_player.initial_actors,
+        ])
+    buttons = []
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        app = App.get_running_app()
+        app.player_config_screen = self
+
+    def go_to_main_menu(self):
+        self.manager.current = 'main_menu_screen'
+
+
+    def current_player_actor(self, index):
+        return self.current_player.initial_actors[index]
+
+
+    def cycle_actors(self, player_actor_index, btn):
+        btn.current_index = (btn.current_index + 1)%len(self.actors)
+        actor = self.actors[btn.current_index]
+        self.current_player.replace_initial_actor_at_i(player_actor_index, actor)
+        self.current_actors_text[player_actor_index] = actor
+
+
+    def set_current_player(self, player_slug):
+        self.current_player = eval(f'self.config.{player_slug}')
+        self.current_player_text = f"Current Player: {player_slug.upper()}"
+        self.current_actors_text = [*self.current_player.initial_actors]
+        for actor, btn in zip(self.current_player.initial_actors, self.buttons):
+            btn.current_index = self.actors.index(actor.upper())
+
+    def print_debug(self):
+        print(f"Config: {self.config.print_self()}")
+
+class ActorChoiceButton(Button):
+    text = StringProperty('initial_stuff')
+    current_index = NumericProperty(0)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.app = App.get_running_app()
+        self.app.player_config_screen.buttons.append(self)
+
+
+class ActorConfigButton(Button):
+    current_index = NumericProperty(0)
 
 class LogScreen(BoxLayout):
     msg_list = []
@@ -170,10 +221,12 @@ class PuzzleGrid(Factory.GridLayout):
         board_con.board_clean_selected_things(board=self)
 
         #I don't think this should be here...
-        self.game = Game(grid_size=self.grid_size, board=self,
-            ini_spaces=self.i_spaces, t_coords=self.t_coords)
 
         self.tiles_with_lines = []
+
+    def start_game(self):
+        self.game = Game(grid_size=self.grid_size, board=self,
+            ini_spaces=self.i_spaces, t_coords=self.t_coords)
 
     def add_line(self, target_tile, x0, y0, x1, y1):
         x0, y0, x1, y1 = int(x0), int(y0), int(x1), int(y1)
@@ -226,6 +279,7 @@ class PuzzleGrid(Factory.GridLayout):
         return self.grid[x][y]
 
     def create_grid(self, t_coords={}, i_spaces=[], actors=[]):
+        self.start_game()
         board_con.create_grid(board=self, size=self.grid_size,
                         t_coords=t_coords, i_spaces=i_spaces, actors=actors)
 

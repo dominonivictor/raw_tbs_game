@@ -1,56 +1,31 @@
 #:kivy 1.11
+#: include kv_files/config_screen.kv
+
 
 <ScreenMaster>:
-    MainGameScreen:
     MainMenuScreen:
+    PlayerConfigScreen:
+    MainGameScreen:
 
 <MainMenuScreen>:
     main_menu_screen: 'main_menu_screen'
     name: 'main_menu_screen'
     id: 'main_menu_screen'
-    Button:
-        id: 'main_menu_btn'
-        text: "Go to the Game!"
-        font_size: 50
-        on_release: root.start_game()
-
-<PlayerConfigScreen>:
-    player_config_screen: 'player_config_screen'
-    name: 'player_config_screen'
-    id: 'player_config_screen'
     BoxLayout:
-        orientation:'horizontal'
-        BoxLayout:
-            orientation: 'vertical'
-            Button:
-                text: 'P1'
-                on_release: self.set_current_player('p1')
-            Button:
-                text: 'P2'
-                on_release: self.set_current_player('p2')
+        orientation: 'vertical'
+        Button:
+            size_hint_y: 50
+            id: 'main_menu_btn'
+            text: "Go to the Game!"
+            font_size: 50
+            on_release: root.start_game()
+        Button:
+            size_hint_y: 50
+            id: 'config_screen_btn'
+            text: 'Go to Config Screen'
+            font_size: 50
+            on_release: root.config()
 
-        BoxLayout:
-            orientation:'vertical'
-            BoxLayout:
-                orientation:'horizontal'
-                Label:
-                    text: self.current_player.show_stuff(index=0)
-                Label:
-                    text: self.current_player.show_stuff(index=1)
-                Label:
-                    text: self.current_player.show_stuff(index=2)
-
-            BoxLayout:
-                orientation: 'horizontal'
-                Button:
-                    text: self.actors[self.current_index]
-                    on_release: self.cycle_actors()
-                Button:
-                    text: self.actors[self.current_index]
-                    on_release: self.cycle_actors()
-                Button:
-                    text: self.actors[self.current_index]
-                    on_release: self.cycle_actors()
 
 
 <PuzzleTile@ButtonBehavior+Label>

@@ -11,7 +11,7 @@ import functions.map_functions as map_funcs
 
 class Game():
     def __init__(self, **kwargs):
-        config = kwargs.get("config", Config())
+        config = Config
         self.state = game_states.START
         self.log = []
         self.event_list = []
@@ -87,7 +87,7 @@ class Game():
         from misc.entities_creation import create_actor
         if type(actors_list) == str:
             for actor_letter in actors_list:
-                player.add_actor(create_actor(actor_letter, self))
+                player.add_actor(create_actor(actor_letter.lower(), self))
         else:
             for actor in actors_list:
                 player.add_actor(actor)
