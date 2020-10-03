@@ -23,14 +23,18 @@ def get_attrs(*args, self=None):
             "self": self,
         }.get(obj)
 
-        #way too much logic inside these... should be cleaner
+        value = aimed_obj.value if hasattr(aimed_obj, "value") else None
+        final_value = aimed_obj.final_value if hasattr(aimed_obj, "final_value") else None
+        heal_value = aimed_obj.heal_value if hasattr(aimed_obj, "heal_value") else None
+        choices =  aimed_obj.choices if hasattr(aimed_obj, "choices") else None
+        timer = aimed_obj.timer if hasattr(aimed_obj, "timer") else None
         aimed_attr = {
             "name": aimed_obj.name,
-            "value": aimed_obj.value if hasattr(aimed_obj, "value") else None,
-            "final_value": aimed_obj.final_value if hasattr(aimed_obj, "final_value") else None,
-            "heal_value": aimed_obj.heal_value if hasattr(aimed_obj, "heal_value") else None,
-            "choices": aimed_obj.choices if hasattr(aimed_obj, "choices") else None,
-            "timer": aimed_obj.timer if hasattr(aimed_obj, "timer") else None,
+            "value": value,
+            "final_value": final_value,
+            "heal_value": heal_value,
+            "choices": choices,
+            "timer": timer,
         }.get(attr)
 
         result.append(aimed_attr)
@@ -79,6 +83,36 @@ VAMP_BITE = {
     "msg": "{} deals {} to {} and heals for {} hp!",
     "msg_function": get_attrs,
     "msg_args": ["owner name", "self final_value", "target name", "self heal_value"],
+}
+
+
+WIND_BLOW = {
+    "id": "wind_blow",
+    "name": "Wind Blow",
+    "value": base_atk, #only for commands that deal/heal <value> hp
+    "description": "Slashes the wind from a distance",
+    "category": "Basic Attack",
+    "is_raw": False,
+    "max_range": 4,
+    "msg": "{} attacks {} for {} damage!",
+    "msg_function": get_attrs,
+    "msg_args": ["owner name", "target name", "self final_value"],
+}
+
+POISON_TAIL = {
+    "id": "poison_tail",
+    "name": "Poisoned Tail",
+    "statuses_list": [
+        {"id": "poisoned", "value": 2, "timer": mid_timer,},
+    ],
+    "timer": mid_timer,
+    "value": 4,
+    "description": "Whips tail with poisoned effects",
+    "category": "Attack and DoT",
+    "max_range": 1,
+    "msg": "{} attacks {} for {} damage and {} is poisoned for {} turns",
+    "msg_function": get_attrs,
+    "msg_args": ["owner name", "target name", "self final_value", "target name", "self timer"],
 }
 
 ####################################
@@ -219,7 +253,7 @@ PARALIZE_SHOT = {
     # },
     "timer": short_timer,
     "value": base_atk - 1,
-    "description": "Shoots target and stuns for 2 turns",
+    "description": f"Shoots target and stuns for {short_timer - 1} turns",
     "category": "Attack and DoT",
     "max_range": 3,
     "msg": "{} shots {} for {} damage and stuns {} for {} turns",
@@ -261,6 +295,9 @@ MIXN = {
     "category": "Utility",
     "max_range": 3,
 }
+
+# Toxic Shot (already written above)
+# Money Bag Explosion (already written below)
 
 ####################################
 ######### STATUS COMMANDS ##########
@@ -342,7 +379,7 @@ WATERBALL = {
     "command_dict": {
         "attack": 3,
     },
-    "max_range": 1,
+    "max_range": 3,
     "msg": "{} deals damage!",
     "msg_function": get_attrs,
     "msg_args": ["target name"],
@@ -350,6 +387,23 @@ WATERBALL = {
 }
 
 
+WAVE_MONEY_BAG = {
+    "id": "wave_money_bag",
+    "name": "Wave Money Bag",
+    "value": 3, #only for commands that deal/heal <value> hp
+    "description": "Aoe attack in meelee range",
+    "category": "aoe",
+    "is_raw": False, # default is False, only valid for commands that use Attack()
+    # if is_raw is false it means the damage dealt will be "pure" (desregarding atk and def bonuses)
+    "command_dict": {
+        "attack": 5,
+    },
+    "max_range": 1,
+    "msg": "{} deals damage!",
+    "msg_function": get_attrs,
+    "msg_args": ["target name"],
+    "aoe_size": 1,
+}
 '''
 {
     "id": ,

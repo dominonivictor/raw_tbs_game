@@ -1,8 +1,61 @@
 #:kivy 1.11
 
+<ScreenMaster>:
+    MainGameScreen:
+    MainMenuScreen:
+
+<MainMenuScreen>:
+    main_menu_screen: 'main_menu_screen'
+    name: 'main_menu_screen'
+    id: 'main_menu_screen'
+    Button:
+        id: 'main_menu_btn'
+        text: "Go to the Game!"
+        font_size: 50
+        on_release: root.start_game()
+
+<PlayerConfigScreen>:
+    player_config_screen: 'player_config_screen'
+    name: 'player_config_screen'
+    id: 'player_config_screen'
+    BoxLayout:
+        orientation:'horizontal'
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                text: 'P1'
+                on_release: self.set_current_player('p1')
+            Button:
+                text: 'P2'
+                on_release: self.set_current_player('p2')
+
+        BoxLayout:
+            orientation:'vertical'
+            BoxLayout:
+                orientation:'horizontal'
+                Label:
+                    text: self.current_player.show_stuff(index=0)
+                Label:
+                    text: self.current_player.show_stuff(index=1)
+                Label:
+                    text: self.current_player.show_stuff(index=2)
+
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: self.actors[self.current_index]
+                    on_release: self.cycle_actors()
+                Button:
+                    text: self.actors[self.current_index]
+                    on_release: self.cycle_actors()
+                Button:
+                    text: self.actors[self.current_index]
+                    on_release: self.cycle_actors()
+
+
 <PuzzleTile@ButtonBehavior+Label>
     size_hint: None, None
-    size: "50dp", "50dp"
+    size: "45dp", "45dp"
     original_color: (1, 1, 1, .2)
     canvas.before:
         Color:
@@ -43,91 +96,97 @@
             width: 1
             rectangle: self.x, self.y, self.width, self.height
 
-BoxLayout:
-    orientation: 'horizontal'
-    #>>>>>>>>>>>>>>>>>>>> LEFT SIDE
+<MainGameScreen>:
+    main_game_screen: 'main_game_screen'
+    name: 'main_game_screen'
+    id: 'main_game_screen'
+    on_enter: puzzle.create_grid()
     BoxLayout:
-        orientation: 'vertical'
-        #>>>>>>>>>>>>>>>>>>>>>>>>> GRID
-        PuzzleGrid:
-            size_hint_y: 80
-            id: puzzle
-            rows: 1
-
-        #>>>>>>>>>>>>>>>>>>>>>>>>> Options Buttons
-        BoxLayout:
-            id: options
-            size_hint_y: 20
-            orientation: 'vertical'
-            MinorOptionsBox:
-                id: minor_options
-                canvas.before:
-                    Color:
-                        rgba: 0, 0.8, 0, 0.5
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-
-                Button:
-                    on_release: print("nice")
-            MajorOptionsBox:
-                id: major_options
-                BoxLayout:
-                    orientation: 'vertical'
-                    Button:
-                        id: 'pass_turn_btn'
-                        text: "pass turn"
-                        on_release:
-                            puzzle.pass_turn()
-                    CreateGridButton:
-                        id: 'create_grid_btn'
-                        text: "create grid"
-                        on_release:
-                            puzzle.create_grid()
-
-    #>>>>>>>>>>>>>>>>>>>>> RIGHT SIDE
-    BoxLayout:
-        orientation: 'vertical'
-        # >>>>>>>>>>>>>>>>>>>>>>>>> Stats Screen
+        orientation: 'horizontal'
+        #>>>>>>>>>>>>>>>>>>>> LEFT SIDE
         BoxLayout:
             orientation: 'vertical'
-            id: stats_screen
-            size_hint_y: 50
-            Label:
-                id: debug_label
-                size_hint_y: 10
-                text: "Actor Stats below (click on actor to check stats)"
-                bgcolor: [0, 0.8, 0.1, 0.6]
-                canvas.before:
-                    Color:
-                        rgba: self.bgcolor
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-            StatsPanel:
-                id: stats_panel
-                size_hint_y: 90
-                text: "Stats info here"
+            #>>>>>>>>>>>>>>>>>>>>>>>>> GRID
+            PuzzleGrid:
+                size_hint_y: 80
+                id: puzzle
+                name: puzzle
+                rows: 1
 
-        # >>>>>>>>>>>>>>>>>>>>>>>>>> LOG SCREEN
-        BoxLayout:
-            orientation: 'vertical'
-            id: log_screen
-            size_hint_y: 50
-            Label:
-                size_hint_y: 10
-                text: "Log Information bellow"
-                canvas.before:
-                    Color:
-                        rgba: (254/255, 94/255, 65/255, 0.5)
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-                    Line:
-                        width: 1
-                        rectangle: self.x, self.y, self.width, self.height
+            #>>>>>>>>>>>>>>>>>>>>>>>>> Options Buttons
             BoxLayout:
-                size_hint_y: 90
-                ScrollableLog:
-                    size_hint_x: 95
-                    id: log_text
+                id: options
+                size_hint_y: 20
+                orientation: 'vertical'
+                MinorOptionsBox:
+                    id: minor_options
+                    canvas.before:
+                        Color:
+                            rgba: 0, 0.8, 0, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+                    Button:
+                        on_release: print("nice")
+                MajorOptionsBox:
+                    id: major_options
+                    BoxLayout:
+                        orientation: 'vertical'
+                        Button:
+                            id: pass_turn_btn
+                            text: "pass turn"
+                            on_release:
+                                puzzle.pass_turn()
+                        CreateGridButton:
+                            id: create_grid_btn
+                            text: "create grid"
+                            on_release:
+                                puzzle.create_grid()
+
+        #>>>>>>>>>>>>>>>>>>>>> RIGHT SIDE
+        BoxLayout:
+            orientation: 'vertical'
+            # >>>>>>>>>>>>>>>>>>>>>>>>> Stats Screen
+            BoxLayout:
+                orientation: 'vertical'
+                id: stats_screen
+                size_hint_y: 50
+                Label:
+                    id: debug_label
+                    size_hint_y: 10
+                    text: "Actor Stats below (click on actor to check stats)"
+                    bgcolor: [0, 0.8, 0.1, 0.6]
+                    canvas.before:
+                        Color:
+                            rgba: self.bgcolor
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                StatsPanel:
+                    id: stats_panel
+                    size_hint_y: 90
+                    text: "Stats info here"
+
+            # >>>>>>>>>>>>>>>>>>>>>>>>>> LOG SCREEN
+            BoxLayout:
+                orientation: 'vertical'
+                id: log_screen
+                size_hint_y: 50
+                Label:
+                    size_hint_y: 10
+                    text: "Log Information bellow"
+                    canvas.before:
+                        Color:
+                            rgba: (254/255, 94/255, 65/255, 0.5)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                        Line:
+                            width: 1
+                            rectangle: self.x, self.y, self.width, self.height
+                BoxLayout:
+                    size_hint_y: 90
+                    ScrollableLog:
+                        size_hint_x: 95
+                        id: log_text

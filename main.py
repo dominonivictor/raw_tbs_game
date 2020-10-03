@@ -1,15 +1,17 @@
 from kivy.factory import Factory
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.properties import ListProperty, StringProperty
+from kivy.properties import ListProperty, StringProperty, ObjectProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.graphics.vertex_instructions import Line
 from kivy.graphics.context_instructions import Color
+from kivy.clock import Clock
 
 from game import Game
 
@@ -22,6 +24,35 @@ import controllers.log_controller as log_con
 
 from time import sleep
 
+
+class ScreenMaster(ScreenManager):
+    pass
+
+class MainMenuScreen(Screen):
+    main_menu_screen = ObjectProperty()
+
+    def start_game(self):
+        self.manager.current = "main_game_screen"
+
+class MainGameScreen(Screen):
+    main_game_screen = ObjectProperty()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_once(self._finish_init)
+
+    def _finish_init(self, dt):
+        app = App.get_running_app()
+        for id_key, obj in self.ids.items():
+            app.root.ids[id_key] = obj
+
+class PlayerConfigScreen(Screen):
+    current_index = 0 # IntegerProperty?
+    actors = ["actor1", "actor2", "actor3"]
+    def cycle_actors(self):
+        current_index = (current_index + 1)%len(self.actors)
+        
+        
 
 class LogScreen(BoxLayout):
     msg_list = []
@@ -163,7 +194,6 @@ class PuzzleGrid(Factory.GridLayout):
         self.add_line_path(from_coord, next_to_coord)
 
 
-
     def remove_lines(self):
         for tile in self.tiles_with_lines:
             tile.remove_lines()
@@ -215,13 +245,16 @@ class MoveLine(Widget):
         y0 = kwargs.get("y0")
         x1 = kwargs.get("x1")
         y1 = kwargs.get("y1")
-        print(f"VALUES: ({x0}, {y0}) ({y0}, {y1})")
+        # print(f"VALUES: ({x0}, {y0}) ({x1}, {y1})")
         with self.canvas.before:
             Color(0, 0, 1, 1)
             Line(points=[x0, y0, x1, y1], width=2)
 
 
 class GameApp(App):
+    def build(self):
+        return ScreenMaster()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Window.bind(mouse_pos=self.on_mouse_pos)
@@ -232,13 +265,16 @@ class GameApp(App):
         self.t_coords = kwargs.get("t_coords", g_cons.T_COORDS_RANDOM)
 
     def on_mouse_pos(self, window, pos):
-        for row in self.root.ids.puzzle.grid:
-            for tile in row:
-                if tile.collide_point(*pos):
-                    self.current_hover_tile = tile
-                    if self.current_hover_tile is not self.last_hover_tile:
-                        self.last_hover_tile = tile
-                        tile.on_hover()
+        try:
+            for row in self.root.ids.puzzle.grid:
+                for tile in row:
+                    if tile.collide_point(*pos):
+                        self.current_hover_tile = tile
+                        if self.current_hover_tile is not self.last_hover_tile:
+                            self.last_hover_tile = tile
+                            tile.on_hover()
+        except AttributeError:
+            pass
 
 
 if __name__ == '__main__':

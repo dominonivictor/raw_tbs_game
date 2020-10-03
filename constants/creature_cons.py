@@ -13,6 +13,7 @@ def_plus = 2
 def_minus = -1
 spd_plus = 1
 spd_minus = -1
+
 '''
 commands_ids:
 
@@ -27,6 +28,7 @@ commands_ids:
     "vamp_bite",
     "speed_up",
 '''
+
 creature_stats = {
     "f":{
         "animal": "fox",
@@ -103,7 +105,7 @@ creature_stats = {
         "income": base_income,
         "kingdom": "mamalia",
         "commands_ids":[
-            "attack",
+            "poison_tail",
             "toxic_shot",
             "power_up",
         ]
@@ -119,7 +121,7 @@ creature_stats = {
         "income": base_income,
         "kingdom": "aves",
         "commands_ids":[
-            "attack",
+            "wind_blow",
             "heal",
             "power_up",
         ]

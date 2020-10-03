@@ -1,35 +1,35 @@
 
 GUARDIAN ={
-    "name": "Guardian", 
-    "category": "Tank Utility", 
-    "commands_ids": ["perfect_counter"], 
+    "name": "Guardian",
+    "category": "Tank Utility",
+    "commands_ids": ["perfect_counter"],
     "status_ids": ["def_up"],
 }
 
 THIEF ={
-    "name": "Thief", 
-    "category": "DPS Utility", 
-    "commands_ids": ["copy_cat"], 
+    "name": "Thief",
+    "category": "DPS Utility",
+    "commands_ids": ["copy_cat"],
     "status_ids": ["spd_up"],
 }
-   
+
 HUNTER = {
-    "name": "Hunter", 
-    "category": "DPS Tank", 
-    "commands_ids": ["toxic_shot"], 
+    "name": "Hunter",
+    "category": "DPS Tank",
+    "commands_ids": ["toxic_shot"],
     "status_ids": ["atk_up"],
 }
 
 COOK = {
-    "name": "Cook", 
-    "category": "Tank Utility", 
-    "commands_ids": ["mixn"], 
+    "name": "Cook",
+    "category": "Tank Utility",
+    "commands_ids": ["mixn"],
     "status_ids": ["max_hp_up"],
 }
 
 MERCHANT = {
-    "name": "Merchant", 
-    "category": "Utility DPS", 
-    "commands_ids": ["mixn"], 
+    "name": "Merchant",
+    "category": "Utility DPS",
+    "commands_ids": ["wave_money_bag"],
     "status_ids": ["income_up"],
 }

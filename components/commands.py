@@ -377,6 +377,8 @@ def instaciate_commands_dict(**kwargs):
         'attack': Attack(**{**cons.ATTACK, **kwargs}),
         'heal': Heal(**{**cons.HEAL, **kwargs}),
         'vamp_bite': VampBite(**{**cons.VAMP_BITE, **kwargs}),
+        'wind_blow': Attack(**{**cons.WIND_BLOW, **kwargs}),
+        'poison_tail': Attack(**{**cons.POISON_TAIL, **kwargs}),
 
         'sun_charge': Command(**{**cons.SUN_CHARGE, **kwargs}),
         'golden_egg': GoldenEgg(**{**cons.GOLDEN_EGG, **kwargs}),
@@ -400,6 +402,7 @@ def instaciate_commands_dict(**kwargs):
         'regen': Command(**{**cons.REGEN, **kwargs}),
 
         'waterball': AOE(**{**cons.WATERBALL, **kwargs}),
+        'wave_money_bag': AOE(**{**cons.WAVE_MONEY_BAG, **kwargs}),
     }
     return commands_dict
 
