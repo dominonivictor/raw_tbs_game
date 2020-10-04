@@ -19,6 +19,8 @@ class UIMoveCommand():
         self.current_tile.rgba = self.board.game.grid[x][y].color
         self.current_tile.text = ""
         self.target_tile.text = self.target_tile.actor.letter
+        # EXPERIMENTAL:
+        self.target_tile.color = self.target_tile.actor.owner.color
         self.target_tile.set_color(colors.WALKABLE_BLUE)
 
         self.board.selected_tile = self.target_tile

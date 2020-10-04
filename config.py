@@ -1,9 +1,10 @@
 from player import Player
+from constants.colors import PLAYER_RED, PLAYER_BLUE
 
 
 class Config:
-    p1 = Player(name='P1')
-    p2 = Player(name='P2')
+    p1 = Player(name='P1', color=PLAYER_RED)
+    p2 = Player(name='P2', color=PLAYER_BLUE)
 
     @classmethod
     def set_player_initial_actors(self, player_slug, actors_str):

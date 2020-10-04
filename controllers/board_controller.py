@@ -260,6 +260,7 @@ def add_actor_at_xy(board, actor, x, y):
     tile = board.get_tile(x, y)
     game.add_actor_at_coord(actor, (x, y))
     tile.text = actor.letter
+    tile.color = actor.owner.color
     tile.actor = actor
     actor.update_pos(x=x, y=y)
 

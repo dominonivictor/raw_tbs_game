@@ -41,10 +41,10 @@ class Actor():
 
     def show_commands(self):
         return self.commands.show_commands()
-        
+
     def learn_job(self, job):
         job.learn(owner=self)
-        
+
     def add_equip(self, item):
         item.equip(owner=self)
 

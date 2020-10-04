@@ -1,3 +1,5 @@
+from constants.colors import PLAYER_BLUE
+
 class Player():
     def __init__(self, name="No named Player", **kwargs):
         self.name = name
@@ -5,6 +7,7 @@ class Player():
         self.equips = [None, None, None]
         self.jobs = [None, None, None]
         self.initial_actors = kwargs.get("initial_actors", "fff")
+        self.color = kwargs.get("color", PLAYER_BLUE)
 
     def replace_initial_actor_at_i(self, index, new_actor):
         actors = list(self.initial_actors)
