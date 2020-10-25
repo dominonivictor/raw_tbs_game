@@ -38,6 +38,10 @@ class MainMenuScreen(Screen):
     def config(self):
         self.manager.current = "player_config_screen"
 
+#####################################################
+############## GAME BOARD SCREEN ####################
+#####################################################
+
 class MainGameScreen(Screen):
     main_game_screen = ObjectProperty()
 
@@ -49,6 +53,10 @@ class MainGameScreen(Screen):
         app = App.get_running_app()
         for id_key, obj in self.ids.items():
             app.root.ids[id_key] = obj
+
+#####################################################
+############## PLAYER CONFIG SCREEN #################
+#####################################################
 
 class PlayerConfigScreen(Screen):
     player_config_screen = ObjectProperty()
@@ -105,16 +113,30 @@ class ActorChoiceButton(Button):
 class ActorConfigButton(Button):
     current_index = NumericProperty(0)
 
+
+#####################################################
+############## LOGS PANEL ###########################
+#####################################################
+
 class LogScreen(BoxLayout):
     msg_list = []
 
 class ScrollableLog(ScrollView):
     text = StringProperty('')
 
+#####################################################
+############## STATS PANEL ##########################
+#####################################################
+
 class StatsPanel(Label):
     rgba = ListProperty(colors.BASIC_BLACK)
     def update_actor_stats(self, actor):
         self.text = log_con.show_actor_stats(actor)
+
+
+#####################################################
+############## MAIN BOARD - BOTTOM MENU #############
+#####################################################
 
 class CreateGridButton(Button):
     def __init__(self, **kwargs):
@@ -149,6 +171,9 @@ class MajorOptionsBox(BoxLayout):
         super().__init__(**kwargs)
         btn_con.gen_major_box_widgets(self)
 
+#####################################################
+################# MAIN BOARD ########################
+#####################################################
 class PuzzleTile(ButtonBehavior, Label):
     rgba = ListProperty([*colors.BASIC_BLACK])
     original_color = None
@@ -305,6 +330,7 @@ class MoveLine(Widget):
             Line(points=[x0, y0, x1, y1], width=2)
 
 
+# MAIN APP 
 class GameApp(App):
     def build(self):
         return ScreenMaster()

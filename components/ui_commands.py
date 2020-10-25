@@ -11,6 +11,9 @@ class UIMoveCommand():
         current_coord = (self.current_tile.grid_x, self.current_tile.grid_y)
         target_coord = (self.target_tile.grid_x, self.target_tile.grid_y)
         actor = self.board.game.pop_actor_at_coord(current_coord)
+        if actor.has_died:
+            print(f"Actor {actor.name} is dead, he cannot move!")
+            return
         self.board.game.add_actor_at_coord(actor, target_coord)
         # UI board stuff
         self.target_tile.actor = actor

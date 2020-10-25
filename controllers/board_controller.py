@@ -101,7 +101,9 @@ def select_tile_normal_state(app, board, target_tile):
         selected_tile.set_color(selected_tile.get_original_color())
 
     actor = target_tile.actor if target_tile.actor else None
-    if actor and not actor.has_moved:
+    if actor and actor.has_died:
+        print(f"actor {actor.name} is dead!")
+    elif actor and not actor.has_moved:
         clean_tiles(board.movable_hl_tiles, board)
         clean_tiles(board.hl_tiles, board)
         clean_tiles(board.temp_hl_tiles, board)
@@ -120,7 +122,7 @@ def select_tile_targeting_state(board, target_tile):
     '''
     TAGS: BOARD, ACTOR
     '''
-    #This is a little better to read, but a bit messy...
+    # This is a little better to read, but a bit messy...
     app = App.get_running_app()
     log_text = app.root.ids.log_text
     if not board.selected_tile:
@@ -132,7 +134,10 @@ def select_tile_targeting_state(board, target_tile):
     else:
         current_tile = board.selected_tile
         actor = current_tile.actor
-        if board.selected_action == "move":
+        if actor.has_died:
+            log_text.text += "actor {actor.name} is dead!"
+            board.state = gs.NORMAL
+        elif board.selected_action == "move":
             tiles = board.movable_hl_tiles
             targeting_move(actor=actor, current_tile=current_tile, target_tile=target_tile, movable_tiles=tiles, board=board)
 
@@ -150,7 +155,9 @@ def targeting_move(actor, current_tile, target_tile, movable_tiles, board):
     #TOO MUCH LOGIC HERE, NEED TO MAKE FLOW EASIER TO READ
     app = App.get_running_app()
     log_text = app.root.ids.log_text
-    if actor.has_moved:
+    if actor.has_died:
+        log_text.text += "Actor is DEAD!\n"
+    elif actor.has_moved:
         log_text.text += "Actor has already moved!\n"
     elif target_tile.actor:
         log_text.text += "This tile is already ocuppied!\n"
@@ -195,9 +202,11 @@ def targeting_command(board, actor, target_tile, commandable_tiles):
         log_text.text += "Actor has already acted!\n"
     elif((target_tile.grid_x, target_tile.grid_y) not in commandable_tiles):
         log_text.text += "Attack out of range!\n"
-        clean_tiles(((x, y) for x, y in region(board.get_width(),
-                                            board.get_height())), board,
-                   color='last_color')
+        clean_tiles(
+                ((x, y) for x, y in region(board.get_width(),
+                 board.get_height())),
+                 board,
+                 color='last_color')
     else:
         target = target_tile.actor
         command.set_target(target)

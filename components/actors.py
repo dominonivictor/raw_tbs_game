@@ -33,7 +33,7 @@ class Actor():
         self.y = kwargs.get("y", 0)
         self.has_moved = False
         self.has_acted = False
-
+        self.has_died = False
         self.game_eye = GameEye.instance()
 
     def show_statuses(self):
@@ -85,23 +85,25 @@ class Actor():
         if self.job: self.job.pass_time()
 
     def take_damage(self, value):
-        hp = self.get_hp()
-        self.set_hp(hp - value if hp - value >= 0 else 0)
+        if not self.has_died:
+            hp = self.get_hp()
+            self.set_hp(hp - value if hp - value >= 0 else 0)
+            if self.hp_stat == 0:
+                self.has_died = True
 
     def heal_damage(self, value):
-        hp = self.get_hp()
-        max_hp = self.get_max_hp()
-        final_value = value + hp if hp + value <= max_hp else max_hp 
-        self.set_hp(final_value)
+        if not self.has_died:
+            hp = self.get_hp()
+            max_hp = self.get_max_hp()
+            final_value = value + hp if hp + value <= max_hp else max_hp
+            self.set_hp(final_value)
 
     def list_commands(self):
         return self.commands.list
 
     def has_command(self, command_id):
         for comm in self.commands.list:
-            if comm.id == command_id:
-                return True
-        
+            if comm.id == command_id: return True
         else: return False
 
     def get_command_by_id(self, id_):
@@ -116,7 +118,7 @@ class Actor():
                 return True
 
         else: return False
-    
+
     def get_status(self, status_id):
         for status in self.statuses.list:
             if status.id == status_id:
