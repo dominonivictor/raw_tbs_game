@@ -1,6 +1,7 @@
 from constants import colors
 
-class UIMoveCommand():
+
+class UIMoveCommand:
     def __init__(self, **kwargs):
         self.current_tile = kwargs.get("current_tile")
         self.target_tile = kwargs.get("target_tile")
@@ -31,4 +32,3 @@ class UIMoveCommand():
         # actor stuff
         actor.update_pos(self.target_tile.grid_x, self.target_tile.grid_y)
         actor.has_moved = True
-

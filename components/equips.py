@@ -1,10 +1,12 @@
 import constants.equips_cons as con
 from components.statuses import PassivesList
 
-class Equip():
-    '''
+
+class Equip:
+    """
         What i want this to do: handle an Equip object, with its commands, passives and elements
-    '''
+    """
+
     def __init__(self, **kwargs):
         self.id = kwargs.get("id")
         self.name = kwargs.get("name", "Lostvayne")
@@ -13,10 +15,11 @@ class Equip():
         self.element = kwargs.get("element", None)
         self.owner = kwargs.get("owner", None)
 
-        #need to get this ready, not process it here...
+        # need to get this ready, not process it here...
         from components.statuses import get_new_statuses_by_ids
+
         status_list = kwargs.get("statuses", [])
-        #all of statuses here will be passives, so the timer will be set to -1 (infinite until removed)
+        # all of statuses here will be passives, so the timer will be set to -1 (infinite until removed)
         self.passives = PassivesList()
         passives = get_new_statuses_by_ids(status_list=status_list)
         for passive in passives:
@@ -31,12 +34,12 @@ class Equip():
         self.owner = owner
         for command in self.commands:
             command.owner = self.owner
-            #TODO knows too much of actors internals... simplify api
+            # TODO knows too much of actors internals... simplify api
             self.owner.commands.add_command(command, category="equip")
 
         for passive in self.passives.list:
             passive.set_owner(self.owner)
-            #TODO knows too much of actors internals... simplify api
+            # TODO knows too much of actors internals... simplify api
             self.owner.statuses.add_status(passive)
 
         self.owner.equip = self
@@ -52,10 +55,11 @@ class Equip():
             self.owner = None
 
     def add_element(self, element):
-        #go into added command and apply the status thingy
+        # go into added command and apply the status thingy
         if self.element:
             self.remove_element(self.element)
         from components.elements import get_new_element_by_id
+
         new_element = get_new_element_by_id(id=element.id)
         new_element.owner = self
         for command in self.commands:
@@ -80,6 +84,7 @@ class Equip():
 
     def add_command(self, command_id):
         from components.commands import get_new_command_by_id
+
         for comm in self.commands:
             if comm.id == command_id:
                 return
@@ -95,6 +100,7 @@ class Equip():
 
     def has_element(self):
         return bool(self.element)
+
 
 def get_new_equip_by_id(**kwargs):
     equips = {

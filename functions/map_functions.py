@@ -1,7 +1,7 @@
 import constants.colors as colors
 from random import randint
 
-#TODO TOO MUCH REPETITION
+# TODO TOO MUCH REPETITION
 def random_map_cost_tile_gen():
     r = randint(1, 12)
     if r in [1, 2]:
@@ -16,8 +16,9 @@ def random_map_cost_tile_gen():
 
     return move_cost, tile_color
 
+
 def defined_map_cost_tile_gen(x, y, t_coords):
-    '''this is kinda messy and not so reusable...'''
+    """this is kinda messy and not so reusable..."""
     if (x, y) in t_coords["mountain"]:
         move_cost = 3
         tile_color = colors.MOUNTAIN_ORANGE

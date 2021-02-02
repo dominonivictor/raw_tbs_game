@@ -26,9 +26,9 @@ SHIELD = {
     "equip_id": "shield",
 }
 
-'''
+"""
     "name": ,
     "description": ,
     "category": "equip",
     "equip_id": ,
-'''
+"""

@@ -1,12 +1,11 @@
-
-GUARDIAN ={
+GUARDIAN = {
     "name": "Guardian",
     "category": "Tank Utility",
     "commands_ids": ["perfect_counter"],
     "status_ids": ["def_up"],
 }
 
-THIEF ={
+THIEF = {
     "name": "Thief",
     "category": "DPS Utility",
     "commands_ids": ["copy_cat"],

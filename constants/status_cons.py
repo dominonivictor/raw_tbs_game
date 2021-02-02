@@ -1,4 +1,4 @@
-'''
+"""
 {
     "name":,
     "base_name": ,
@@ -24,7 +24,7 @@ categories:
     special_buff
     attr_buff
     hp_buff
-'''
+"""
 ##################### SPECIAL EFFECTS ##########################
 STUNNED = {
     "id": "stunned",
@@ -32,7 +32,6 @@ STUNNED = {
     "base_name": "stunned",
     "timer": 2,
     "category": "special_status",
-    
 }
 
 PERFECT_COUNTER_STANCE = {
@@ -40,7 +39,7 @@ PERFECT_COUNTER_STANCE = {
     "name": "Perfect Counter Stance",
     "base_name": "perfect_counter_stance",
     "timer": 2,
-    "category": "special_status"
+    "category": "special_status",
 }
 
 
@@ -98,7 +97,7 @@ INCOME_UP = {
 ########################## DMG/HEAL BUFFS ##########################
 REGENERATING = {
     "id": "regen",
-    "name":"Regenerating",
+    "name": "Regenerating",
     "base_name": "hot",
     "value": 2,
     "timer": 4,
@@ -122,4 +121,3 @@ BURNED = {
     "timer": 3,
     "category": "hp_change",
 }
-

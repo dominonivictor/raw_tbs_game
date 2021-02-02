@@ -1,7 +1,8 @@
 import pytest
 from factories.actor_factory import get_new_actor
 from factories.equip_factory import get_new_equip
-'''
+
+"""
 ### BASICS
 attack OK
 heal OK
@@ -33,15 +34,17 @@ regen
 ### LEARN/EQUIP
 learn_job_command OK
 equip_equip_command OK
-'''
+"""
+
 
 @pytest.fixture
 def actor():
     return get_new_actor(test=True)
 
+
 ############# BASICS
 def test_atk(actor):
-    #TODO test knows too much of the names of ids
+    # TODO test knows too much of the names of ids
     attacking_actor = get_new_actor(test=True)
     attack = attacking_actor.get_command_by_id("attack")
     attack.set_target(actor)
@@ -50,8 +53,9 @@ def test_atk(actor):
 
     assert actor.get_hp() < hp_before
 
+
 def test_heal(actor):
-    #TODO test knows too much of actor and command internals
+    # TODO test knows too much of actor and command internals
     heal = actor.get_command_by_id("heal")
     hp_before = actor.get_hp()
 
@@ -63,6 +67,7 @@ def test_heal(actor):
     actor.take_damage(value=dmg_taken)
     heal.execute()
     assert actor.get_hp() == hp_before - dmg_taken + heal.value
+
 
 def test_vamp_bite(actor):
     attacking_actor = get_new_actor(test=True)
@@ -78,10 +83,12 @@ def test_vamp_bite(actor):
     assert attacking_actor.get_hp() > attacker_hp_before
     assert actor.get_hp() < victim_hp_before
 
+
 ############# KINGDOM
 
+
 def test_sun_charge(actor):
-    #TODO test knows too much of actor and command internals
+    # TODO test knows too much of actor and command internals
     atk_before = actor.get_atk()
     def_before = actor.get_def()
     spd_before = actor.get_spd()
@@ -89,13 +96,24 @@ def test_sun_charge(actor):
     sun_charge.set_target(actor)
     sun_charge.execute()
 
-    assert actor.get_atk() > atk_before and actor.get_def() > def_before and actor.get_spd() > spd_before
+    assert (
+        actor.get_atk() > atk_before
+        and actor.get_def() > def_before
+        and actor.get_spd() > spd_before
+    )
+
 
 def test_golden_egg(actor):
     golden_egg = actor.get_command_by_id("golden_egg")
+
     def get_stats_sum(actor):
-        stats_sum = (actor.get_hp() + actor.get_atk() + actor.get_def() +
-               actor.get_spd() + actor.get_inc())
+        stats_sum = (
+            actor.get_hp()
+            + actor.get_atk()
+            + actor.get_def()
+            + actor.get_spd()
+            + actor.get_inc()
+        )
         return stats_sum
 
     stats_before = get_stats_sum(actor)
@@ -104,7 +122,8 @@ def test_golden_egg(actor):
 
     assert stats_before < get_stats_sum(actor)
 
-'''
+
+"""
 def multiply(actor):
     #How do I tackle this???
     #maybe just check the return?
@@ -114,7 +133,7 @@ def multiply(actor):
     multi = actor.get_command_by_id("multiply")
 
     pass
-'''
+"""
 
 ############# JOBS
 def test_perfect_counter(actor):
@@ -124,8 +143,9 @@ def test_perfect_counter(actor):
 
     assert actor.has_status("perfect_counter_stance")
 
+
 def test_copy_cat(actor):
-    #still needs to test the forget method
+    # still needs to test the forget method
     thief = get_new_actor(commands_ids=["copy_cat"])
     length_before = len(thief.list_commands())
     copy_cat = thief.get_command_by_id("copy_cat")
@@ -136,9 +156,10 @@ def test_copy_cat(actor):
     copy_cat.execute()
     assert len(thief.list_commands()) == length_before
 
+
 def test_mixn(actor):
-    #this requires more setup... need to generate equip and to test equip maybe not
-    #attacking with elemental equip is another thing...
+    # this requires more setup... need to generate equip and to test equip maybe not
+    # attacking with elemental equip is another thing...
     equip = get_new_equip()
     actor_with_equip = get_new_actor(equip=equip)
     mixn = actor.get_command_by_id("mixn")
@@ -146,6 +167,7 @@ def test_mixn(actor):
     mixn.execute()
 
     assert equip.has_element()
+
 
 ############# EQUIPS
 def test_true_slash(actor):
@@ -157,11 +179,12 @@ def test_true_slash(actor):
 
     assert hp_before > actor.get_hp()
 
+
 def test_toxic_shot(actor):
     attacking_actor = get_new_actor(test=True)
     toxic_shot = attacking_actor.get_command_by_id("toxic_shot")
     toxic_shot.set_target(actor)
-    #TODO this is messy, knows too much of internals
+    # TODO this is messy, knows too much of internals
     hp_before = actor.get_hp()
     timer = toxic_shot.statuses.list[0].timer
     value = toxic_shot.statuses.list[0].value
@@ -170,6 +193,7 @@ def test_toxic_shot(actor):
     assert actor.has_status("poisoned")
     assert actor.get_status("poisoned")
     assert actor.get_hp() < hp_before
+
 
 def test_shield_bash(actor):
     shield_bash = actor.get_command_by_id("shield_bash")
@@ -180,6 +204,7 @@ def test_shield_bash(actor):
     assert actor.has_status("stunned")
     assert hp_before > actor.get_hp()
 
+
 def test_rage_soup(actor):
     atk_before = actor.get_atk()
     def_before = actor.get_def()
@@ -189,6 +214,7 @@ def test_rage_soup(actor):
 
     assert actor.get_atk() > atk_before and actor.get_def() < def_before
 
+
 def test_paralize_shot(actor):
     para_shot = actor.get_command_by_id("paralize_shot")
     hp_before = actor.get_hp()
@@ -197,14 +223,16 @@ def test_paralize_shot(actor):
 
 
 ############# STATUSES
-'''There is a slight problem here that these commands are kinda testing the
+"""There is a slight problem here that these commands are kinda testing the
 command but are also testing the status behavior... these should be separated!
-'''
+"""
+
+
 def test_power_up(actor):
-    #TODO test knows too much of statuses internals
+    # TODO test knows too much of statuses internals
     power_up = actor.get_command_by_id("power_up")
     actor_atk_before = actor.get_atk()
-    power_up.set_target(actor)  #this is done by the tile selection
+    power_up.set_target(actor)  # this is done by the tile selection
     value = power_up.get_statuses_values(pos=0)
     timer = power_up.get_timer()
     power_up.execute()
@@ -214,10 +242,11 @@ def test_power_up(actor):
         actor.pass_time()
     assert actor_atk_before == actor.get_atk()
 
+
 def test_defense_up(actor):
     defense_up = actor.get_command_by_id("defense_up")
     actor_def_before = actor.get_def()
-    defense_up.set_target(actor)  #this is done by the tile selection
+    defense_up.set_target(actor)  # this is done by the tile selection
     value = defense_up.get_statuses_values(pos=0)
     timer = defense_up.get_timer()
     defense_up.execute()
@@ -227,10 +256,11 @@ def test_defense_up(actor):
         actor.pass_time()
     assert actor_def_before == actor.get_def()
 
+
 def test_speed_up(actor):
     speed_up = actor.get_command_by_id("speed_up")
     actor_spd_before = actor.get_spd()
-    speed_up.set_target(actor)  #this is done by the tile selection
+    speed_up.set_target(actor)  # this is done by the tile selection
     value = speed_up.get_statuses_values(pos=0)
     timer = speed_up.get_timer()
     speed_up.execute()
@@ -239,6 +269,7 @@ def test_speed_up(actor):
     for _ in range(timer):
         actor.pass_time()
     assert actor_spd_before == actor.get_spd()
+
 
 def test_regen(actor):
     regen = actor.get_command_by_id("regen")
@@ -255,13 +286,15 @@ def test_regen(actor):
     actor.pass_time()
     assert not actor.has_status("regen")
 
+
 ############# LEARN/EQUIP
 def test_learn_job_command():
-    #TODO test knows too much of actor and command internals
+    # TODO test knows too much of actor and command internals
     actor = get_new_actor()
     actor2 = get_new_actor()
 
     from components.jobs_commands import gen_jobs_list
+
     commands_length = len(actor.list_commands())
     status_length = len(actor.list_statuses())
 
@@ -271,18 +304,22 @@ def test_learn_job_command():
     job_command2.set_target(actor2)
     job_command.execute()
     job_command2.execute()
-    #too many asserts!!!!!
+    # too many asserts!!!!!
     assert actor.job is job_command.job
     assert job_command.job.name == "Guardian"
     assert commands_length + 1 == len(actor.list_commands())
     assert commands_length + 1 == len(actor2.list_commands())
-    assert status_length + 1 == len(actor.list_statuses()) == len(actor2.list_statuses())
-    #test knows too much of actor internals
+    assert (
+        status_length + 1 == len(actor.list_statuses()) == len(actor2.list_statuses())
+    )
+    # test knows too much of actor internals
     assert actor.list_commands()[-1].id == actor2.list_commands()[-1].id
 
+
 def test_equip_equip_command(actor):
-    #TODO test is giving kind of a false positive, when clicking on the actor we get an error... 
+    # TODO test is giving kind of a false positive, when clicking on the actor we get an error...
     from components.equips_commands import gen_equips_list
+
     equip_command = gen_equips_list()[0]
     equip_command.set_target(actor)
     equip_command.execute()
@@ -293,11 +330,13 @@ def test_equip_equip_command(actor):
 ############## AOE
 def create_mock_game_board(grid_size):
     grid = [[Tile() for _ in range(grid_size)] for _ in range(grid_size)]
-    return list(map(list, zip(*grid))) #doing this to transpose, is it needed though?
+    return list(map(list, zip(*grid)))  # doing this to transpose, is it needed though?
+
 
 from map_objects.tile import Tile
 
-class MockGame():
+
+class MockGame:
     def __init__(self):
 
         grid = [[Tile() for _ in range(3)] for _ in range(3)]
@@ -311,7 +350,6 @@ class MockGame():
 
     def get_actor_on_xy(self, x, y):
         return self.grid[x][y].actor
-
 
 
 def test_waterball(actor):
@@ -329,12 +367,9 @@ def test_waterball(actor):
 
     mock_game.set_actor_on_xy(target_out_of_range, 0, 0)
     mock_game.set_actor_on_xy(target_in_range, 1, 1)
-    #put actors on the board
+    # put actors on the board
     waterball.set_target_pos((1, 1))
     waterball.execute()
 
     assert target_in_range.get_hp() < in_range_hp_before
     assert target_out_of_range.get_hp() == out_range_hp_before
-
-
-

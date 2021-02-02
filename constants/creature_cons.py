@@ -1,4 +1,3 @@
-
 base_hp = 25
 base_atk = 3
 base_def = 1
@@ -14,7 +13,7 @@ def_minus = -1
 spd_plus = 1
 spd_minus = -1
 
-'''
+"""
 commands_ids:
 
     "attack",
@@ -27,10 +26,10 @@ commands_ids:
     "defense_up",
     "vamp_bite",
     "speed_up",
-'''
+"""
 
 creature_stats = {
-    "f":{
+    "f": {
         "animal": "fox",
         "letter": "F",
         "name": "Rogue",
@@ -40,13 +39,9 @@ creature_stats = {
         "spd": base_spd,
         "income": base_income,
         "kingdom": "mamalia",
-        "commands_ids":[
-            "attack",
-            "vamp_bite",
-            "speed_up",
-        ]
+        "commands_ids": ["attack", "vamp_bite", "speed_up",],
     },
-    "t":{
+    "t": {
         "animal": "turtle",
         "letter": "T",
         "name": "Kami",
@@ -56,13 +51,9 @@ creature_stats = {
         "spd": base_spd + spd_minus,
         "income": base_income,
         "kingdom": "reptalia",
-        "commands_ids":[
-            "waterball",
-            "regen",
-            "defense_up",
-        ]
+        "commands_ids": ["waterball", "regen", "defense_up",],
     },
-    "c":{
+    "c": {
         "animal": "chicken",
         "letter": "C",
         "name": "Bugh Cohk",
@@ -72,13 +63,9 @@ creature_stats = {
         "spd": base_spd + spd_plus,
         "income": base_income,
         "kingdom": "aves",
-        "commands_ids":[
-            "attack",
-            "rage",
-            "speed_up",
-        ]
+        "commands_ids": ["attack", "rage", "speed_up",],
     },
-    "a":{
+    "a": {
         "animal": "alligator",
         "letter": "A",
         "name": "Shrek",
@@ -88,13 +75,9 @@ creature_stats = {
         "spd": base_spd + spd_minus,
         "income": base_income,
         "kingdom": "reptalia",
-        "commands_ids":[
-            "attack",
-            "vamp_bite",
-            "power_up",
-        ]
+        "commands_ids": ["attack", "vamp_bite", "power_up",],
     },
-    "p":{
+    "p": {
         "animal": "platypus",
         "letter": "P",
         "name": "Perry",
@@ -104,13 +87,9 @@ creature_stats = {
         "spd": base_spd + spd_minus,
         "income": base_income,
         "kingdom": "mamalia",
-        "commands_ids":[
-            "poison_tail",
-            "toxic_shot",
-            "power_up",
-        ]
+        "commands_ids": ["poison_tail", "toxic_shot", "power_up",],
     },
-    "o":{
+    "o": {
         "animal": "owl",
         "letter": "O",
         "name": "Owrly",
@@ -120,15 +99,11 @@ creature_stats = {
         "spd": base_spd,
         "income": base_income,
         "kingdom": "aves",
-        "commands_ids":[
-            "wind_blow",
-            "heal",
-            "power_up",
-        ]
+        "commands_ids": ["wind_blow", "heal", "power_up",],
     },
 }
 
-'''
+"""
     "":{
         "animal": ,
         "letter": ,
@@ -145,4 +120,4 @@ creature_stats = {
         ]
     },
 
-'''
+"""

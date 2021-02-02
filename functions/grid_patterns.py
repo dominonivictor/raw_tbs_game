@@ -1,9 +1,11 @@
-#this needs to be converted into a function, accepting some params like size or style
+# this needs to be converted into a function, accepting some params like size or style
+
 
 def region(row_f, col_f, row_i=0, col_i=0):
     for row in range(row_i, row_f + 1):
         for col in range(col_i, col_f + 1):
             yield row, col
+
 
 def create_grid_coords(size=1):
     coords = set()

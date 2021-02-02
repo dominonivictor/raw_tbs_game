@@ -1,4 +1,4 @@
-'''
+"""
 {
     "name": ,
     "value": ,
@@ -6,7 +6,7 @@
     "commands_ids": [],
     "category": ,
 }
-'''
+"""
 ZARABA = {
     "id": "zarabatana",
     "name": "Zarabatana",
@@ -23,7 +23,6 @@ DAGGER = {
     "statuses_list": [],
     "commands_ids": ["true_slash"],
     "category": "meelee",
-
 }
 
 CAULDRON = {
@@ -39,9 +38,7 @@ SHIELD = {
     "id": "shield",
     "name": "Shield",
     "value": 3,
-    "statuses_list": [
-        {"id": "def_up", "value": 2, "timer": -1},
-    ],
+    "statuses_list": [{"id": "def_up", "value": 2, "timer": -1},],
     "commands_ids": ["shield_bash"],
     "category": "meelee",
 }

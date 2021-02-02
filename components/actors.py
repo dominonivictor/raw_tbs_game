@@ -3,7 +3,7 @@ from components.command_list import CommandList
 from game_eye import GameEye
 
 
-class Actor():
+class Actor:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name", "Nameless")
         self.letter = kwargs.get("letter", "X")
@@ -19,8 +19,8 @@ class Actor():
         self.statuses = StatusManager()
         self.statuses.owner = self
 
-        commands_ids = kwargs.get("commands_ids", [])
-        self.commands = CommandList(owner=self, raw_commands_ids=commands_ids)
+        raw_commands_ids = kwargs.get("commands_ids", [])
+        self.commands = CommandList(owner=self, raw_commands_ids=raw_commands_ids)
         self.job = kwargs.get("job", None)
         if self.job:
             self.learn_job(job)
@@ -44,6 +44,9 @@ class Actor():
 
     def learn_job(self, job):
         job.learn(owner=self)
+    
+    def forget_job(self):
+        self.job.forget()
 
     def add_equip(self, item):
         item.equip(owner=self)
@@ -81,8 +84,10 @@ class Actor():
     def pass_time(self):
         self.commands.pass_time()
         self.statuses.pass_time()
-        if self.equip: self.equip.pass_time()
-        if self.job: self.job.pass_time()
+        if self.equip:
+            self.equip.pass_time()
+        if self.job:
+            self.job.pass_time()
 
     def take_damage(self, value):
         if not self.has_died:
@@ -103,8 +108,9 @@ class Actor():
 
     def has_command(self, command_id):
         for comm in self.commands.list:
-            if comm.id == command_id: return True
-        else: return False
+            if comm.id == command_id:
+                return True
+        return False
 
     def get_command_by_id(self, id_):
         return self.commands.get_command_by_id(id_)
@@ -113,18 +119,15 @@ class Actor():
         return self.statuses.list
 
     def has_status(self, status_id):
-        for status in self.statuses.list:
-            if status.id == status_id:
-                return True
-
-        else: return False
+        return self.statuses.has_status(status_id)
 
     def get_status(self, status_id):
         for status in self.statuses.list:
             if status.id == status_id:
                 return status
 
-        else: return None
+        else:
+            return None
 
     def get_hp(self):
         return self.hp_stat
@@ -171,6 +174,7 @@ class Actor():
 
     def set_y(self, y):
         self.y = y
+
     def get_x(self):
         return self.x
 

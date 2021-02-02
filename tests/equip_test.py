@@ -3,9 +3,11 @@ from factories.actor_factory import get_new_actor
 from factories.equip_factory import get_new_equip
 import constants.equips_cons as cons
 
+
 @pytest.fixture
 def actor():
     return get_new_actor(test=True)
+
 
 def test_zarabatana():
     equip = get_new_equip(**cons.ZARABA)

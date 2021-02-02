@@ -1,38 +1,39 @@
 from components.actors import Actor
 
+
 def get_new_actor(**kwargs):
     test = kwargs.get("test", False)
 
     if test:
-        #This list follows exactly the commands.py commands_dict
-        #duplication in this case is dangerous, if i mistype or forget
-        #it will bite me later...
+        # This list follows exactly the commands.py commands_dict
+        # duplication in this case is dangerous, if i mistype or forget
+        # it will bite me later...
         commands_ids = [
-            #BASICS
+            # BASICS
             "attack",
             "heal",
             "vamp_bite",
-            #KINGDOM 
+            # KINGDOM
             "sun_charge",
             "golden_egg",
             "multiply",
-            #JOBS
+            # JOBS
             "perfect_counter",
             "copy_cat",
             "mixn",
-            #EQUIPS 
+            # EQUIPS
             "true_slash",
             "toxic_shot",
             "shield_bash",
             "rage",
             "paralize_shot",
-            #STATUSES
+            # STATUSES
             "power_up",
             "defense_up",
             "speed_up",
             "regen",
-            #AOE
+            # AOE
             "waterball",
         ]
-        kwargs ={**kwargs, **{"commands_ids": commands_ids}}
-    return Actor(**kwargs) 
+        kwargs = {**kwargs, **{"commands_ids": commands_ids}}
+    return Actor(**kwargs)

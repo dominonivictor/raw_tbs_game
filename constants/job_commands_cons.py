@@ -1,6 +1,7 @@
 import components.jobs as jobs
 import constants.job_cons as cons
-#TODO this is wrong cause the instances are static...
+
+# TODO this is wrong cause the instances are static...
 BASE = {
     "name": "go get a job",
     "description": "Getchoself a job",
@@ -43,9 +44,9 @@ COOK = {
 }
 
 
-'''
+"""
     "name": ,
     "description": ,
     "category": "learn_job",
     "job": ,
-'''
+"""

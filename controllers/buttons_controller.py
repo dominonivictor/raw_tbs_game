@@ -4,14 +4,18 @@ import misc.game_states as gs
 
 from components.jobs_commands import gen_jobs_list
 from components.equips_commands import gen_equips_list
-from controllers.board_controller import (highlight_attackable_spaces,
-clean_tiles, clean_hl_tiles)
+from controllers.board_controller import (
+    highlight_attackable_spaces,
+    clean_tiles,
+    clean_hl_tiles,
+)
+
 
 def minor_btn_on_press(minor_btn):
-    '''
+    """
     TAGS: BOARD, COMMAND?
-    '''
-    #needs to know too much of the board...? kinda yeah... also about the framework...
+    """
+    # needs to know too much of the board...? kinda yeah... also about the framework...
     app = App.get_running_app()
     board = app.root.ids.puzzle
     board.set_selected_action("command")
@@ -19,15 +23,15 @@ def minor_btn_on_press(minor_btn):
     board.selected_command = command
     start_tile = board.selected_tile
 
-    clean_hl_tiles(board, color='original_color')
+    clean_hl_tiles(board, color="original_color")
     highlight_attackable_spaces(command, start_tile)
     board.state = gs.TARGETING
 
 
 def minor_box_update_list(box, new_list):
-    '''
+    """
     TAGS: BTN BOX, COMMAND?
-    '''
+    """
     box.clear_widgets()
     box.current_list = []
     if new_list:
@@ -41,9 +45,9 @@ def minor_box_update_list(box, new_list):
 
 
 def major_move_btn():
-    '''
+    """
     TAGS: BOARD, LOG_TEXT
-    '''
+    """
     app = App.get_running_app()
     log_text = app.root.ids.log_text
     board = app.root.ids.puzzle
@@ -55,41 +59,45 @@ def major_move_btn():
     else:
         log_text.text += "No actor selected\n"
 
+
 def major_btn_update_minor_box(new_list):
-    '''
+    """
     TAGS: MINOR BOX, BOARD, LOG_TEXT
-    '''
+    """
     app = App.get_running_app()
     board = app.root.ids.puzzle
     minor_box = app.root.ids.minor_options
 
-    #needs to be commands    
+    # needs to be commands
     board.state = gs.TARGETING
     board.selected_action = "command"
-    minor_box.update_commands_list(new_list) #jobs_list comes from import
+    minor_box.update_commands_list(new_list)  # jobs_list comes from import
+
 
 def gen_major_box_widgets(box):
-    '''
+    """
     TAGS: MAJOR BOX
-    '''
+    """
     from main import MajorOptionsButton
-    #too hard coded! but okish
+
+    # too hard coded! but okish
     text_list = ["move", "learn_job", "equip_equip"]
     box.btns_list = (MajorOptionsButton(text=t) for t in text_list)
 
     for btn in box.btns_list:
         box.add_widget(btn)
 
+
 def handle_major_options_btns(box):
-    '''
+    """
     TAGS: MAJOR BOX
-    '''
-    if box.text == 'move':
+    """
+    if box.text == "move":
         major_move_btn()
-    elif box.text == 'learn_job':
+    elif box.text == "learn_job":
         jobs_list = gen_jobs_list()
         major_btn_update_minor_box(jobs_list)
-    elif box.text == 'equip_equip':
+    elif box.text == "equip_equip":
         equips_list = gen_equips_list()
         major_btn_update_minor_box(equips_list)
     else:
