@@ -1,7 +1,12 @@
 from kivy.factory import Factory
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.properties import ListProperty, StringProperty, ObjectProperty, NumericProperty
+from kivy.properties import (
+    ListProperty,
+    StringProperty,
+    ObjectProperty,
+    NumericProperty,
+)
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
@@ -9,6 +14,7 @@ from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.popup import Popup
 from kivy.graphics.vertex_instructions import Line
 from kivy.graphics.context_instructions import Color
 from kivy.clock import Clock
@@ -27,20 +33,48 @@ from time import sleep
 
 
 class ScreenMaster(ScreenManager):
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.app = App.get_running_app()
+        self.app.screen_manager = self
+
+
+def make_popup_btn():
+    btn = Button(text="Exit Popup")
+    pop = Popup(content=btn, auto_dismiss=True, size=(400, 400), size_hint=(None, None))
+    btn.bind(on_release=pop.dismiss)
+    return pop
+
+
+class PopButton(Button):
+    def on_release(self):
+        self.make_popup_btn()
+
+    def make_popup_btn(self):
+        make_popup_btn()
 
 class MainMenuScreen(Screen):
     main_menu_screen = ObjectProperty()
+    pass
 
-    def start_game(self):
+    def make_popup_btn(self):
+        btn = Button(text="Cool Text")
+        pop = Popup(
+            content=btn, auto_dismiss=True, size=(400, 400), size_hint=(None, None)
+        )
+        btn.bind(on_release=self.start_game)
+        pop.open()
+
+    def start_game(self, *args):
         self.manager.current = "main_game_screen"
 
-    def config(self):
+    def config(self, *args):
         self.manager.current = "player_config_screen"
 
 #####################################################
 ############## GAME BOARD SCREEN ####################
 #####################################################
+
 
 class MainGameScreen(Screen):
     main_game_screen = ObjectProperty()
@@ -54,21 +88,20 @@ class MainGameScreen(Screen):
         for id_key, obj in self.ids.items():
             app.root.ids[id_key] = obj
 
+
 #####################################################
 ############## PLAYER CONFIG SCREEN #################
 #####################################################
+
 
 class PlayerConfigScreen(Screen):
     player_config_screen = ObjectProperty()
     current_index = NumericProperty(0)
     actors = "foaptc".upper()
-    #actors = ["actor1", "actor2", "actor3"]
     current_player = Config.p1
     config = Config
-    current_player_text = StringProperty('Current Player: P1')
-    current_actors_text = ListProperty([
-        *current_player.initial_actors,
-        ])
+    current_player_text = StringProperty("Current Player: P1")
+    current_actors_text = ListProperty([*current_player.initial_actors,])
     buttons = []
 
     def __init__(self, **kwargs):
@@ -77,22 +110,19 @@ class PlayerConfigScreen(Screen):
         app.player_config_screen = self
 
     def go_to_main_menu(self):
-        self.manager.current = 'main_menu_screen'
-
+        self.manager.current = "main_menu_screen"
 
     def current_player_actor(self, index):
         return self.current_player.initial_actors[index]
 
-
     def cycle_actors(self, player_actor_index, btn):
-        btn.current_index = (btn.current_index + 1)%len(self.actors)
+        btn.current_index = (btn.current_index + 1) % len(self.actors)
         actor = self.actors[btn.current_index]
         self.current_player.replace_initial_actor_at_i(player_actor_index, actor)
         self.current_actors_text[player_actor_index] = actor
 
-
     def set_current_player(self, player_slug):
-        self.current_player = eval(f'self.config.{player_slug}')
+        self.current_player = eval(f"self.config.{player_slug}")
         self.current_player_text = f"Current Player: {player_slug.upper()}"
         self.current_actors_text = [*self.current_player.initial_actors]
         for actor, btn in zip(self.current_player.initial_actors, self.buttons):
@@ -101,9 +131,11 @@ class PlayerConfigScreen(Screen):
     def print_debug(self):
         print(f"Config: {self.config.print_self()}")
 
+
 class ActorChoiceButton(Button):
-    text = StringProperty('initial_stuff')
+    text = StringProperty("initial_stuff")
     current_index = NumericProperty(0)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
@@ -118,18 +150,23 @@ class ActorConfigButton(Button):
 ############## LOGS PANEL ###########################
 #####################################################
 
+
 class LogScreen(BoxLayout):
     msg_list = []
 
+
 class ScrollableLog(ScrollView):
-    text = StringProperty('')
+    text = StringProperty("")
+
 
 #####################################################
 ############## STATS PANEL ##########################
 #####################################################
 
+
 class StatsPanel(Label):
     rgba = ListProperty(colors.BASIC_BLACK)
+
     def update_actor_stats(self, actor):
         self.text = log_con.show_actor_stats(actor)
 
@@ -137,6 +174,7 @@ class StatsPanel(Label):
 #####################################################
 ############## MAIN BOARD - BOTTOM MENU #############
 #####################################################
+
 
 class CreateGridButton(Button):
     def __init__(self, **kwargs):
@@ -150,7 +188,8 @@ class CreateGridButton(Button):
         t_coords = app.t_coords
         i_spaces = app.i_spaces
         actors = []
-        puzzle.create_grid(t_coords=t_coords, i_spaces=i_spaces, actors=actors)
+        puzzle.create_grid(t_coords=t_coords, i_spaces=i_spaces)
+
 
 class MinorOptionsButton(Button):
     def on_release(self):
@@ -159,17 +198,21 @@ class MinorOptionsButton(Button):
 
 class MinorOptionsBox(Factory.BoxLayout):
     commands_list = []
+
     def update_commands_list(self, commands_list):
         btn_con.minor_box_update_list(self, commands_list)
+
 
 class MajorOptionsButton(Button):
     def on_release(self):
         btn_con.handle_major_options_btns(box=self)
 
+
 class MajorOptionsBox(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         btn_con.gen_major_box_widgets(self)
+
 
 #####################################################
 ################# MAIN BOARD ########################
@@ -225,8 +268,9 @@ class PuzzleTile(ButtonBehavior, Label):
     def get_center_xy(self):
         return self.center_x, self.center_y
 
+
 class PuzzleGrid(Factory.GridLayout):
-    #Is it having too many responsabilities?
+    # Is it having too many responsabilities?
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
@@ -236,32 +280,36 @@ class PuzzleGrid(Factory.GridLayout):
         self.reset_hl_tiles()
 
         self.grid_size = self.app.grid_size
-        #initial spaces
+        # initial spaces
         self.i_spaces = self.app.i_spaces
-        #target_coords
+        # target_coords
         self.t_coords = self.app.t_coords
         self.rows = 1
         self.grid = []
         self.graph = {}
         board_con.board_clean_selected_things(board=self)
 
-        #I don't think this should be here...
+        # I don't think this should be here...
 
         self.tiles_with_lines = []
 
     def start_game(self):
-        self.game = Game(grid_size=self.grid_size, board=self,
-            ini_spaces=self.i_spaces, t_coords=self.t_coords)
+        self.game = Game(
+            grid_size=self.grid_size,
+            board=self,
+            ini_spaces=self.i_spaces,
+            t_coords=self.t_coords,
+        )
 
     def add_line(self, target_tile, x0, y0, x1, y1):
         x0, y0, x1, y1 = int(x0), int(y0), int(x1), int(y1)
         line = MoveLine(x0=x0, y0=y0, x1=x1, y1=y1)
-        #target_tile = self.grid[x1][y1]
+        # target_tile = self.grid[x1][y1]
         target_tile.add_line(line)
         self.tiles_with_lines.append(target_tile)
 
     def add_line_path(self, from_coord, to_coord):
-        if(to_coord == final_coord):
+        if to_coord == from_coord:
             return
         next_to_coord = self.movable_spaces[to_coord]["via"]
         x0, y0 = to_coord
@@ -270,7 +318,6 @@ class PuzzleGrid(Factory.GridLayout):
         next_real_xy = self.grid[x1][y1].get_center_xy()
         self.add_line(*target_real_xy, *next_real_xy)
         self.add_line_path(from_coord, next_to_coord)
-
 
     def remove_lines(self):
         for tile in self.tiles_with_lines:
@@ -303,10 +350,14 @@ class PuzzleGrid(Factory.GridLayout):
     def get_tile(self, x, y):
         return self.grid[x][y]
 
-    def create_grid(self, t_coords={}, i_spaces=[], actors=[]):
+    def create_grid(self, t_coords={}, i_spaces=[]):
         self.start_game()
-        board_con.create_grid(board=self, size=self.grid_size,
-                        t_coords=t_coords, i_spaces=i_spaces, actors=actors)
+        board_con.create_grid(
+            board=self,
+            size=self.grid_size,
+            t_coords=t_coords,
+            i_spaces=i_spaces,
+        )
 
     def select_tile(self, target_tile):
         board_con.select_tile(board=self, target_tile=target_tile)
@@ -315,7 +366,18 @@ class PuzzleGrid(Factory.GridLayout):
         board_con.pass_turn(board=self)
 
     def set_selected_action(self, action_str):
-        self.selected_action  = action_str
+        self.selected_action = action_str
+
+    def endgame_popup(self, lost_players):
+        btn = Button(text=f"Player(s) Lost: {[p.name for p in lost_players]}")
+        pop = Popup(
+            content=btn, auto_dismiss=True, size=(400, 400), size_hint=(None, None), title="ENDGAME"
+        )
+        btn.bind(on_release=self.goto_main_menu)
+        pop.open()
+    
+    def goto_main_menu(self, *args):
+        self.app.screen_manager.current = 'main_menu_screen'
 
 class MoveLine(Widget):
     def __init__(self, **kwargs):
@@ -330,7 +392,9 @@ class MoveLine(Widget):
             Line(points=[x0, y0, x1, y1], width=2)
 
 
-# MAIN APP 
+#####################################################
+################# MAIN APP ##########################
+#####################################################
 class GameApp(App):
     def build(self):
         return ScreenMaster()
@@ -357,5 +421,5 @@ class GameApp(App):
             pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     GameApp().run()

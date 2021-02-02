@@ -35,10 +35,11 @@
                 orientation:'vertical'
                 Label:
                     text: root.current_actors_text[0]
-                Label:
-                    text: root.current_actors_text[1]
-                Label:
-                    text: root.current_actors_text[2]
+                # FIXME: needs to be refactored to be added dynamically, just like options buttons
+                #Label:
+                #    text: root.current_actors_text[1]
+                #Label:
+                #    text: root.current_actors_text[2]
 
             BoxLayout:
                 orientation: 'vertical'
@@ -47,11 +48,12 @@
                     id: actor_choice_btn_1
                     text: root.actors[self.current_index]
                     on_release: root.cycle_actors(0, self)
-                ActorChoiceButton:
-                    id: actor_choice_btn_2
-                    text: root.actors[self.current_index]
-                    on_release: root.cycle_actors(1, self)
-                ActorChoiceButton:
-                    id: actor_choice_btn_3
-                    text: root.actors[self.current_index]
-                    on_release: root.cycle_actors(2, self)
+                # FIXME: needs to be refactored to be added dynamically, just like options buttons
+                #ActorChoiceButton:
+                #    id: actor_choice_btn_2
+                #    text: root.actors[self.current_index]
+                #    on_release: root.cycle_actors(1, self)
+                #ActorChoiceButton:
+                #    id: actor_choice_btn_3
+                #    text: root.actors[self.current_index]
+                #    on_release: root.cycle_actors(2, self)
