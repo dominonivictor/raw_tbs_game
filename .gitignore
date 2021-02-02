@@ -6,3 +6,4 @@ htmlcov/
 .coverage
 conftest.py
 *__init__.py*
+*.pyc
