@@ -113,7 +113,7 @@ def select_tile_normal_state(app, board, target_tile):
     #checking if tile has actor
     actor_command_list = actor.list_commands() if actor else ""
 
-    app.root.ids.stats_panel.update_actor_stats(actor)
+    app.root.ids.stats_panel.update_actors_stats(actor)
     app.root.ids.minor_options.update_commands_list(actor_command_list)
 
 def select_tile_targeting_state(board, target_tile):
@@ -270,7 +270,7 @@ def highlight_movable_spaces(actor, start_tile):
     #TODO This needs to be generic to any amount of tiles and color
     app = App.get_running_app()
 
-    n_moves = actor.get_spd()
+    n_moves = actor.stats.sp
     board = app.root.ids.puzzle
     game_grid = board.game.grid
 

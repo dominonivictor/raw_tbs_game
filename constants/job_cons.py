@@ -10,7 +10,7 @@ THIEF ={
     "name": "Thief", 
     "category": "DPS Utility", 
     "commands_ids": ["copy_cat"], 
-    "status_ids": ["spd_up"],
+    "status_ids": ["ap_up"],
 }
    
 HUNTER = {
@@ -31,5 +31,5 @@ MERCHANT = {
     "name": "Merchant", 
     "category": "Utility DPS", 
     "commands_ids": ["mixn"], 
-    "status_ids": ["income_up"],
+    "status_ids": ["spd_up"],
 }

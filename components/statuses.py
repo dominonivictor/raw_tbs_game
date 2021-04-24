@@ -200,7 +200,7 @@ def get_status_obj_and_params(id_: str):
         "def_up": [Buff, cons.DEF_UP],
         "spd_up": [Buff, cons.SPD_UP],
         "max_hp_up": [Buff, cons.MAX_HP_UP],
-        "income_up": [Buff, cons.INCOME_UP],
+        "ap_up": [Buff, cons.AP_UP],
         
         "regen": [HoT, cons.REGENERATING],
         "poisoned": [DoT, cons.POISONED],

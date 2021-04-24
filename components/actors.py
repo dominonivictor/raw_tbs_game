@@ -1,4 +1,5 @@
 from components.statuses import StatusManager
+from components.stats import StatsManager
 from components.command_list import CommandList
 from game_eye import GameEye
 
@@ -9,14 +10,8 @@ class Actor():
         self.letter = kwargs.get("letter", "X")
         self.kingdom = kwargs.get("kingdom", "reptalia")
         self.animal = kwargs.get("animal", "fox")
-        self.hp_stat = kwargs.get("hp_stat", 10)
-        self.max_hp_stat = kwargs.get("hp_stat", 10)
-        self.atk_stat = kwargs.get("atk_stat", 2)
-        self.def_stat = kwargs.get("def_stat", 0)
-        self.spd_stat = kwargs.get("spd_stat", 4)
-        self.income_stat = kwargs.get("income_stat", 2)
-
-        self.statuses = StatusManager()
+        self.stats = StatsManager(stats=kwargs.get("stats")) 
+        self.statuses = StatusManager() #same thing as passives manager, worth merging i think
         self.statuses.owner = self
 
         commands_ids = kwargs.get("commands_ids", [])
@@ -36,12 +31,14 @@ class Actor():
 
         self.game_eye = GameEye.instance()
 
+    # I think these could be called directly... no need for extra layers...
     def show_statuses(self):
         return self.statuses.show_statuses()
 
     def show_commands(self):
         return self.commands.show_commands()
         
+    # maybe do the same with these? do we really need owner self and stuff...
     def learn_job(self, job):
         job.learn(owner=self)
         
@@ -56,14 +53,13 @@ class Actor():
         Name: {self.name}
         Animal: {self.animal}
         Kingdom: {self.kingdom}
-        HP: {self.get_hp()}/{self.get_max_hp()}
-        ATK: {self.get_atk()}
-        DEF: {self.get_def()}
-        SPD: {self.get_spd()}
-        In: {self.get_inc()}
+        HP: {self.stats.hp}/{self.stats.max_hp}
+        ATK: {self.stats.at}
+        DEF: {self.stats.df}
+        SPD: {self.stats.sp}
         Statuses: {self.show_statuses()}
         Commands: {self.show_commands()}
-        x, y: {self.get_x()}, {self.get_y()}
+        x, y: {self.x}, {self.y}
         job: {self.job.get_name() if self.job else "Jobless"}
         equip: {self.equip.show_equip_stats() if self.equip else "No Equip"}
         """
@@ -85,14 +81,19 @@ class Actor():
         if self.job: self.job.pass_time()
 
     def take_damage(self, value):
-        hp = self.get_hp()
-        self.set_hp(hp - value if hp - value >= 0 else 0)
+        # where is the thing calculated? def and atk bonus and stuff? in Command?
+        hp = self.stats.hp
+        # would a survive with one 1 hp/tryndamere ult kind of passive be here? 
+        # maybe it could, but it would be better if a combat handler did it.
+        # something like: self.combat.calculate_take_damage(value)
+        self.stats.hp = hp - value if hp - value >= 0 else 0
 
     def heal_damage(self, value):
-        hp = self.get_hp()
-        max_hp = self.get_max_hp()
-        final_value = value + hp if hp + value <= max_hp else max_hp 
-        self.set_hp(final_value)
+        hp = self.stats.hp
+        stats_max_hp = self.stats.max_hp
+        final_value = value + hp if hp + value <= stats_max_hp else stats_max_hp 
+        # same thing from function above here!
+        self.stats.hp = final_value
 
     def list_commands(self):
         return self.commands.list
@@ -102,11 +103,13 @@ class Actor():
             if comm.id == command_id:
                 return True
         
-        else: return False
+        return False
 
     def get_command_by_id(self, id_):
         return self.commands.get_command_by_id(id_)
 
+    # TODO: think better about these statuses functions... 
+    # they really should be in the manager... or have a better API
     def list_statuses(self):
         return self.statuses.list
 
@@ -115,62 +118,16 @@ class Actor():
             if status.id == status_id:
                 return True
 
-        else: return False
+        return False
     
     def get_status(self, status_id):
         for status in self.statuses.list:
             if status.id == status_id:
                 return status
+        return None
 
-        else: return None
 
-    def get_hp(self):
-        return self.hp_stat
-
-    def set_hp(self, value):
-        self.hp_stat = value
-
-    def get_max_hp(self):
-        return self.max_hp_stat
-
-    def set_max_hp(self, value):
-        self.max_hp_stat = value
-
-    def get_atk(self):
-        return self.atk_stat
-
-    def set_atk(self, value):
-        self.atk_stat = value
-
-    def get_def(self):
-        return self.def_stat
-
-    def set_def(self, value):
-        self.def_stat = value
-
-    def get_spd(self):
-        return self.spd_stat
-
-    def set_spd(self, value):
-        self.spd_stat = value
-
-    def get_inc(self):
-        return self.income_stat
-
-    def set_inc(self, value):
-        self.income_stat = value
 
     def set_pos(self, x, y):
-        self.set_x(x)
-        self.set_y(y)
-
-    def set_x(self, x):
         self.x = x
-
-    def set_y(self, y):
         self.y = y
-    def get_x(self):
-        return self.x
-
-    def get_y(self):
-        return self.y

@@ -15,7 +15,7 @@ ids:
     "def_up",
     "spd_up",
     "max_hp_up",
-    "income_up",
+    "ap_up",
     "regen",
     "poisoned",
     "burned",
@@ -82,17 +82,17 @@ MAX_HP_UP = {
     "timer": 2,
     "value": 2,
     "category": "attr_buff",
-    "attr": "max_hp_stat",
+    "attr": "max_hp",
 }
 
-INCOME_UP = {
-    "id": "income_up",
-    "name": "Income Up",
+AP_UP = {
+    "id": "ap_up",
+    "name": "AP Up",
     "base_name": "buff",
     "timer": 2,
-    "value": 2,
+    "value": 1,
     "category": "attr_buff",
-    "attr": "income_stat",
+    "attr": "max_ap",
 }
 
 ########################## DMG/HEAL BUFFS ##########################

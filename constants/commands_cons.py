@@ -92,6 +92,7 @@ SUN_CHARGE = {
         {"id": "atk_up", "value": 1, "timer": mid_timer,},
         {"id": "def_up", "value": 1, "timer": mid_timer,},
         {"id": "spd_up", "value": 1, "timer": mid_timer,},
+        {"id": "ap_up", "value": 1, "timer": mid_timer,},
     ],
     "timer": mid_timer,
     "description": "Sun Charge increases all stats by 1 for 1 turn.",
@@ -112,7 +113,7 @@ GOLDEN_EGG = {
         {"id": "atk_up", "value": 2, "timer": 2,},
         {"id": "def_up", "value": 2, "timer": 2,},
         {"id": "spd_up", "value": 2, "timer": 2,},
-        {"id": "income_up", "value": 2, "timer": 2,},
+        {"id": "ap_up", "value": 1, "timer": 2,},
     ],
 
     "max_range": 1,

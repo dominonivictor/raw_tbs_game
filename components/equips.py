@@ -14,13 +14,9 @@ class Equip():
         self.owner = kwargs.get("owner", None)
 
         #need to get this ready, not process it here...
-        from components.statuses import get_new_statuses_by_ids
         status_list = kwargs.get("statuses", [])
         #all of statuses here will be passives, so the timer will be set to -1 (infinite until removed)
-        self.passives = PassivesList()
-        passives = get_new_statuses_by_ids(status_list=status_list)
-        for passive in passives:
-            self.passives.add_passive(passive)
+        self.passives = PassivesList(status_list=status_list)
 
         commands_ids = kwargs.get("commands_ids", [])
         self.commands = []
