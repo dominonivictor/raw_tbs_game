@@ -1,9 +1,9 @@
 
 base_hp = 25
-base_atk = 3
-base_def = 1
-base_spd = 4
-base_income = 1
+base_ap = 1
+base_at = 3
+base_df = 1
+base_sp = 4
 
 hp_plus = 5
 hp_minus = -3
@@ -27,16 +27,21 @@ commands_ids:
     "vamp_bite",
     "speed_up",
 '''
-creature_stats = {
+actors_stats = {
     "f":{
+        "id": "fox",
         "animal": "fox",
         "letter": "F",
         "name": "Rogue",
-        "hp_stat": base_hp + hp_minus,
-        "atk": base_atk + atk_plus,
-        "def": base_def,
-        "spd": base_spd,
-        "income": base_income,
+        "stats": {
+            "max_hp": base_hp,
+            "hp": base_hp,
+            "max_ap": base_ap,
+            "ap": base_ap,
+            "at": base_at,
+            "df": base_df,
+            "sp": base_sp,
+        },
         "kingdom": "mamalia",
         "commands_ids":[
             "attack",
@@ -45,14 +50,19 @@ creature_stats = {
         ]
     },
     "t":{
+        "id": "turtle",
         "animal": "turtle",
         "letter": "T",
         "name": "Kami",
-        "hp_stat": base_hp + hp_plus,
-        "atk": base_atk + atk_minus,
-        "def": base_def + def_plus,
-        "spd": base_spd + spd_minus,
-        "income": base_income,
+        "stats": {
+            "max_hp": base_hp,
+            "hp": base_hp,
+            "max_ap": base_ap,
+            "ap": base_ap,
+            "at": base_at,
+            "df": base_df,
+            "sp": base_sp,
+        },
         "kingdom": "reptalia",
         "commands_ids":[
             "waterball",
@@ -61,14 +71,19 @@ creature_stats = {
         ]
     },
     "c":{
+        "id": "chicken",
         "animal": "chicken",
         "letter": "C",
         "name": "Bugh Cohk",
-        "hp_stat": base_hp + hp_minus,
-        "atk": base_atk + atk_plus,
-        "def": base_def + def_minus,
-        "spd": base_spd + spd_plus,
-        "income": base_income,
+        "stats": {
+            "max_hp": base_hp,
+            "hp": base_hp,
+            "max_ap": base_ap,
+            "ap": base_ap,
+            "at": base_at,
+            "df": base_df,
+            "sp": base_sp,
+        },
         "kingdom": "aves",
         "commands_ids":[
             "attack",
@@ -77,14 +92,19 @@ creature_stats = {
         ]
     },
     "a":{
+        "id": "alligator",
         "animal": "alligator",
         "letter": "A",
         "name": "Shrek",
-        "hp_stat": base_hp,
-        "atk": base_atk + atk_plus,
-        "def": base_def,
-        "spd": base_spd + spd_minus,
-        "income": base_income,
+        "stats": {
+            "max_hp": base_hp,
+            "hp": base_hp,
+            "max_ap": base_ap,
+            "ap": base_ap,
+            "at": base_at,
+            "df": base_df,
+            "sp": base_sp,
+        },
         "kingdom": "reptalia",
         "commands_ids":[
             "attack",
@@ -93,14 +113,19 @@ creature_stats = {
         ]
     },
     "p":{
+        "id": "platypus",
         "animal": "platypus",
         "letter": "P",
         "name": "Perry",
-        "hp_stat": base_hp + hp_minus,
-        "atk": base_atk + atk_plus,
-        "def": base_def + def_plus,
-        "spd": base_spd + spd_minus,
-        "income": base_income,
+        "stats": {
+            "max_hp": base_hp,
+            "hp": base_hp,
+            "max_ap": base_ap,
+            "ap": base_ap,
+            "at": base_at,
+            "df": base_df,
+            "sp": base_sp,
+        },
         "kingdom": "mamalia",
         "commands_ids":[
             "attack",
@@ -109,14 +134,19 @@ creature_stats = {
         ]
     },
     "o":{
+        "id": "owl",
         "animal": "owl",
         "letter": "O",
         "name": "Owrly",
-        "hp_stat": base_hp,
-        "atk": base_atk + atk_plus,
-        "def": base_def + def_minus,
-        "spd": base_spd,
-        "income": base_income,
+        "stats": {
+            "max_hp": base_hp,
+            "hp": base_hp,
+            "max_ap": base_ap,
+            "ap": base_ap,
+            "at": base_at,
+            "df": base_df,
+            "sp": base_sp,
+        },
         "kingdom": "aves",
         "commands_ids":[
             "attack",
@@ -131,10 +161,15 @@ creature_stats = {
         "animal": ,
         "letter": ,
         "name": "",
-        "hp_stat": ,
-        "atk": ,
-        "def": ,
-        "spd": ,
+        "stats": {
+            "max_hp": base_hp,
+            "hp": base_hp,
+            "max_ap": base_ap,
+            "ap": base_ap,
+            "at": base_at,
+            "df": base_df,
+            "sp": base_sp,
+        }
         "kingdom": "",
         "commands_ids":[
             "toxic_shot",

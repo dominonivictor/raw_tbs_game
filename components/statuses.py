@@ -67,7 +67,6 @@ class ComponentStatusList():
         self.add_statuses_from_raw_ids(raw_statuses_ids=self.raw_statuses_ids)
 
     def add_statuses_from_raw_ids(self, raw_statuses_ids):
-        from components.statuses import get_new_statuses_by_ids
         self.list = get_new_statuses_by_ids(status_list=raw_statuses_ids)
 
     def add_statuses(self, statuses: list):
@@ -82,11 +81,18 @@ class ComponentStatusList():
             status.owner, status.target = self.owner, self.target
 
 class PassivesList():
-    def __init__(self):
+    def __init__(self, **kwargs):
+        self.status_list = kwargs.get("status_list")
+        self.add_passives(self.status_list)
         self.list = []
 
     def add_passive(self, passive):
         self.list.append(passive)
+
+    def add_passives(self, status_list: list):
+        passives = get_new_statuses_by_ids(status_list=status_list)
+        for p in passives:
+            self.add_passive(p) 
 
 #########################################################################################
 ############################ MOTHER STATUS ##############################################
@@ -102,7 +108,8 @@ class Status():
         self.owner = kwargs.get("owner", None)
         self.target = kwargs.get("target", None)
         self.category = kwargs.get("category", "Deep")
-        self.statuses = kwargs.get("statuses", [self]) if kwargs.get("statuses", []) else [self]
+        statuses = kwargs.get("statuses", [])
+        self.statuses = statuses if statuses else [self]
 
     def apply_buff(self):
         pass
@@ -156,12 +163,11 @@ class Buff(Status):
 
     def apply_buff(self):
         current_value = getattr(self.owner, self.attr)
-        setattr(self.owner, self.attr, current_value + self.value)
+        setattr(self.owner.stat, self.attr, current_value + self.value)
 
     def remove_buff(self):
-
         current_value = getattr(self.owner, self.attr)
-        setattr(self.owner, self.attr, current_value - self.value)
+        setattr(self.owner.stat, self.attr, current_value - self.value)
         self.owner = None
 
     def pass_time(self):

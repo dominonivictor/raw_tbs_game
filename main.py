@@ -31,8 +31,8 @@ class ScrollableLog(ScrollView):
 
 class StatsPanel(Label):
     rgba = ListProperty(colors.BASIC_BLACK)
-    def update_actor_stats(self, actor):
-        self.text = log_con.show_actor_stats(actor)
+    def update_actors_stats(self, actor):
+        self.text = log_con.show_actors_stats(actor)
 
 class CreateGridButton(Button):
     def __init__(self, **kwargs):

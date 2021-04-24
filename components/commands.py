@@ -95,8 +95,8 @@ class Command():
         return execution_dict
 
     def calculate_final_dmg_value(self, is_raw=False):
-        actor_atk_stat = self.owner.get_atk()
-        bonuses = actor_atk_stat - self.target.get_def() if not is_raw else 0
+        actor_atk_stat = self.owner.atk_stat
+        bonuses = actor_atk_stat - self.target.def_stat if not is_raw else 0
         final_value =  self.value + bonuses
         if final_value < 0: final_value = 0
 
@@ -233,11 +233,11 @@ class Multiply(Command):
             "animal": f"small {parent.animal}",
             "letter": parent.letter.lower(),
             "kingdom": parent.kingdom,
-            "hp_stat": int(parent.get_hp()*self.ratio),
-            "atk_stat": int(parent.get_atk()*(self.ratio**2)),
-            "def_stat": int(parent.get_def()*(self.ratio**2)),
-            "spd_stat": int(parent.get_spd()*self.ratio),
-            "income_stat": int(parent.get_inc()*self.ratio),
+            "hp": int(parent.stat.max_hp*self.ratio),
+            "ap": int(parent.stat.max_ap*self.ratio),
+            "at": int(parent.stat.at*(self.ratio**2)),
+            "de": int(parent.stat.de*(self.ratio**2)),
+            "sp": int(parent.stat.sp*self.ratio),
             "commands": parent.commands.base_list,
             "x": x,
             "y": y,
@@ -303,6 +303,7 @@ class Mixn(Command):
         super().__init__(**kwargs)
 
     def execute(self):
+        # TODO: instead of this do: if not self.target.is_buffable / mixable / ?
         if not self.target.equip:
             return {"msg": "Target doesn't have an equip to mix with"}
         from components.elements import get_new_element_by_id
@@ -395,11 +396,10 @@ def instaciate_commands_dict(**kwargs):
         'power_up': Command(**{**cons.POWER_UP, **kwargs}),
         'defense_up': Command(**{**cons.DEFENSE_UP, **kwargs}),
         'speed_up': Command(**{**cons.SPEED_UP, **kwargs}),
-        # 'income_up': Command(**{**cons.INCOME_UP, **kwargs}),
-        # 'max_hp_up': Command(**{**cons.MAX_HP_UP, **kwargs}),
         'regen': Command(**{**cons.REGEN, **kwargs}),
 
         'waterball': AOE(**{**cons.WATERBALL, **kwargs}),
+        #TODO: add fireball
     }
     return commands_dict
 

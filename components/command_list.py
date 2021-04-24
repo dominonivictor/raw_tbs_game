@@ -13,8 +13,7 @@ class CommandList():
 
     def init(self):
         from components.commands import get_new_command_by_id
-        commands = [get_new_command_by_id(id=comm_id) for comm_id in
-        self.raw_commands_ids]
+        commands = [get_new_command_by_id(id=comm_id) for comm_id in self.raw_commands_ids]
         for command in commands:
             self.add_command(command, "base")
         self.add_kingdom_command()

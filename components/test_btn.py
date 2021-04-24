@@ -74,7 +74,7 @@
 #         board = app.puzzle
 #         actor = Actor()
 #         actor.stats.sp = 2
-#         initial_space = INITIAL_SPACE_1
+#         initial_spaces = INITIAL_SPACE_1
 #         map_grid = TEST_MAP_MOVE_SPACES_1
 
 #         board.create_grid(grid=map_grid, initial_spaces=initial_spaces, actors=[actor])

@@ -9,7 +9,7 @@ def special_status_handler(command):
     if "stunned" in owner_status_base_names: 
         return stunned_handler(command) 
     if "perfect_counter_stance" in target_status_base_names: 
-        perfect_counter_stance_handler(command)
+        return perfect_counter_stance_handler(command)
 
     return {}
 
@@ -22,4 +22,13 @@ def stunned_handler(command):
     }
 
 def perfect_counter_stance_handler(command):
+    owner, target = command.owner, command.target
+    command.owner, command.target = target, owner
+
     command.set_target(command.owner)
+    return {
+        'msg': f"{owner.name} counters command from {target.name}!",
+        'valid_action': True,
+        'result': {"attack": "no attack", "final_value": 0},
+        'should_continue': True,
+    }
