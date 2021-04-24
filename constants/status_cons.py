@@ -52,7 +52,7 @@ ATK_UP = {
     "timer": 2,
     "value": 2,
     "category": "attr_buff",
-    "attr": "atk_stat",
+    "attr": "at",
 }
 
 DEF_UP = {
@@ -62,7 +62,7 @@ DEF_UP = {
     "timer": 2,
     "value": 2,
     "category": "attr_buff",
-    "attr": "def_stat",
+    "attr": "df",
 }
 
 SPD_UP = {
@@ -72,7 +72,7 @@ SPD_UP = {
     "timer": 2,
     "value": 2,
     "category": "attr_buff",
-    "attr": "spd_stat",
+    "attr": "sp",
 }
 
 MAX_HP_UP = {
@@ -88,6 +88,16 @@ MAX_HP_UP = {
 AP_UP = {
     "id": "ap_up",
     "name": "AP Up",
+    "base_name": "buff",
+    "timer": 2,
+    "value": 1,
+    "category": "attr_buff",
+    "attr": "max_ap",
+}
+
+MAX_AP_UP = {
+    "id": "max_ap_up",
+    "name": "Max AP Up",
     "base_name": "buff",
     "timer": 2,
     "value": 1,

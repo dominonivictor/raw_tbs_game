@@ -82,19 +82,19 @@ def test_vamp_bite(actor):
 
 def test_sun_charge(actor):
     #TODO test knows too much of actor and command internals
-    atk_before = actor.atk_stat
-    def_before = actor.def_stat
+    atk_before = actor.stats.at
+    def_before = actor.stats.df
     spd_before = actor.stats.sp
     sun_charge = actor.get_command_by_id("sun_charge")
     sun_charge.set_target(actor)
     sun_charge.execute()
 
-    assert actor.atk_stat > atk_before and actor.def_stat > def_before and actor.stats.sp > spd_before
+    assert actor.stats.at > atk_before and actor.stats.df > def_before and actor.stats.sp > spd_before
 
 def test_golden_egg(actor):
     golden_egg = actor.get_command_by_id("golden_egg")
     def get_stats_sum(actor):
-        stats_sum = (actor.hp_stat + actor.atk_stat + actor.def_stat +
+        stats_sum = (actor.hp_stat + actor.stats.at + actor.stats.df +
                actor.stats.sp + actor.income_stat)
         return stats_sum
 
@@ -181,13 +181,13 @@ def test_shield_bash(actor):
     assert hp_before > actor.hp_stat
 
 def test_rage_soup(actor):
-    atk_before = actor.atk_stat
-    def_before = actor.def_stat
+    atk_before = actor.stats.at
+    def_before = actor.stats.df
     rage_soup = actor.get_command_by_id("rage")
     rage_soup.set_target(actor)
     rage_soup.execute()
 
-    assert actor.atk_stat > atk_before and actor.def_stat < def_before
+    assert actor.stats.at > atk_before and actor.stats.df < def_before
 
 def test_paralize_shot(actor):
     para_shot = actor.get_command_by_id("paralize_shot")
@@ -203,29 +203,29 @@ command but are also testing the status behavior... these should be separated!
 def test_power_up(actor):
     #TODO test knows too much of statuses internals
     power_up = actor.get_command_by_id("power_up")
-    actor_atk_before = actor.atk_stat
+    actor_atk_before = actor.stats.at
     power_up.set_target(actor)  #this is done by the tile selection
     value = power_up.get_statuses_values(pos=0)
     timer = power_up.get_timer()
     power_up.execute()
 
-    assert actor_atk_before == actor.atk_stat - value
+    assert actor_atk_before == actor.stats.at - value
     for _ in range(timer):
         actor.pass_time()
-    assert actor_atk_before == actor.atk_stat
+    assert actor_atk_before == actor.stats.at
 
 def test_defense_up(actor):
     defense_up = actor.get_command_by_id("defense_up")
-    actor_def_before = actor.def_stat
+    actor_def_before = actor.stats.df
     defense_up.set_target(actor)  #this is done by the tile selection
     value = defense_up.get_statuses_values(pos=0)
     timer = defense_up.get_timer()
     defense_up.execute()
 
-    assert actor_def_before == actor.def_stat - value
+    assert actor_def_before == actor.stats.df - value
     for _ in range(timer):
         actor.pass_time()
-    assert actor_def_before == actor.def_stat
+    assert actor_def_before == actor.stats.df
 
 def test_speed_up(actor):
     speed_up = actor.get_command_by_id("speed_up")

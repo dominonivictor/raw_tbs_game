@@ -95,8 +95,8 @@ class Command():
         return execution_dict
 
     def calculate_final_dmg_value(self, is_raw=False):
-        actor_atk_stat = self.owner.atk_stat
-        bonuses = actor_atk_stat - self.target.def_stat if not is_raw else 0
+        actor_atk_stat = self.owner.stats.at
+        bonuses = actor_atk_stat - self.target.stats.df if not is_raw else 0
         final_value =  self.value + bonuses
         if final_value < 0: final_value = 0
 
@@ -233,11 +233,11 @@ class Multiply(Command):
             "animal": f"small {parent.animal}",
             "letter": parent.letter.lower(),
             "kingdom": parent.kingdom,
-            "hp": int(parent.stat.max_hp*self.ratio),
-            "ap": int(parent.stat.max_ap*self.ratio),
-            "at": int(parent.stat.at*(self.ratio**2)),
-            "de": int(parent.stat.de*(self.ratio**2)),
-            "sp": int(parent.stat.sp*self.ratio),
+            "hp": int(parent.stats.max_hp*self.ratio),
+            "ap": int(parent.stats.max_ap*self.ratio),
+            "at": int(parent.stats.at*(self.ratio**2)),
+            "de": int(parent.stats.de*(self.ratio**2)),
+            "sp": int(parent.stats.sp*self.ratio),
             "commands": parent.commands.base_list,
             "x": x,
             "y": y,

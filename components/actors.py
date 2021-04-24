@@ -1,5 +1,5 @@
 from components.statuses import StatusManager
-from components.stats import StatsManager
+from components.stats import Stats
 from components.command_list import CommandList
 from game_eye import GameEye
 
@@ -10,7 +10,7 @@ class Actor():
         self.letter = kwargs.get("letter", "X")
         self.kingdom = kwargs.get("kingdom", "reptalia")
         self.animal = kwargs.get("animal", "fox")
-        self.stats = StatsManager(stats=kwargs.get("stats")) 
+        self.stats = Stats(stats=kwargs.get("stats")) 
         self.statuses = StatusManager() #same thing as passives manager, worth merging i think
         self.statuses.owner = self
 

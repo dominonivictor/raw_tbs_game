@@ -162,12 +162,12 @@ class Buff(Status):
         self.attr = kwargs.get("attr")
 
     def apply_buff(self):
-        current_value = getattr(self.owner, self.attr)
-        setattr(self.owner.stat, self.attr, current_value + self.value)
+        current_value = getattr(self.owner.stats, self.attr)
+        setattr(self.owner.stats, self.attr, current_value + self.value)
 
     def remove_buff(self):
-        current_value = getattr(self.owner, self.attr)
-        setattr(self.owner.stat, self.attr, current_value - self.value)
+        current_value = getattr(self.owner.stats, self.attr)
+        setattr(self.owner.stats, self.attr, current_value - self.value)
         self.owner = None
 
     def pass_time(self):
