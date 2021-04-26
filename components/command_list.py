@@ -1,6 +1,6 @@
 
 
-class CommandList():
+class CommandsManager():
     def __init__(self, **kwargs):
         self.owner = kwargs.get("owner")
         self.base_list = []
@@ -8,12 +8,12 @@ class CommandList():
         self.equip_list = []
         self.job_list = []
         self.list = []
-        self.raw_commands_ids = kwargs.get("raw_commands_ids", [])
+        self.commands_ids = kwargs.get("commands_ids", [])
         self.init()
 
     def init(self):
         from components.commands import get_new_command_by_id
-        commands = [get_new_command_by_id(id=comm_id) for comm_id in self.raw_commands_ids]
+        commands = [get_new_command_by_id(id=comm_id) for comm_id in self.commands_ids]
         for command in commands:
             self.add_command(command, "base")
         self.add_kingdom_command()

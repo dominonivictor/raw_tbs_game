@@ -1,6 +1,7 @@
 from components.statuses import StatusManager
 from components.stats import Stats
-from components.command_list import CommandList
+from components.command_list import CommandsManager
+from components.combat import CombatComponent
 from game_eye import GameEye
 
 
@@ -10,12 +11,15 @@ class Actor():
         self.letter = kwargs.get("letter", "X")
         self.kingdom = kwargs.get("kingdom", "reptalia")
         self.animal = kwargs.get("animal", "fox")
-        self.stats = Stats(stats=kwargs.get("stats")) 
-        self.statuses = StatusManager() #same thing as passives manager, worth merging i think
-        self.statuses.owner = self
 
-        commands_ids = kwargs.get("commands_ids", [])
-        self.commands = CommandList(owner=self, raw_commands_ids=commands_ids)
+        self.combat = CombatComponent(**kwargs)
+
+        # self.stats = Stats(stats=kwargs.get("stats")) 
+        # self.statuses = StatusManager() #same thing as passives manager, worth merging i think
+        # self.statuses.owner = self
+        # commands_ids = kwargs.get("commands_ids", [])
+        # self.commands = CommandsManager(owner=self, commands_ids=commands_ids)
+
         self.job = kwargs.get("job", None)
         if self.job:
             self.learn_job(job)
@@ -24,12 +28,33 @@ class Actor():
         if self.equip:
             self.add_equip(self.equip)
 
-        self.x = kwargs.get("x", 0)
-        self.y = kwargs.get("y", 0)
+        # self.x = kwargs.get("x", 0)
+        # self.y = kwargs.get("y", 0)
         self.has_moved = False
         self.has_acted = False
 
         self.game_eye = GameEye.instance()
+
+    @property
+    def stats(self):
+        return self.combat.stats
+
+    @property
+    def statuses(self):
+        return self.combat.statuses
+
+    @property
+    def commands(self):
+        return self.combat.commands
+
+    @property
+    def x(self):
+        return self.combat.coords.x
+
+    @property
+    def y(self):
+        return self.combat.coords.y
+     
 
     # I think these could be called directly... no need for extra layers...
     def show_statuses(self):
@@ -125,8 +150,6 @@ class Actor():
             if status.id == status_id:
                 return status
         return None
-
-
 
     def set_pos(self, x, y):
         self.x = x
